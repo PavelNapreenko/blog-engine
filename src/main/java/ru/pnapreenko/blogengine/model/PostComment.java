@@ -1,64 +1,49 @@
 package ru.pnapreenko.blogengine.model;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import javax.persistence.*;
-import java.sql.Date;
-import java.util.Objects;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "post_comments")
-@ToString
-@Getter
-@Setter
-@RequiredArgsConstructor
-public class PostComment {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id", nullable = false)
-    private Integer commentId;
-
-    @Column(name = "parent_id")
-    private Integer parentCommentId;
-
-    @Column(name = "post_id", nullable = false, insertable = false, updatable = false)
-    private Integer postCommentId;
-
-    @Column(name = "user_id", nullable = false, insertable = false, updatable = false)
-    private Integer userCommentId;
-
-    @Column(name = "time", nullable = false)
-    private Date commentTime;
-
-    @Column(name = "text", nullable = false)
-    private String commentText;
-
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinColumn(name = "post_id", referencedColumnName = "id",
-    foreignKey = @ForeignKey(name = "post"))
-    private Post post;
+@Data
+@NoArgsConstructor(force = true)
+@EqualsAndHashCode(callSuper = true, of = {"text", "time"})
+@ToString(callSuper = true, of = {"text", "user", "time"})
+public class PostComment extends AbstractEntity {
 
     @ManyToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "id",
-    foreignKey = @ForeignKey(name = "user"))
+    @JoinColumn(name = "parent_id", referencedColumnName = "id")
+    private PostComment parentComment;
+
+    @NotNull
+    @OneToMany(mappedBy = "parentComment", fetch = FetchType.LAZY, orphanRemoval = true)
+    private final Set<PostComment> childComments = new HashSet<>();
+
+    @NotNull
+    @ManyToOne(cascade = CascadeType.MERGE, optional = false)
+    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false, updatable = false)
     private User user;
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        PostComment that = (PostComment) o;
-        return getCommentId().equals(that.getCommentId()) && Objects.equals(getParentCommentId(), that.getParentCommentId())
-                && getPostCommentId().equals(that.getPostCommentId()) && getUserCommentId().equals(that.getUserCommentId())
-                && getCommentTime().equals(that.getCommentTime()) && getCommentText().equals(that.getCommentText());
-    }
+    @NotNull
+    @ManyToOne(cascade = CascadeType.MERGE, optional = false)
+    @JoinColumn(name = "post_id", referencedColumnName = "id", nullable = false, updatable = false)
+    private Post post;
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(getCommentId(), getParentCommentId(), getPostCommentId(), getUserCommentId(), getCommentTime(), getCommentText());
+    @NotNull
+    @Column(nullable = false)
+    private Date time;
+
+    @NotBlank
+    @Column(columnDefinition = "TEXT", nullable = false)
+    private String text;
+
     }
-}

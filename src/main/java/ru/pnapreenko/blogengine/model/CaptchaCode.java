@@ -1,47 +1,30 @@
 package ru.pnapreenko.blogengine.model;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.sql.Date;
-import java.util.Objects;
+import javax.validation.constraints.NotNull;
+import java.util.Date;
 
 @Entity
 @Table(name = "captcha_codes")
-@ToString
-@Getter
-@Setter
-@RequiredArgsConstructor
-public class CaptchaCode {
+@Data
+@NoArgsConstructor(force = true)
+@AllArgsConstructor
+public class CaptchaCode extends AbstractEntity{
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id", nullable = false)
-    private Integer captchaId;
+    @NotNull
+    @Column(nullable = false)
+    @Temporal(TemporalType.DATE)
+    private Date time;
 
-    @Column(name = "time", nullable = false)
-    private Date captchaGeneratedTime;
+    @NotNull
+    @Column(columnDefinition = "TINYTEXT", nullable = false)
+    private String code;
 
-    @Column(name = "code", nullable = false)
-    private Short captchaViewCode;
-
-    @Column(name = "secret_code", nullable = false)
-    private Short secretCode;
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        CaptchaCode that = (CaptchaCode) o;
-        return getCaptchaId().equals(that.getCaptchaId()) && getCaptchaGeneratedTime().equals(that.getCaptchaGeneratedTime())
-                && getCaptchaViewCode().equals(that.getCaptchaViewCode()) && getSecretCode().equals(that.getSecretCode());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getCaptchaId(), getCaptchaGeneratedTime(), getCaptchaViewCode(), getSecretCode());
-    }
+    @NotNull
+    @Column(name = "secret_code", columnDefinition = "TINYTEXT", nullable = false)
+    private String secretCode;
 }

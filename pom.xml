@@ -12,7 +12,7 @@
 	<artifactId>blog-engine</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>blog-engine</name>
-	<description>Diplom project for Skillbox</description>
+	<description>Graduate work project for Skillbox</description>
 	<properties>
 		<java.version>11</java.version>
 	</properties>
@@ -60,7 +60,12 @@
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
-			<scope>runtime</scope>
+			<version>8.0.23</version>
+		</dependency>
+		<dependency>
+			<groupId>org.flywaydb</groupId>
+			<artifactId>flyway-core</artifactId>
+			<version>7.12.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.projectlombok</groupId>
@@ -101,5 +106,4 @@
 			</plugin>
 		</plugins>
 	</build>
-
 </project>

@@ -1,4 +1,4 @@
-package ru.pnapreenko.blogengine.model;
+package ru.pnapreenko.blogengine.enums;
 
 public enum ModerationStatus {
     NEW,
