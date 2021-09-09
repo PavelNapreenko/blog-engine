@@ -7,7 +7,7 @@ import lombok.ToString;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import java.util.Date;
+import java.time.Instant;
 
 @Entity
 @Table(name = "post_votes")
@@ -21,25 +21,24 @@ public class PostVote extends AbstractEntity {
         this.post = post;
     }
 
-    public PostVote(@NotNull User user, @NotNull Post post, @NotNull Date time) {
+    public PostVote(@NotNull User user, @NotNull Post post, @NotNull Instant time) {
         this(user, post);
         this.time = time;
     }
 
     @NotNull
     @ManyToOne(cascade = CascadeType.MERGE, optional = false)
-    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @NotNull
     @ManyToOne(cascade = CascadeType.MERGE, optional = false)
-    @JoinColumn(name = "post_id", referencedColumnName = "id", nullable = false)
+    @JoinColumn(name = "post_id", nullable = false)
     private Post post;
 
     @NotNull
     @Column(nullable = false)
-    @Temporal(TemporalType.TIME)
-    private Date time;
+    private Instant time;
 
     @Column(nullable = false)
     private byte value;

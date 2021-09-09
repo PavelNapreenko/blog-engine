@@ -1,4 +1,5 @@
-server.port: 8090
+server.port:
+  8090
 
 spring:
 
@@ -12,8 +13,10 @@ spring:
     driver-class-name:
       com.mysql.cj.jdbc.Driver
     hikari:
-      connection-timeout: 30000
-      maximum-pool-size: 10
+      connection-timeout:
+        30000
+      maximum-pool-size:
+        10
 
   jpa:
     open-in-view:
@@ -24,18 +27,31 @@ spring:
       ddl-auto:
         update
       naming:
-        implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyHbmImpl
-        physical-strategy: org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy
+        implicit-strategy:
+          org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyHbmImpl
+        physical-strategy:
+          org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy
     show-sql:
       true
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.MySQL8Dialect
+        dialect:
+          org.hibernate.dialect.MySQL8Dialect
+  logging:
+    level:
+      org.springframework: INFO
 
 blogapp:
-  title:  BlogSite
-  subtitle: Все обо Всём
-  phone:  +7 929 591 59155
-  email:  pavel1119@mail.ru
-  copyright:  Павел Напреенко
-  copyrightFrom:  2021
+  properties:
+    title:
+      BlogSite
+    subtitle:
+      Все обо Всём
+    phone:
+      +7 929 591 59155
+    email:
+      pavel1119@mail.ru
+    copyright:
+      Павел Напреенко
+    copyrightFrom:
+      2021

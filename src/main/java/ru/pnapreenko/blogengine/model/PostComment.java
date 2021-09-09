@@ -8,7 +8,7 @@ import lombok.ToString;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.util.Date;
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -21,7 +21,7 @@ import java.util.Set;
 public class PostComment extends AbstractEntity {
 
     @ManyToOne
-    @JoinColumn(name = "parent_id", referencedColumnName = "id")
+    @JoinColumn(name = "parent_id")
     private PostComment parentComment;
 
     @NotNull
@@ -30,17 +30,17 @@ public class PostComment extends AbstractEntity {
 
     @NotNull
     @ManyToOne(cascade = CascadeType.MERGE, optional = false)
-    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false, updatable = false)
+    @JoinColumn(name = "user_id", nullable = false, updatable = false)
     private User user;
 
     @NotNull
     @ManyToOne(cascade = CascadeType.MERGE, optional = false)
-    @JoinColumn(name = "post_id", referencedColumnName = "id", nullable = false, updatable = false)
+    @JoinColumn(name = "post_id", nullable = false, updatable = false)
     private Post post;
 
     @NotNull
     @Column(nullable = false)
-    private Date time;
+    private Instant time;
 
     @NotBlank
     @Column(columnDefinition = "TEXT", nullable = false)

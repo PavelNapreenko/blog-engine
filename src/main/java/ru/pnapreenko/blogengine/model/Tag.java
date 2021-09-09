@@ -11,9 +11,7 @@ import javax.validation.constraints.NotBlank;
 import java.util.Set;
 
 @Entity
-@Table(name = "tags", indexes = {
-        @Index(name = "idx_tags_name", columnList="name", unique = true),
-})
+@Table(name = "tags")
 @Data
 @NoArgsConstructor(force = true)
 @AllArgsConstructor

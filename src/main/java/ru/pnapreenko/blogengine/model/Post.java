@@ -12,7 +12,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.util.Date;
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -33,18 +33,17 @@ public class Post extends AbstractEntity {
     private ModerationStatus moderationStatus = ModerationStatus.NEW;
 
     @ManyToOne(cascade = CascadeType.MERGE)
-    @JoinColumn(name = "moderator_id", referencedColumnName = "id")
+    @JoinColumn(name = "moderator_id")
     private User moderatedBy;
 
     @NotNull
     @ManyToOne(cascade = CascadeType.MERGE, optional = false)
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    @JoinColumn(name = "user_id")
     private User author;
 
     @NotNull
     @Column(nullable = false)
-    @Temporal(TemporalType.TIME)
-    private Date time;
+    private Instant time;
 
     @NotBlank
     @Size(max = 255)
@@ -60,9 +59,9 @@ public class Post extends AbstractEntity {
 
     @NotNull
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
-    @JoinTable(name = "posts_tags",
-            joinColumns = @JoinColumn(name = "post_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "tag_id", referencedColumnName = "id"))
+    @JoinTable(name = "tag2post",
+            joinColumns = @JoinColumn(name = "post_id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id"))
     @LazyCollection(LazyCollectionOption.EXTRA)
     private Set<Tag> tags = new HashSet<>();
 
