@@ -1,88 +1,97 @@
 package ru.pnapreenko.blogengine.model;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
+import ru.pnapreenko.blogengine.enums.ModerationStatus;
 
 import javax.persistence.*;
-import java.sql.Date;
-import java.util.List;
-import java.util.Objects;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import java.time.Instant;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "posts")
-@ToString
-@Getter
-@Setter
-@RequiredArgsConstructor
-public class Post {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id", nullable = false)
-    private Integer postId;
+@Data
+@NoArgsConstructor(force = true)
+@EqualsAndHashCode(callSuper = true, of = {"title", "time"})
+@ToString(callSuper = true, of = {"title"})
+public class Post extends AbstractEntity {
 
     @Column(name = "is_active", nullable = false)
-    private Short isActive;
+    private boolean isActive;
 
-    @Column(name = "moderation_status", nullable = false)
     @Enumerated(EnumType.STRING)
-    private ModerationStatus moderationStatus;
+    @NotNull
+    @Column(name = "moderation_status", length = 10, nullable = false)
+    private ModerationStatus moderationStatus = ModerationStatus.NEW;
 
-    @Column(name = "moderator_id")
-    private Integer moderatorId;
+    @ManyToOne(cascade = CascadeType.MERGE)
+    @JoinColumn(name = "moderator_id")
+    private User moderatedBy;
 
-    @Column(name = "user_id", nullable = false, insertable = false, updatable = false)
-    private Integer postUserId;
+    @NotNull
+    @ManyToOne(cascade = CascadeType.MERGE, optional = false)
+    @JoinColumn(name = "user_id")
+    private User author;
 
-    @Column(name = "time", nullable = false)
-    private Date postPublicationTime;
+    @NotNull
+    @Column(nullable = false)
+    private Instant time;
 
-    @Column(name = "title", nullable = false)
-    private String postTitle;
+    @NotBlank
+    @Size(max = 255)
+    @Column(nullable = false)
+    private String title;
 
-    @Column(name = "text", nullable = false)
-    private String postText;
+    @NotBlank
+    @Column(columnDefinition = "TEXT", nullable = false)
+    private String text;
 
     @Column(name = "view_count", nullable = false)
-    private Integer postViewCount;
+    private int viewCount;
 
-    @ToString.Exclude
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "user_id", referencedColumnName = "id",
-            foreignKey = @ForeignKey(name = "user"))
-    private User user;
-
-    @ToString.Exclude
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @NotNull
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
     @JoinTable(name = "tag2post",
             joinColumns = @JoinColumn(name = "post_id"),
             inverseJoinColumns = @JoinColumn(name = "tag_id"))
-    private List<Tag> tags;
+    @LazyCollection(LazyCollectionOption.EXTRA)
+    private Set<Tag> tags = new HashSet<>();
 
-    @ToString.Exclude
-    @OneToMany(mappedBy = "post", cascade = CascadeType.PERSIST, orphanRemoval = true)
-    private List<PostComment> postComments;
+    @NotNull
+    @OneToMany(mappedBy = "post", fetch = FetchType.LAZY, orphanRemoval = true)
+    @LazyCollection(LazyCollectionOption.EXTRA)
+    private Set<PostVote> votes = new HashSet<>();
 
-    @ToString.Exclude
-    @OneToMany(mappedBy = "post", cascade = CascadeType.PERSIST, orphanRemoval = true)
-    private List<PostVote> postVotes;
+    @NotNull
+    @OneToMany(mappedBy = "post", fetch = FetchType.LAZY, orphanRemoval = true)
+    @LazyCollection(LazyCollectionOption.EXTRA)
+    private Set<PostComment> comments = new HashSet<>();
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Post post = (Post) o;
-        return getPostId().equals(post.getPostId()) && getIsActive().equals(post.getIsActive()) && getModerationStatus() == post.getModerationStatus()
-                && Objects.equals(getModeratorId(), post.getModeratorId()) && getPostUserId().equals(post.getPostUserId())
-                && getPostPublicationTime().equals(post.getPostPublicationTime()) && getPostTitle().equals(post.getPostTitle())
-                && getPostText().equals(post.getPostText()) && getPostViewCount().equals(post.getPostViewCount());
+    public void setComments(Set<PostComment> comments) {
+        this.comments = comments;
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(getPostId(), getIsActive(), getModerationStatus(), getModeratorId(), getPostUserId(), getPostPublicationTime(),
-                getPostTitle(), getPostText(), getPostViewCount());
+    public void setVotes(Set<PostVote> votes) {
+        this.votes = votes;
+    }
+
+    public void setTags(Set<Tag> tags) {
+        this.tags = tags;
+    }
+
+    public void addTag(@NotNull Tag tag) {
+        tags.add(tag);
+    }
+
+    public void updateViewCount() {
+        this.viewCount++;
     }
 }

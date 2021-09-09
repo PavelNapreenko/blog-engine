@@ -1,77 +1,74 @@
 package ru.pnapreenko.blogengine.model;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
+import org.hibernate.annotations.NaturalId;
 
 import javax.persistence.*;
-import java.sql.Date;
-import java.util.List;
-import java.util.Objects;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import java.time.Instant;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "users")
-@ToString
-@Getter
-@Setter
-@RequiredArgsConstructor
-public class User {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id", nullable = false)
-    private Integer id;
+@Data
+@NoArgsConstructor(force = true)
+@EqualsAndHashCode(callSuper = true, of = {"email"})
+@ToString(callSuper = true, of = {"name"})
+public class User extends AbstractEntity {
 
     @Column(name = "is_moderator", nullable = false)
-    private Short isModerator;
+    private boolean isModerator;
 
+    @NotNull
     @Column(name = "reg_time", nullable = false)
-    private Date regTime;
+    private Instant regTime;
 
-    @Basic(fetch = FetchType.LAZY)
-    @ToString.Exclude
-    @Column(name = "name", nullable = false)
-    private String userName;
+    @NotBlank
+    @Size(max = 255)
+    @Column(nullable = false)
+    private String name;
 
-    @Column(name = "email", nullable = false)
-    private String userEmail;
+    @NaturalId(mutable = true)
+    @Email
+    @NotBlank
+    @Size(max = 255)
+    @Column(nullable = false)
+    private String email;
 
-    @Column(name = "password", nullable = false)
-    private String userPassword;
+    @NotBlank
+    @Size(max = 255)
+    @Column(nullable = false)
+    private String password;
 
-    @Column(name = "code")
-    private String passwordRecoveryCode;
+    @Size(max = 255)
+    private String code;
 
-    @Column(name = "photo")
-    private String userPhoto;
+    @Column(columnDefinition = "TEXT")
+    private String photo;
 
-    @ToString.Exclude
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Post> posts;
+    @NotNull
+    @OneToMany(mappedBy = "author", fetch = FetchType.LAZY, orphanRemoval = true)
+    private final Set<Post> posts = new HashSet<>();
 
-    @ToString.Exclude
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PostVote> postVoteList;
+    @NotNull
+    @OneToMany(mappedBy = "moderatedBy", fetch = FetchType.LAZY, orphanRemoval = true)
+    @LazyCollection(LazyCollectionOption.EXTRA)
+    private final Set<Post> moderatedPosts = new HashSet<>();
 
-    @ToString.Exclude
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PostComment> postComments;
+    @NotNull
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, orphanRemoval = true)
+    private final Set<PostComment> comments = new HashSet<>();
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        User user = (User) o;
-        return getId().equals(user.getId()) && getIsModerator().equals(user.getIsModerator()) && getRegTime().equals(user.getRegTime())
-                && getUserName().equals(user.getUserName()) && getUserEmail().equals(user.getUserEmail())
-                && getUserPassword().equals(user.getUserPassword()) && Objects.equals(getPasswordRecoveryCode(), user.getPasswordRecoveryCode())
-                && Objects.equals(getUserPhoto(), user.getUserPhoto());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getId(), getIsModerator(), getRegTime(), getUserName(), getUserEmail(), getUserPassword(), getPasswordRecoveryCode(),
-                getUserPhoto());
-    }
+    @NotNull
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, orphanRemoval = true)
+    private final Set<PostVote> votes = new HashSet<>();
 }

@@ -1,47 +1,30 @@
 package ru.pnapreenko.blogengine.model;
 
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.List;
-import java.util.Objects;
+import javax.validation.constraints.NotBlank;
+import java.util.Set;
 
 @Entity
-@Table(name = "tag")
-@ToString
-@Getter
-@Setter
-@RequiredArgsConstructor
-public class Tag {
+@Table(name = "tags")
+@Data
+@NoArgsConstructor(force = true)
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public class Tag extends AbstractEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id", nullable = false)
-    private Integer tagId;
-
-    @Column(name = "name", nullable = false)
-    private String tagName;
+    @NotBlank
+    @Column(nullable = false)
+    private String name;
 
     @ManyToMany(cascade = CascadeType.PERSIST)
     @JoinTable(name = "tag2post",
             joinColumns = @JoinColumn(name = "tag_id"),
             inverseJoinColumns = @JoinColumn(name = "post_id"))
-    private List<Post> posts;
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Tag tag = (Tag) o;
-        return getTagId().equals(tag.getTagId()) && getTagName().equals(tag.getTagName());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getTagId(), getTagName());
-    }
+    private Set<Post> posts;
 }
