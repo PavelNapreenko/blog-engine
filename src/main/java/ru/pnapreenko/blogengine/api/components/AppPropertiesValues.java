@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor(force = true)
-public class AppProperties {
+public class AppPropertiesValues {
     @Value("${blogapp.properties.title}")
     private String title;
     @Value("${blogapp.properties.subtitle}")
