@@ -13,6 +13,6 @@ import javax.persistence.MappedSuperclass;
 @EqualsAndHashCode(of = {"id"})
 public abstract class AbstractEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 }

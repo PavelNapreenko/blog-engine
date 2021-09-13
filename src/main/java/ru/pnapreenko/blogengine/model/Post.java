@@ -75,18 +75,6 @@ public class Post extends AbstractEntity {
     @LazyCollection(LazyCollectionOption.EXTRA)
     private Set<PostComment> comments = new HashSet<>();
 
-    public void setComments(Set<PostComment> comments) {
-        this.comments = comments;
-    }
-
-    public void setVotes(Set<PostVote> votes) {
-        this.votes = votes;
-    }
-
-    public void setTags(Set<Tag> tags) {
-        this.tags = tags;
-    }
-
     public void addTag(@NotNull Tag tag) {
         tags.add(tag);
     }

@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS `users`
     `id`           int                                     NOT NULL AUTO_INCREMENT,
     `code`         varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
     `email`        varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-    `is_moderator` tinyint                                 NOT NULL,
+    `is_moderator` tinyint(1)                              NOT NULL,
     `name`         varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
     `password`     varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
     `photo`        text COLLATE utf8mb4_unicode_ci         DEFAULT NULL,
@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS `users`
 CREATE TABLE IF NOT EXISTS `posts`
 (
     `id`                int                                     NOT NULL AUTO_INCREMENT,
-    `is_active`         tinyint                                 NOT NULL,
+    `is_active`         tinyint(1)                              NOT NULL,
     `moderation_status` varchar(10) COLLATE utf8mb4_unicode_ci  NOT NULL,
     `text`              text COLLATE utf8mb4_unicode_ci         NOT NULL,
     `time`              datetime(6)                             NOT NULL,
@@ -138,5 +138,3 @@ CREATE TABLE IF NOT EXISTS `global_settings`
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
-
-USE blogapp;
