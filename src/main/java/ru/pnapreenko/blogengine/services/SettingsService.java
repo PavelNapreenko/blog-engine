@@ -6,6 +6,10 @@ import ru.pnapreenko.blogengine.enums.SettingsCodeAndValue;
 import ru.pnapreenko.blogengine.model.dto.SettingsDTO;
 import ru.pnapreenko.blogengine.repositories.SettingsRepository;
 
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+
 @Service
 public class SettingsService {
 
@@ -17,17 +21,12 @@ public class SettingsService {
     }
 
     public SettingsDTO getSettings() {
-        SettingsDTO settings = new SettingsDTO();
 
-        settingsRepository.findAll().forEach(setting -> {
-            final var MULTIUSER_MODE = settingsRepository.findByCodeIs(SettingsCodeAndValue.Code.MULTIUSER_MODE);
-            final var POST_PREMODERATION = settingsRepository.findByCodeIs(SettingsCodeAndValue.Code.POST_PREMODERATION);
-            final var STATISTICS_IS_PUBLIC = settingsRepository.findByCodeIs(SettingsCodeAndValue.Code.STATISTICS_IS_PUBLIC);
+        Map<String, Boolean> map = StreamSupport.stream(settingsRepository.findAll().spliterator(), false)
+                .collect(Collectors.toMap(s -> s.getCode().getName(), s -> s.getValue().getValue()));
 
-            settings.setMultiuserMode(MULTIUSER_MODE.getValue().getValue());
-            settings.setPostPremoderation(POST_PREMODERATION.getValue().getValue());
-            settings.setStatisticsIsPublic(STATISTICS_IS_PUBLIC.getValue().getValue());
-        });
-        return settings;
+        return new SettingsDTO(map.get(SettingsCodeAndValue.Code.MULTIUSER_MODE.getName()),
+                               map.get(SettingsCodeAndValue.Code.POST_PREMODERATION.getName()),
+                               map.get(SettingsCodeAndValue.Code.STATISTICS_IS_PUBLIC.getName()));
     }
 }

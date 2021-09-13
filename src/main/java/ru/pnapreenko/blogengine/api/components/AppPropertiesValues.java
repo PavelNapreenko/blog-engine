@@ -1,4 +1,4 @@
-package ru.pnapreenko.blogengine.model.dto;
+package ru.pnapreenko.blogengine.api.components;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor(force = true)
-public class AppPropertiesDTO {
+public class AppPropertiesValues {
     @Value("${blogapp.properties.title}")
     private String title;
     @Value("${blogapp.properties.subtitle}")
