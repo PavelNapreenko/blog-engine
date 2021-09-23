@@ -28,17 +28,15 @@ public class ApiPostController {
             @RequestParam(name = "offset") int offset,
             @RequestParam(name = "limit") int limit,
             @RequestParam(name = "mode") String mode) {
-
         return postsService.getPosts(offset, limit, mode);
     }
 
-    @GetMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
-    @JsonView(JsonViews.IdName.class)
-    public ResponseEntity<?> searchPosts(
-            @RequestParam(name = "offset") int offset,
-            @RequestParam(name = "limit") int limit,
-            @RequestParam(name = "query") String query) {
-
-        return postsService.searchPosts(offset, limit, query);
-    }
+//    @GetMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
+//    @JsonView(JsonViews.IdName.class)
+//    public ResponseEntity<?> searchPosts(
+//            @RequestParam(name = "offset") int offset,
+//            @RequestParam(name = "limit") int limit,
+//            @RequestParam(name = "query") String query) {
+//        return postsService.searchPosts(offset, limit, query);
+//    }
 }

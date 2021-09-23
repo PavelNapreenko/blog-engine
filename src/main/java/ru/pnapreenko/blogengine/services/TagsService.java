@@ -8,6 +8,7 @@ import ru.pnapreenko.blogengine.model.dto.TagDTO;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 @Service
@@ -18,13 +19,13 @@ public class TagsService {
         List<TagDTO> tags = new ArrayList<>();
 
         for (int i = 0; i < 6; i++ ) {
+            Random r = new Random();
             String name = "TAG" + i;
             Tag tag = new Tag();
             tag.setName(name);
-            TagDTO tagForPage = new TagDTO(tag, 10);
+            TagDTO tagForPage = new TagDTO(tag, r.nextInt(10));
             tags.add(tagForPage);
         }
-
 
         tags.forEach(tag -> tag.setBaseWeight(NUM_POSTS));
         tags.forEach(tag -> tag.setWeight(tags.get(0).getBaseWeight()));
