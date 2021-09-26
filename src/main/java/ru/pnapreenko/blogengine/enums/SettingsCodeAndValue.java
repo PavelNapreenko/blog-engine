@@ -1,11 +1,13 @@
 package ru.pnapreenko.blogengine.enums;
 
+import ru.pnapreenko.blogengine.config.ConfigStrings;
+
 public class SettingsCodeAndValue {
 
         public enum Code {
-            MULTIUSER_MODE("Многопользовательский режим"),
-            POST_PREMODERATION("Премодерация постов"),
-            STATISTICS_IS_PUBLIC("Показывать всем статистику блога");
+            MULTIUSER_MODE(ConfigStrings.MULTIUSER_MODE),
+            POST_PREMODERATION(ConfigStrings.POST_PREMODERATION),
+            STATISTICS_IS_PUBLIC(ConfigStrings.STATISTICS_IS_PUBLIC);
 
             private final String name;
 
