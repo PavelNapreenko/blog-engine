@@ -1,4 +1,4 @@
-package ru.pnapreenko.blogengine.model.dto;
+package ru.pnapreenko.blogengine.model.dto.post;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import lombok.AllArgsConstructor;

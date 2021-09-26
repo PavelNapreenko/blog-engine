@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import ru.pnapreenko.blogengine.model.Post;
-import ru.pnapreenko.blogengine.model.dto.PostDTO;
+import ru.pnapreenko.blogengine.model.dto.post.PostDTO;
 
 import java.time.Instant;
 
@@ -15,7 +15,7 @@ import java.time.Instant;
 public interface PostsRepository extends JpaRepository<Post, Integer> {
 
     String QUERY = "SELECT" +
-            "    new ru.pnapreenko.blogengine.model.dto.PostDTO(" +
+            "    new ru.pnapreenko.blogengine.model.dto.post.PostDTO(" +
             "        p, " +
             "        SUM(CASE WHEN v.value = 1 THEN 1 ELSE 0 END) as like_count, " +
             "        SUM(CASE WHEN v.value = -1 THEN 1 ELSE 0 END)" +

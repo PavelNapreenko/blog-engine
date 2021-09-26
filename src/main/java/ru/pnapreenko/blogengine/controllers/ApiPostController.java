@@ -23,6 +23,7 @@ public class ApiPostController {
     }
 
     @GetMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
+
     @JsonView(JsonViews.IdName.class)
     public ResponseEntity<?> getPosts(
             @RequestParam(name = "offset") int offset,

@@ -10,8 +10,8 @@ import org.springframework.stereotype.Service;
 import ru.pnapreenko.blogengine.api.responses.APIResponse;
 import ru.pnapreenko.blogengine.api.utils.MainPagePostsOffset;
 import ru.pnapreenko.blogengine.enums.PostMode;
-import ru.pnapreenko.blogengine.model.dto.ListPostsDTO;
-import ru.pnapreenko.blogengine.model.dto.PostDTO;
+import ru.pnapreenko.blogengine.model.dto.post.ListPostsDTO;
+import ru.pnapreenko.blogengine.model.dto.post.PostDTO;
 import ru.pnapreenko.blogengine.repositories.PostsRepository;
 
 import java.time.Instant;
