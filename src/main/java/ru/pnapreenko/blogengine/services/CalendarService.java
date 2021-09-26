@@ -2,35 +2,25 @@ package ru.pnapreenko.blogengine.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.pnapreenko.blogengine.api.utils.DateUtils;
 import ru.pnapreenko.blogengine.model.dto.CalendarDTO;
-import ru.pnapreenko.blogengine.model.dto.PostDTO;
+import ru.pnapreenko.blogengine.repositories.calendar.CalendarRepository;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @Service
 public class CalendarService {
 
-    private final PostsService postsService;
+    private final CalendarRepository calendarRepository;
 
     @Autowired
-    public CalendarService(PostsService postsService) {
-        this.postsService = postsService;
+    public CalendarService(CalendarRepository calendarRepository) {
+        this.calendarRepository = calendarRepository;
     }
 
     public CalendarDTO getCalendar(String year) {
-        List<Integer> years = List.of(2021);
-        Map<String, Long> posts = new HashMap<>();
-
-        for(PostDTO p: postsService.getPostList()) {
-            String postYear = DateUtils.formatDate(p.getDate(),"yyyy-MM-dd");
-            if (postYear.contains(year)) {
-                long l = postsService.getPostList().size();
-                posts.put(postYear, l);
-            }
-        }
+        List<Integer> years = calendarRepository.findAllYears(year);
+        Map<String, Long> posts = calendarRepository.findAllPosts(year);
         return new CalendarDTO(years, posts);
     }
 }
