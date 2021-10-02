@@ -73,7 +73,7 @@ public class PostDTO implements Comparable<PostDTO> {
         this.id = post.getId();
         this.title = post.getTitle();
         this.text = post.getText();
-        this.announce = Jsoup.parse(post.getText()).text();
+        this.announce = Jsoup.parse(getAnnounce(post.getText())).text();
         this.timestamp = post.getTime().getEpochSecond();
         this.user = new PostAuthorDTO(post.getAuthor().getId(), post.getAuthor().getName());
         this.viewCount = post.getViewCount();
@@ -91,5 +91,10 @@ public class PostDTO implements Comparable<PostDTO> {
         int result = o.getCommentCount() - this.getCommentCount();
         if (result == 0) result = o.getDate().compareTo(this.getDate());
         return result;
+    }
+
+    private String getAnnounce(String text) {
+        text = text.substring(0,149).concat("...");
+        return text;
     }
 }

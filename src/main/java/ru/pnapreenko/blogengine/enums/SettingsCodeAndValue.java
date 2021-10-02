@@ -21,8 +21,8 @@ public class SettingsCodeAndValue {
         }
 
         public enum Value {
-            YES("Да", true),
-            NO("Нет", false);
+            YES(ConfigStrings.YES, true),
+            NO(ConfigStrings.NO, false);
 
             private final String name;
             private final boolean value;

@@ -1,5 +1,7 @@
 package ru.pnapreenko.blogengine.enums;
 
+import ru.pnapreenko.blogengine.config.ConfigStrings;
+
 public enum PostMode {
     /** сортировать по дате публикации, выводить сначала новые */
     RECENT("recent"),
@@ -29,5 +31,5 @@ public enum PostMode {
                 return mode;
             }
         }
-        throw new IllegalArgumentException(String.format("Неподдерживаемый режим вывода: '%s'!", name));
+        throw new IllegalArgumentException(String.format(ConfigStrings.POST_NO_SUCH_MODE, name));
     }}

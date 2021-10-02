@@ -20,17 +20,17 @@ public interface TagsRepository extends CrudRepository<Tag, Integer> {
             "WHERE p.isActive = 1 AND p.moderationStatus = 'ACCEPTED' AND p.time <= NOW() ";
     String GROUP_BY = "GROUP BY t.id";
 
-    String ORDER = "ORDER BY cnt DESC, t.name ASC ";
+    String ORDER = " ORDER BY cnt DESC, t.name ASC ";
     @Query(SELECT_DTO + QUERY + GROUP_BY + ORDER)
     List<TagDTO> findAllTags();
 
     String AND_LIKE = "AND t.name LIKE %:name% ";
     @Query(SELECT_DTO + QUERY + AND_LIKE  + GROUP_BY)
-    List<TagDTO> findAllTagsByNameContaining(String name);
+    List<TagDTO> findAllTagsUsingNameContaining(String name);
 
     Tag findByNameIgnoreCase(String name);
 
     String queryFindTagNamesByPost = "SELECT t.name FROM Tag t JOIN t.posts p WHERE p = :post";
     @Query(queryFindTagNamesByPost)
-    List<String> findTagNamesByPost(@Param("post") Post post);
+    List<String> findTagNamesUsingPost(@Param("post") Post post);
 }

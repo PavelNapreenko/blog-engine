@@ -8,13 +8,14 @@ import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import org.springframework.boot.jackson.JsonComponent;
 import ru.pnapreenko.blogengine.api.utils.DateUtils;
+import ru.pnapreenko.blogengine.config.ConfigStrings;
 
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 
 @JsonComponent
 public class PostDateConverter {
-    private static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm";
+    private static final String DATE_FORMAT = ConfigStrings.NEW_POST_DATE_FORMAT;
     private static final SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
 
     public static class Serialize extends JsonSerializer<Instant> {

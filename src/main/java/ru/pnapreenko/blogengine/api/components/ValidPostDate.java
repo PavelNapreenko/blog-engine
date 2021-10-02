@@ -1,5 +1,7 @@
 package ru.pnapreenko.blogengine.api.components;
 
+import ru.pnapreenko.blogengine.config.ConfigStrings;
+
 import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
@@ -12,7 +14,7 @@ import java.time.Instant;
 @Constraint(validatedBy = ValidPostDate.PostDateValidator.class)
 @Documented
 public @interface ValidPostDate {
-    String message() default "Неправильный формат даты! Используйте: 'yyyy-MM-ddTHH:mm'.";
+    String message() default ConfigStrings.NEW_POST_INVALID_DATE;
 
     Class<?>[] groups() default {};
 
