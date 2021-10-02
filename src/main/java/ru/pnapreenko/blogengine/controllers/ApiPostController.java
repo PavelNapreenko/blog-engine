@@ -6,6 +6,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import ru.pnapreenko.blogengine.api.utils.JsonViews;
@@ -23,7 +24,6 @@ public class ApiPostController {
     }
 
     @GetMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
-
     @JsonView(JsonViews.IdName.class)
     public ResponseEntity<?> getPosts(
             @RequestParam(name = "offset") int offset,
@@ -32,12 +32,36 @@ public class ApiPostController {
         return postsService.getPosts(offset, limit, mode);
     }
 
-//    @GetMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
-//    @JsonView(JsonViews.IdName.class)
-//    public ResponseEntity<?> searchPosts(
-//            @RequestParam(name = "offset") int offset,
-//            @RequestParam(name = "limit") int limit,
-//            @RequestParam(name = "query") String query) {
-//        return postsService.searchPosts(offset, limit, query);
-//    }
+    @GetMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
+    @JsonView(JsonViews.IdName.class)
+    public ResponseEntity<?> searchPosts(
+            @RequestParam(name = "offset") int offset,
+            @RequestParam(name = "limit") int limit,
+            @RequestParam(name = "query") String query) {
+        return postsService.searchPosts(offset, limit, query);
+    }
+
+    @GetMapping(value = "/byDate", produces = MediaType.APPLICATION_JSON_VALUE)
+    @JsonView(JsonViews.IdName.class)
+    public ResponseEntity<?> searchByDate(
+            @RequestParam(name = "offset") int offset,
+            @RequestParam(name = "limit") int limit,
+            @RequestParam(name = "date") String date) {
+        return postsService.searchByDate(offset, limit, date);
+    }
+
+    @GetMapping(value = "/byTag", produces = MediaType.APPLICATION_JSON_VALUE)
+    @JsonView(JsonViews.IdName.class)
+    public ResponseEntity<?> searchByTag(
+            @RequestParam(name = "offset") int offset,
+            @RequestParam(name = "limit") int limit,
+            @RequestParam(name = "tag") String tagName) {
+        return postsService.searchByTag(offset, limit, tagName);
+    }
+
+    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @JsonView(JsonViews.EntityIdName.class)
+    public ResponseEntity<?> searchPosts(@PathVariable int id) {
+        return postsService.getPost(id);
+    }
 }

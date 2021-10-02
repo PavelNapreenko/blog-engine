@@ -29,6 +29,7 @@ public class ConfigStrings {
 
     public static final String POST_INVALID_DATE = "Неправильный формат даты! Используйте: 'yyyy-MM-dd'.";
     public static final String POST_INVALID_TAG = "Тег '%s' не найден!";
+    public static final String POST_NOT_FOUND = "Пост с идентификатором '%d' не найден!";
     public static final String NEW_POST_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm";
     public static final String NEW_POST_INVALID_DATE = "Неправильный формат даты! Используйте: 'yyyy-MM-ddTHH:mm'.";
 

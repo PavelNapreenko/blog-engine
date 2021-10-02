@@ -26,7 +26,6 @@ public interface PostsRepository extends JpaRepository<Post, Integer> {
     String GROUP_BY = "GROUP BY p.id";
 
     String FULL_QUERY = QUERY_DTO + WHERE + GROUP_BY;
-
     @Query(FULL_QUERY)
     Page<PostDTO> findAllPosts(@Param("date") Instant date, Pageable pageable);
 
@@ -44,10 +43,6 @@ public interface PostsRepository extends JpaRepository<Post, Integer> {
             @Param("tag") Tag tag,
             Pageable pageable);
 
-    String COUNT_ACTIVE_POSTS = "SELECT COUNT(*) FROM Post p ";
-    @Query(COUNT_ACTIVE_POSTS + WHERE)
-    int countActivePosts(@Param("date") Instant date);
-
     String QUERY_SEARCH =  " AND (" +
             "   p.title LIKE %:query% OR p.text LIKE %:query%" +
             " ) ";
@@ -56,5 +51,9 @@ public interface PostsRepository extends JpaRepository<Post, Integer> {
             @Param("date") Instant date,
             @Param("query") String query,
             Pageable pageable);
+
+    String COUNT_ACTIVE_POSTS = "SELECT COUNT(*) FROM Post p ";
+    @Query(COUNT_ACTIVE_POSTS + WHERE)
+    int countActivePosts(@Param("date") Instant date);
 
 }
