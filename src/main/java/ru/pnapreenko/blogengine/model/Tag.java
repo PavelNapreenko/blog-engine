@@ -18,6 +18,10 @@ import java.util.Set;
 @EqualsAndHashCode(callSuper = true)
 public class Tag extends AbstractEntity {
 
+    public Tag(String name) {
+        this.name = name;
+    }
+
     @NotBlank
     @Column(nullable = false)
     private String name;

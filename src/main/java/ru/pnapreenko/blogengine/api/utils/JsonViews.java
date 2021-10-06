@@ -4,6 +4,7 @@ public final class JsonViews {
 
     public interface Id {}
     public interface IdName extends Id {}
+    public interface Name {}
     public interface EntityId extends Id {}
     public interface EntityIdName extends EntityId {}
 }

@@ -1,8 +1,9 @@
-package ru.pnapreenko.blogengine.model.dto;
+package ru.pnapreenko.blogengine.model.dto.post;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.jsoup.Jsoup;
 import ru.pnapreenko.blogengine.api.utils.JsonViews;
 import ru.pnapreenko.blogengine.model.Post;
@@ -12,75 +13,62 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class PostDTO implements Comparable<PostDTO> {
 
-    @Getter
+
     @JsonView({JsonViews.IdName.class, JsonViews.EntityId.class})
-    private final int id;
+    private int id;
 
-    @Getter
     @JsonView({JsonViews.IdName.class, JsonViews.EntityIdName.class})
-    private final String title;
+    private String title;
 
-    @Getter
     @JsonView(JsonViews.IdName.class)
-    private final String announce;
+    private String announce;
 
-    @Getter
     @JsonView(JsonViews.EntityIdName.class)
-    private final String text;
+    private String text;
 
-    @Getter @Setter
     @JsonView({JsonViews.IdName.class, JsonViews.EntityIdName.class})
     private long timestamp;
 
-    @Getter
     @JsonView({JsonViews.IdName.class, JsonViews.EntityIdName.class})
-    private final PostAuthorDTO user;
+    private PostAuthorDTO user;
 
-    @Getter
     @JsonView({JsonViews.IdName.class, JsonViews.EntityIdName.class})
-    private final int viewCount;
+    private int viewCount;
 
-    @Getter
     @JsonView({JsonViews.IdName.class, JsonViews.EntityIdName.class})
-    private final int commentCount;
+    private int commentCount;
 
-    @Getter @Setter
     @JsonView({JsonViews.IdName.class, JsonViews.EntityIdName.class})
     private long likeCount;
 
-    @Getter @Setter
     @JsonView({JsonViews.IdName.class, JsonViews.EntityIdName.class})
     private long dislikeCount;
 
-    @Getter @Setter
     @JsonView(JsonViews.EntityIdName.class)
     private List<String> tags;
 
-    @Getter @Setter
     @JsonView(JsonViews.EntityIdName.class)
     private List<PostComment> comments;
 
-    @Getter
-    private final Instant date;
+    private Instant date;
 
     public PostDTO(Post post) {
-        this(post, 0, 0);
-    }
-
-    public PostDTO(Post post, long likeCount, long dislikeCount) {
         this.id = post.getId();
         this.title = post.getTitle();
         this.text = post.getText();
-        this.announce = Jsoup.parse(post.getText()).text();
+        this.announce = Jsoup.parse(getAnnounce(post.getText())).text();
         this.timestamp = post.getTime().getEpochSecond();
         this.user = new PostAuthorDTO(post.getAuthor().getId(), post.getAuthor().getName());
         this.viewCount = post.getViewCount();
 
         this.commentCount = post.getComments().size();
-        this.likeCount = likeCount;
-        this.dislikeCount = dislikeCount;
+        this.likeCount = getLikeCount(post);
+        this.dislikeCount = getDislikeCount(post);
 
         this.date = post.getTime();
         this.comments = new ArrayList<>();
@@ -92,4 +80,18 @@ public class PostDTO implements Comparable<PostDTO> {
         if (result == 0) result = o.getDate().compareTo(this.getDate());
         return result;
     }
+
+    private String getAnnounce(String text) {
+        text = text.substring(0,149).concat("...");
+        return text;
+    }
+
+    private long getLikeCount(Post post) {
+        return post.getVotes().stream().filter(postVote -> postVote.getValue() > 0).count();
+    }
+
+    private long getDislikeCount(Post post) {
+        return post.getVotes().stream().filter(postVote -> postVote.getValue() < 0).count();
+    }
+
 }

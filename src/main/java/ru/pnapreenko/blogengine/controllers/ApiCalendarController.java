@@ -24,7 +24,7 @@ public class ApiCalendarController {
     @GetMapping(value="", produces = "application/json")
     @JsonView(JsonViews.IdName.class)
     public CalendarDTO getCalendar(
-            @RequestParam(name="year", required = false) String year) {
+            @RequestParam(name="year") String year) {
         return calendarService.getCalendar(year);
     }
 }
