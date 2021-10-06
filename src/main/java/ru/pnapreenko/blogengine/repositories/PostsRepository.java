@@ -8,37 +8,52 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import ru.pnapreenko.blogengine.model.Post;
 import ru.pnapreenko.blogengine.model.Tag;
-import ru.pnapreenko.blogengine.model.dto.post.PostDTO;
 
 import java.time.Instant;
 
 @Repository
 public interface PostsRepository extends JpaRepository<Post, Integer> {
 
-    String QUERY_DTO = "SELECT " +
-            "new ru.pnapreenko.blogengine.model.dto.post.PostDTO(p, " +
-            "SUM(CASE WHEN v.value = 1 THEN 1 ELSE 0 END) as like_count, " +
-            "SUM(CASE WHEN v.value = -1 THEN 1 ELSE 0 END)) " +
-            "FROM Post p " +
-            "JOIN p.votes as v ";
-
+    String QUERY_DTO = "SELECT p " +
+            "FROM #{#entityName} p ";
+    String QUERY_DTO_WITH_VOTES = "LEFT JOIN p.votes v ";
+    String QUERY_DTO_WITH_COMMENTS = "LEFT JOIN p.comments c ";
     String WHERE = "WHERE p.isActive = 1 AND p.moderationStatus = 'ACCEPTED' AND p.time <= :date ";
-    String GROUP_BY = "GROUP BY p.id";
+    String GROUP_BY = "GROUP BY p.id ";
+    String ORDER_BY_TIME_DESC = "ORDER BY p.time DESC ";
+    String ORDER_BY_TIME_ASC = "ORDER BY p.time ";
+    String ORDER_BY_LIKE_COUNT_DESC = "ORDER BY (SUM(CASE WHEN v.value = 1 THEN 1 ELSE 0 END)) DESC ";
+    String ORDER_BY_COMMENT_COUNT_DESC = "ORDER BY size(p.comments) DESC ";
 
-    String FULL_QUERY = QUERY_DTO + WHERE + GROUP_BY;
+
+    String FULL_QUERY = QUERY_DTO + WHERE + GROUP_BY + ORDER_BY_TIME_DESC;
     @Query(FULL_QUERY)
-    Page<PostDTO> findAllPosts(@Param("date") Instant date, Pageable pageable);
+    Page<Post> findAllPosts(@Param("date") Instant date, Pageable pageable);
+
+    String QUERY_EARLY = QUERY_DTO + WHERE + GROUP_BY + ORDER_BY_TIME_ASC;
+    @Query(QUERY_EARLY)
+    Page<Post> findAllPostsUsedModeEarly(@Param("date") Instant date, Pageable pageable);
+
+    String QUERY_BEST = QUERY_DTO + QUERY_DTO_WITH_VOTES + WHERE + GROUP_BY + ORDER_BY_LIKE_COUNT_DESC;
+    @Query(QUERY_BEST)
+    Page<Post> findAllPostsUsedModeBest(@Param("date") Instant date, Pageable pageable);
+
+    String QUERY_POPULAR = QUERY_DTO + QUERY_DTO_WITH_COMMENTS + WHERE + GROUP_BY + ORDER_BY_COMMENT_COUNT_DESC;
+    @Query(QUERY_POPULAR)
+    Page<Post> findAllPostsUsedModePopular(@Param("date") Instant date, Pageable pageable);
+
+
 
     String QUERY_DATE = " AND DATE_FORMAT(p.time, '%Y-%m-%d') = str(:date_requested) ";
-    @Query(QUERY_DTO + WHERE + QUERY_DATE + GROUP_BY)
-    Page<PostDTO> findAllPostsUsedDate(
+    @Query(QUERY_DTO + WHERE + QUERY_DATE + GROUP_BY + ORDER_BY_TIME_DESC)
+    Page<Post> findAllPostsUsedDate(
             @Param("date") Instant date,
             @Param("date_requested") String dateRequested,
             Pageable pageable);
 
     String QUERY_TAG = " JOIN p.tags t " + WHERE + " AND t = :tag ";
-    @Query(QUERY_DTO + QUERY_TAG + GROUP_BY)
-    Page<PostDTO> findAllPostsUsedTag(
+    @Query(QUERY_DTO + QUERY_TAG + GROUP_BY + ORDER_BY_TIME_DESC)
+    Page<Post> findAllPostsUsedTag(
             @Param("date") Instant date,
             @Param("tag") Tag tag,
             Pageable pageable);
@@ -46,8 +61,8 @@ public interface PostsRepository extends JpaRepository<Post, Integer> {
     String QUERY_SEARCH =  " AND (" +
             "   p.title LIKE %:query% OR p.text LIKE %:query%" +
             " ) ";
-    @Query(QUERY_DTO + WHERE + QUERY_SEARCH + GROUP_BY)
-    Page<PostDTO> findAllPostsUsedQuery(
+    @Query(QUERY_DTO + WHERE + QUERY_SEARCH + GROUP_BY + ORDER_BY_TIME_DESC)
+    Page<Post> findAllPostsUsedQuery(
             @Param("date") Instant date,
             @Param("query") String query,
             Pageable pageable);

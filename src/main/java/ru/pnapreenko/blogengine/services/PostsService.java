@@ -1,12 +1,15 @@
 package ru.pnapreenko.blogengine.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import ru.pnapreenko.blogengine.api.responses.APIResponse;
 import ru.pnapreenko.blogengine.api.utils.DateUtils;
+import ru.pnapreenko.blogengine.api.utils.PostDTOConverter;
 import ru.pnapreenko.blogengine.config.ConfigStrings;
 import ru.pnapreenko.blogengine.enums.ModerationStatus;
 import ru.pnapreenko.blogengine.enums.PostMode;
@@ -23,8 +26,6 @@ import ru.pnapreenko.blogengine.repositories.TagsRepository;
 import ru.pnapreenko.blogengine.repositories.VotesRepository;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,6 +37,7 @@ public class PostsService {
     private final VotesRepository votesRepository;
     private final CommentsRepository commentsRepository;
     private final TagsService tagsService;
+    private Page<PostDTO> posts;
 
     @Autowired
     public PostsService(PostsRepository postsRepository, TagsRepository tagsRepository, VotesRepository votesRepository,
@@ -51,8 +53,7 @@ public class PostsService {
 
         final Instant now = Instant.now();
         final PostMode mode;
-        Sort sort = Sort.by(Sort.Direction.DESC,"time");
-
+        posts = getAllActivePosts(now, offset, limit);
 
         try {
             mode = PostMode.getByName(postMode);
@@ -63,28 +64,24 @@ public class PostsService {
         switch (mode) {
             /* сортировать по дате публикации, выводить сначала старые */
             case EARLY:
-                sort = Sort.by(Sort.Direction.ASC, "time");
+                posts = getPageWithPostDTO(postsRepository.findAllPostsUsedModeEarly(now, getPageable(offset, limit)));
                 break;
             /* сортировать по убыванию количества лайков */
             case BEST:
-                sort = Sort.by(Sort.Direction.DESC, "like_count");
+                posts = getPageWithPostDTO(postsRepository.findAllPostsUsedModeBest(now, getPageable(offset, limit)));
                 break;
             /* сортировать по убыванию количества комментариев */
             case POPULAR:
-                Page<PostDTO> posts = getAllActivePosts(now, offset, limit, sort);
-                final List<PostDTO> p = new ArrayList<>(posts.getContent());
-                Collections.sort(p);
-                posts = new PageImpl<>(p);
-                return ResponseEntity.ok(new ListPostsDTO(posts));
+                posts = getPageWithPostDTO(postsRepository.findAllPostsUsedModePopular(now, getPageable(offset, limit)));
                 /* сортировать по дате публикации, выводить сначала новые */
             case RECENT:
             default:
                 break;
         }
-
-        Page<PostDTO> posts = postsRepository.findAllPosts(now, getPageable(offset, limit, sort));
         return ResponseEntity.ok(new ListPostsDTO(posts));
     }
+
+
 
     public ResponseEntity<?> getPost(int id) {
         Optional<Post> postOptional = postsRepository.findById(id);
@@ -137,22 +134,20 @@ public class PostsService {
     }
 
     public ResponseEntity<?> searchPosts(int offset, int limit, String query) {
-        if (query == null || query.length() < ConfigStrings.POST_MIN_QUERY_LENGTH)
+        if (query == null || query.length() < ConfigStrings.POST_MIN_QUERY_LENGTH) {
             return ResponseEntity.badRequest().body(APIResponse.error(ConfigStrings.POST_INVALID_QUERY));
+        }
 
-        Sort sort = Sort.by(Sort.Direction.DESC, "time");
-        Pageable pageable = getPageable(offset, limit, sort);
-        Page<PostDTO> posts = postsRepository.findAllPostsUsedQuery(Instant.now(), query, pageable);
+        posts = getPageWithPostDTO(postsRepository.findAllPostsUsedQuery(Instant.now(), query, getPageable(offset, limit)));
         return ResponseEntity.ok(new ListPostsDTO(posts));
     }
 
     public ResponseEntity<?> searchByDate(int offset, int limit, String date) {
-        if (!DateUtils.isValidDate(date))
+        if (!DateUtils.isValidDate(date)) {
             return ResponseEntity.badRequest().body(APIResponse.error(ConfigStrings.POST_INVALID_DATE));
+        }
 
-        Sort sort = Sort.by(Sort.Direction.DESC, "time");
-        Pageable pageable = getPageable(offset, limit, sort);
-        Page<PostDTO> posts = postsRepository.findAllPostsUsedDate(Instant.now(), date, pageable);
+        posts = getPageWithPostDTO(postsRepository.findAllPostsUsedDate(Instant.now(), date, getPageable(offset, limit)));
 
         return ResponseEntity.ok(new ListPostsDTO(posts));
     }
@@ -165,21 +160,20 @@ public class PostsService {
                     APIResponse.error(String.format(ConfigStrings.POST_INVALID_TAG, tagName))
             );
 
-        Sort sort = Sort.by(Sort.Direction.DESC, "time");
-        Pageable pageable = getPageable(offset, limit, sort);
-
-        Page<PostDTO> posts = postsRepository.findAllPostsUsedTag(Instant.now(), tag, pageable);
+        posts = getPageWithPostDTO(postsRepository.findAllPostsUsedTag(Instant.now(), tag, getPageable(offset, limit)));
         return ResponseEntity.ok(new ListPostsDTO(posts));
     }
 
-
-
-    private Pageable getPageable(int offset, int limit, Sort sort) {
-        return PageRequest.of(offset / limit, limit, sort);
+    private Pageable getPageable(int offset, int limit) {
+        return PageRequest.of(offset / limit, limit);
     }
 
-    private Page<PostDTO> getAllActivePosts(Instant now, int offset, int limit, Sort sort) {
-        return postsRepository.findAllPosts(now, getPageable(offset, limit, sort));
+    private Page<PostDTO> getAllActivePosts (Instant now, int offset, int limit ) {
+        Page<Post> source = postsRepository.findAllPosts(now, getPageable(offset, limit));
+        return getPageWithPostDTO(source);
     }
 
+    private Page<PostDTO> getPageWithPostDTO(Page<Post> source) {
+        return source.map(PostDTOConverter::getConversion);
+    }
 }

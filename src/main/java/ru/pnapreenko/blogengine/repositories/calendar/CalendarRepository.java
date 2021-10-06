@@ -23,16 +23,17 @@ public class CalendarRepository implements CalendarRepInterface {
             "AND p.moderationStatus = 'ACCEPTED' " +
             "AND p.time <= NOW() ";
 
-    final String QUERY_YEARS = "SELECT YEAR(p.time) as years " +
+    final String QUERY_YEARS = "SELECT YEAR(p.time) AS years " +
             "FROM Post p %s " +
             "GROUP BY years " +
-            "ORDER BY p.time DESC";
+            "ORDER BY p.time DESC ";
 
     final String QUERY_POSTS = "SELECT " +
-            "    DATE_FORMAT(p.time,'%%Y-%%m-%%d') as post_date, " +
-            "    count(*) as num_posts " +
+            "    DATE_FORMAT(p.time,'%%Y-%%m-%%d') AS post_date, " +
+            "    COUNT(*) AS num_posts " +
             "FROM Post p %s " +
-            "GROUP BY post_date ";
+            "GROUP BY post_date " +
+            "ORDER BY p.time DESC ";
 
     @Override
     public List<Integer> findAllYears(String year) {
