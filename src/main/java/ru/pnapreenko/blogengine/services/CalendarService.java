@@ -19,7 +19,7 @@ public class CalendarService {
     }
 
     public CalendarDTO getCalendar(String year) {
-        List<Integer> years = calendarRepository.findAllYears(year);
+        List<Integer> years = calendarRepository.findAllYears();
         Map<String, Long> posts = calendarRepository.findAllPosts(year);
         return new CalendarDTO(years, posts);
     }
