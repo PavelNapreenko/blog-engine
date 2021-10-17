@@ -14,6 +14,5 @@ public interface CaptchaCodesRepository extends CrudRepository<CaptchaCode, Inte
 
     @Modifying
     void deleteByTimeBefore(Instant time);
-
     CaptchaCode findBySecretCode(String secretCode);
 }

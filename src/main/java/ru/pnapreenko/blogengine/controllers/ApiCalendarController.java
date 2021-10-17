@@ -1,7 +1,6 @@
 package ru.pnapreenko.blogengine.controllers;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -16,7 +15,6 @@ public class ApiCalendarController {
 
     private final CalendarService calendarService;
 
-    @Autowired
     public ApiCalendarController(CalendarService calendarService) {
         this.calendarService = calendarService;
     }

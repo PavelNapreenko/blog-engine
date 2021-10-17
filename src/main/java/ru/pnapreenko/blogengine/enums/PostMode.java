@@ -1,6 +1,6 @@
 package ru.pnapreenko.blogengine.enums;
 
-import ru.pnapreenko.blogengine.config.ConfigStrings;
+import ru.pnapreenko.blogengine.api.utils.ConfigStrings;
 
 public enum PostMode {
     /** сортировать по дате публикации, выводить сначала новые */

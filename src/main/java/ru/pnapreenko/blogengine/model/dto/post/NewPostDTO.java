@@ -9,7 +9,7 @@ import lombok.ToString;
 import org.springframework.lang.Nullable;
 import ru.pnapreenko.blogengine.api.components.PostDateConverter;
 import ru.pnapreenko.blogengine.api.components.ValidPostDate;
-import ru.pnapreenko.blogengine.config.ConfigStrings;
+import ru.pnapreenko.blogengine.api.utils.ConfigStrings;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;

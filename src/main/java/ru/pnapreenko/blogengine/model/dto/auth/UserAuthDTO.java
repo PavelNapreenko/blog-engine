@@ -1,4 +1,4 @@
-package ru.pnapreenko.blogengine.model.dto;
+package ru.pnapreenko.blogengine.model.dto.auth;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import lombok.Data;
@@ -9,7 +9,7 @@ import ru.pnapreenko.blogengine.api.utils.JsonViews;
 @Data
 @NoArgsConstructor
 @ToString
-public class UserAuthenticationDTO {
+public class UserAuthDTO {
     
     @JsonView(JsonViews.IdName.class)
     private int id;
@@ -32,7 +32,7 @@ public class UserAuthenticationDTO {
     @JsonView(JsonViews.IdName.class)
     private boolean settings;
 
-    public UserAuthenticationDTO(int id, String name, String photo, String email) {
+    public UserAuthDTO(int id, String name, String photo, String email) {
         this.id = id;
         this.name = name;
         this.photo = photo;
