@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import org.springframework.boot.jackson.JsonComponent;
 import ru.pnapreenko.blogengine.api.utils.DateUtils;
-import ru.pnapreenko.blogengine.config.ConfigStrings;
+import ru.pnapreenko.blogengine.api.utils.ConfigStrings;
 
 import java.text.SimpleDateFormat;
 import java.time.Instant;

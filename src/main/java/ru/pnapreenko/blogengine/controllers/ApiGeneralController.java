@@ -1,6 +1,5 @@
 package ru.pnapreenko.blogengine.controllers;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,7 +15,6 @@ public class ApiGeneralController {
     private final AppProperties appProperties;
     private final SettingsService settingsService;
 
-    @Autowired
     public ApiGeneralController(AppProperties appProperties, SettingsService settingsService) {
         this.appProperties = appProperties;
         this.settingsService = settingsService;

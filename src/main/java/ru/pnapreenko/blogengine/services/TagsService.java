@@ -1,6 +1,5 @@
 package ru.pnapreenko.blogengine.services;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import ru.pnapreenko.blogengine.model.Tag;
@@ -19,7 +18,6 @@ public class TagsService {
     private final TagsRepository tagsRepository;
     private final PostsRepository postsRepository;
 
-    @Autowired
     public TagsService(TagsRepository tagsRepository, PostsRepository postsRepository) {
         this.tagsRepository = tagsRepository;
         this.postsRepository = postsRepository;

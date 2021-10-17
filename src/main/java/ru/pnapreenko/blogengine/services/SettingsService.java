@@ -1,6 +1,5 @@
 package ru.pnapreenko.blogengine.services;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.pnapreenko.blogengine.enums.SettingsCodeAndValue;
 import ru.pnapreenko.blogengine.model.dto.SettingsDTO;
@@ -15,7 +14,6 @@ public class SettingsService {
 
     private final SettingsRepository settingsRepository;
 
-    @Autowired
     public SettingsService(SettingsRepository settingsRepository) {
         this.settingsRepository = settingsRepository;
     }

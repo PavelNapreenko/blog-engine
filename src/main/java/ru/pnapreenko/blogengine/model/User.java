@@ -7,6 +7,7 @@ import lombok.ToString;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 import org.hibernate.annotations.NaturalId;
+import ru.pnapreenko.blogengine.enums.Role;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
@@ -71,4 +72,8 @@ public class User extends AbstractEntity {
     @NotNull
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, orphanRemoval = true)
     private final Set<PostVote> votes = new HashSet<>();
+
+    public Role getRole() {
+        return isModerator ? Role.MODERATOR : Role.USER;
+    }
 }

@@ -1,7 +1,6 @@
 package ru.pnapreenko.blogengine.controllers;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -16,9 +15,10 @@ import ru.pnapreenko.blogengine.services.PostsService;
 @RequestMapping("/api/post")
 public class ApiPostController {
 
+    // @PreAuthorize("hasAuthority('user:write')")
+    //@PreAuthorize("hasAuthority('user:moderate')")
     private final PostsService postsService;
 
-    @Autowired
     public ApiPostController(PostsService postsService) {
         this.postsService = postsService;
     }
@@ -56,6 +56,7 @@ public class ApiPostController {
             @RequestParam(name = "offset") int offset,
             @RequestParam(name = "limit") int limit,
             @RequestParam(name = "tag") String tagName) {
+
         return postsService.searchByTag(offset, limit, tagName);
     }
 

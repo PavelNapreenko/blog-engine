@@ -21,7 +21,7 @@ VALUES (1, NULL, 'dima.dima@fakemail.tld', b'0', 'Дмитрий Дмитрие�
        (10, NULL, 'demyan2D@fakemail.tld', b'0', 'Демьян Демьяненко',
         '$2y$08$BESk64YmYRuGNNTqYAHNQ.8HBqdhczfybYK1HXufEaNU1QbbgHwwu', NULL, '2020-12-28 08:23:11.000000'),
        (18, NULL, 'napreenko.pavel@mail.ru', b'1', 'Напреенко Павел',
-        '$2y$08$px8dDw0/Evl6j0noResHwuFqOW7I3EclaAxbFbTuVaG75aEurWxyC', NULL, '2021-02-05 19:31:32.000000'),
+        '$2a$12$s2IUixZ8A6AWSjTrD6Nb4uK5zj8Jcke6D9NzxRtCMisTdwAnmtG7S', NULL, '2021-02-05 19:31:32.000000'),
        (19, NULL, 'piter.ershov@gmail.com', b'0', 'piter.ershov@gmail.com',
         '$2y$08$2KjxvwFYrT8Pz67ABoj8/uuTgClGhsr/cdCWgFuVZrFpLxpOrbv6G', NULL, '2021-02-05 19:48:28.000000'),
        (20, NULL, 'ivan.ifanoff@gmail.tld', b'0', 'ivan.ifanoff@gmail.tld',

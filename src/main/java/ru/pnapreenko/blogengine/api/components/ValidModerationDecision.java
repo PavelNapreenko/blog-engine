@@ -1,6 +1,6 @@
 package ru.pnapreenko.blogengine.api.components;
 
-import ru.pnapreenko.blogengine.config.ConfigStrings;
+import ru.pnapreenko.blogengine.api.utils.ConfigStrings;
 import ru.pnapreenko.blogengine.enums.ModerationDecision;
 
 import javax.validation.Constraint;

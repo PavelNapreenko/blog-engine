@@ -1,6 +1,5 @@
 package ru.pnapreenko.blogengine.services;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.pnapreenko.blogengine.model.dto.CalendarDTO;
 import ru.pnapreenko.blogengine.repositories.calendar.CalendarRepository;
@@ -13,7 +12,6 @@ public class CalendarService {
 
     private final CalendarRepository calendarRepository;
 
-    @Autowired
     public CalendarService(CalendarRepository calendarRepository) {
         this.calendarRepository = calendarRepository;
     }
