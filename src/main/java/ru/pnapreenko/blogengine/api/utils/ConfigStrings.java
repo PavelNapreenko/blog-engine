@@ -34,10 +34,10 @@ public class ConfigStrings {
 
     public static final String MODERATION_WRONG_DECISION = "Неверное значение параметра! Используйте 'accept' или 'decline'.";
 
-    public static final String AUTH_INVALID_EMAIL = "Почтовый адрес указан неверно.";
+    public static final String AUTH_INVALID_EMAIL = "E-mail указан неверно.";
     public static final String AUTH_SHORT_PASSWORD = "Слишком короткий пароль.";
     public static final int AUTH_BCRYPT_STRENGTH = 8;
-    public static final String AUTH_EMAIL_ALREADY_REGISTERED = "Этот почтовый адрес уже зарегистрирован.";
+    public static final String AUTH_EMAIL_ALREADY_REGISTERED = "Этот e-mail уже зарегистрирован.";
     public static final int AUTH_MIN_PASSWORD_LENGTH = 6;
     public static final String AUTH_INVALID_PASSWORD_LENGTH = String.format("Пароль короче " +
             "%d символов.", AUTH_MIN_PASSWORD_LENGTH);
@@ -46,4 +46,5 @@ public class ConfigStrings {
     public static final String AUTH_EMPTY_EMAIL_OR_PASSWORD = "Адрес или пароль не указаны.";
     public static final String AUTH_LOGIN_NO_SUCH_USER = "Пользователь не найден.";
     public static final String AUTH_WRONG_PASSWORD = "Пароль указан неверно.";
+    public static final String AUTH_INVALID_NAME = "Имя указано неверно.";
 }
