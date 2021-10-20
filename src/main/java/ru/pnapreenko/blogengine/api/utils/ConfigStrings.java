@@ -47,4 +47,8 @@ public class ConfigStrings {
     public static final String AUTH_LOGIN_NO_SUCH_USER = "Пользователь не найден.";
     public static final String AUTH_WRONG_PASSWORD = "Пароль указан неверно.";
     public static final String AUTH_INVALID_NAME = "Имя указано неверно.";
+    public static final int POST_NEW_TITLE_MIN_LENGTH = 3;
+    public static final String POST_INVALID_NEW_TITLE = "Заголовок поста не установлен.";
+    public static final int POST_NEW_TEXT_MIN_LENGTH = 50;
+    public static final String POST_INVALID_NEW_TEXT = "Текст публикации слишком короткий.";
 }

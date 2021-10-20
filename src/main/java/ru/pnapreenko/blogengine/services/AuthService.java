@@ -121,11 +121,11 @@ public class AuthService {
         return captchaService.getCaptcha();
     }
 
-    private User getUserFromDB (String email) {
+    public User getUserFromDB (String email) {
         return usersRepository.findByEmail(email);
     }
 
-    private UserAuthDTO getAuthUser(User user) {
+    public UserAuthDTO getAuthUser(User user) {
         UserAuthDTO userAuthDTO = new UserAuthDTO(user.getId(), user.getName(), user.getPhoto(), user.getEmail());
         if (user.isModerator()) {
             userAuthDTO.setUserModeratorStatus(postsRepository.countPostAwaitingModeration());

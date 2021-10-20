@@ -6,11 +6,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.Errors;
 import ru.pnapreenko.blogengine.api.responses.APIResponse;
 import ru.pnapreenko.blogengine.api.utils.ConfigStrings;
 import ru.pnapreenko.blogengine.api.utils.DateUtils;
+import ru.pnapreenko.blogengine.api.utils.ErrorsValidation;
 import ru.pnapreenko.blogengine.api.utils.PostDTOConverter;
 import ru.pnapreenko.blogengine.enums.ModerationStatus;
+import ru.pnapreenko.blogengine.enums.MyPostsStatus;
 import ru.pnapreenko.blogengine.enums.PostMode;
 import ru.pnapreenko.blogengine.model.Post;
 import ru.pnapreenko.blogengine.model.PostComment;
@@ -24,8 +27,11 @@ import ru.pnapreenko.blogengine.repositories.PostsRepository;
 import ru.pnapreenko.blogengine.repositories.TagsRepository;
 import ru.pnapreenko.blogengine.repositories.VotesRepository;
 
+import java.security.Principal;
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -36,15 +42,18 @@ public class PostsService {
     private final VotesRepository votesRepository;
     private final CommentsRepository commentsRepository;
     private final TagsService tagsService;
+    private final AuthService authService;
     private Page<PostDTO> posts;
 
+
     public PostsService(PostsRepository postsRepository, TagsRepository tagsRepository, VotesRepository votesRepository,
-                        CommentsRepository commentsRepository, TagsService tagsService) {
+                        CommentsRepository commentsRepository, TagsService tagsService, AuthService authService) {
         this.postsRepository = postsRepository;
         this.tagsRepository = tagsRepository;
         this.votesRepository = votesRepository;
         this.commentsRepository = commentsRepository;
         this.tagsService = tagsService;
+        this.authService = authService;
     }
 
     public ResponseEntity<?> getPosts(int offset, int limit, String postMode) {
@@ -79,8 +88,6 @@ public class PostsService {
         return ResponseEntity.ok(new ListPostsDTO(posts));
     }
 
-
-
     public ResponseEntity<?> getPost(int id) {
         Optional<Post> postOptional = postsRepository.findById(id);
 
@@ -107,28 +114,6 @@ public class PostsService {
         }
 
         return ResponseEntity.ok(postDTO);
-    }
-
-    public Post savePost(Post post, NewPostDTO postData, User editor) {
-
-        final Post postToSave = (post == null) ? new Post() : post;
-        final Instant NOW = Instant.now();
-
-        postToSave.setTitle(postData.getTitle());
-        postToSave.setText(postData.getText());
-        postToSave.setActive(postData.getActive());
-        postToSave.setTime(postData.getTime().isBefore(NOW) ? NOW : postData.getTime());
-        postToSave.setAuthor((postToSave.getId() == 0) ? editor : postToSave.getAuthor());
-
-        if ((post == null) || (editor.equals(postToSave.getAuthor()) && !editor.isModerator())) {
-            postToSave.setModerationStatus(ModerationStatus.NEW);
-        }
-
-        if (postData.getTags() != null) {
-            postData.getTags().forEach(tag -> postToSave.getTags().add(tagsService.saveTag(tag)));
-        }
-
-        return postsRepository.save(postToSave);
     }
 
     public ResponseEntity<?> searchPosts(int offset, int limit, String query) {
@@ -162,6 +147,51 @@ public class PostsService {
         return ResponseEntity.ok(new ListPostsDTO(posts));
     }
 
+    public ResponseEntity<?> getModeratedPosts(int offset, int limit, ModerationStatus status, Principal principal) {
+        User moderator = authService.getUserFromDB(principal.getName());
+        posts = getPageWithPostDTO(postsRepository.findAllModeratedPosts(status, moderator, getPageable(offset,limit)));
+        return ResponseEntity.ok(new ListPostsDTO(posts));
+    }
+
+    public ResponseEntity<?> getMyPosts(int offset, int limit, MyPostsStatus myPostsStatus, Principal principal) {
+        final boolean isActive = myPostsStatus.isActive();
+        final ModerationStatus postStatus = myPostsStatus.getModerationStatus();
+        User user = authService.getUserFromDB(principal.getName());
+        posts = getPageWithPostDTO(postsRepository.findMyPosts(user, isActive, postStatus, getPageable(offset, limit)));
+        return ResponseEntity.ok(new ListPostsDTO(posts));
+    }
+
+    public ResponseEntity<?> savePost(Post post, NewPostDTO newPost, Principal principal, Errors validationErrors) {
+        Map<String, Object> errors = validateNewPostSaveDataInputAndGetErrors(newPost, validationErrors);
+
+        if (errors.size() > 0)
+            return ResponseEntity.ok(APIResponse.error(errors));
+
+        User editor = authService.getUserFromDB(principal.getName());
+        Post postToSave = (post == null) ? new Post() : post;
+        Instant now = Instant.now();
+        Instant postDate = Instant.ofEpochMilli(newPost.getTimestamp());
+
+        postToSave.setTitle(newPost.getTitle());
+        postToSave.setText(newPost.getText());
+        postToSave.setActive(newPost.getActive());
+        postToSave.setTime(postDate.isBefore(now) ? now : postDate);
+        postToSave.setAuthor((postToSave.getId() == 0) ? editor : postToSave.getAuthor());
+
+        if ((post == null) || (editor.equals(postToSave.getAuthor()) && !editor.isModerator())) {
+            postToSave.setModerationStatus(ModerationStatus.NEW);
+        }
+
+        if (newPost.getTags() != null) {
+            newPost.getTags().forEach(tag -> postToSave.getTags().add(tagsService.saveTag(tag)));
+        }
+
+        postsRepository.save(postToSave);
+        return ResponseEntity.ok(APIResponse.ok());
+    }
+
+
+
     private Page<PostDTO> getAllActivePosts (Instant now, int offset, int limit) {
         Page<Post> source = postsRepository.findAllOrderByTimeLessThen_Desc(now, getPageable(offset, limit));
         return getPageWithPostDTO(source);
@@ -173,5 +203,23 @@ public class PostsService {
 
     private Page<PostDTO> getPageWithPostDTO(Page<Post> source) {
         return source.map(PostDTOConverter::getConversion);
+    }
+
+    private Map<String, Object> validateNewPostSaveDataInputAndGetErrors(NewPostDTO newPost, Errors validationErrors) {
+        final String title = newPost.getTitle();
+        final String text = newPost.getText();
+
+        Map<String, Object> errors = new HashMap<>();
+
+        if (validationErrors.hasErrors())
+            return ErrorsValidation.getValidationErrors(validationErrors);
+
+        if (title == null || title.length() < ConfigStrings.POST_NEW_TITLE_MIN_LENGTH)
+            errors.put("title", ConfigStrings.POST_INVALID_NEW_TITLE);
+
+        if (text == null || text.length() < ConfigStrings.POST_NEW_TEXT_MIN_LENGTH)
+            errors.put("text", ConfigStrings.POST_INVALID_NEW_TEXT);
+
+        return errors;
     }
 }

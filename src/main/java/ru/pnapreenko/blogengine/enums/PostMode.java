@@ -32,4 +32,5 @@ public enum PostMode {
             }
         }
         throw new IllegalArgumentException(String.format(ConfigStrings.POST_NO_SUCH_MODE, name));
-    }}
+    }
+}

@@ -54,6 +54,4 @@ public class ApiAuthController {
         return authService.getCaptcha();
     }
 
-
-
 }

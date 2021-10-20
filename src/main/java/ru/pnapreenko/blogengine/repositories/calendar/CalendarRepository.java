@@ -15,21 +15,9 @@ import java.util.stream.Collectors;
 public class CalendarRepository implements CalendarRepositoryInterface {
 
     private final EntityManager em;
-
-    final static String WHERE = "WHERE p.isActive = 1 " +
-            "AND p.moderationStatus = 'ACCEPTED' " +
-            "AND p.time <= NOW() ";
-
-    final static String WHERE_WITH_YEAR = "WHERE p.isActive = 1 " +
-            "AND p.moderationStatus = 'ACCEPTED' " +
-            "AND YEAR(p.time) = ";
-
-
-    final String QUERY_YEARS = "SELECT DISTINCT YEAR(p.time) AS years " +
-            "FROM Post p " +
-            WHERE +
-            "GROUP BY p.time " +
-            "ORDER BY years";
+    static final String WHERE = "WHERE p.isActive = 1 AND p.moderationStatus = 'ACCEPTED' AND p.time <= NOW() ";
+    static final String WHERE_WITH_YEAR = "WHERE p.isActive = 1 AND p.moderationStatus = 'ACCEPTED' AND YEAR(p.time) = ";
+    static final String QUERY_YEARS = "SELECT DISTINCT YEAR(p.time) AS years FROM Post p " + WHERE + "GROUP BY p.time ORDER BY years";
 
     @Autowired
     public CalendarRepository(EntityManager em) {

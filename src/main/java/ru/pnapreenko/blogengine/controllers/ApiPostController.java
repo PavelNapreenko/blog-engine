@@ -3,24 +3,31 @@ package ru.pnapreenko.blogengine.controllers;
 import com.fasterxml.jackson.annotation.JsonView;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.validation.Errors;
+import org.springframework.web.bind.annotation.*;
 import ru.pnapreenko.blogengine.api.utils.JsonViews;
+import ru.pnapreenko.blogengine.enums.ModerationStatus;
+import ru.pnapreenko.blogengine.enums.MyPostsStatus;
+import ru.pnapreenko.blogengine.model.Post;
+import ru.pnapreenko.blogengine.model.dto.post.NewPostDTO;
+import ru.pnapreenko.blogengine.repositories.PostsRepository;
 import ru.pnapreenko.blogengine.services.PostsService;
+
+import javax.validation.Valid;
+import java.security.Principal;
 
 @Controller
 @RequestMapping("/api/post")
 public class ApiPostController {
 
-    // @PreAuthorize("hasAuthority('user:write')")
-    //@PreAuthorize("hasAuthority('user:moderate')")
     private final PostsService postsService;
+    private final PostsRepository postsRepository;
 
-    public ApiPostController(PostsService postsService) {
+    public ApiPostController(PostsService postsService, PostsRepository postsRepository) {
         this.postsService = postsService;
+        this.postsRepository = postsRepository;
     }
 
     @GetMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -56,7 +63,6 @@ public class ApiPostController {
             @RequestParam(name = "offset") int offset,
             @RequestParam(name = "limit") int limit,
             @RequestParam(name = "tag") String tagName) {
-
         return postsService.searchByTag(offset, limit, tagName);
     }
 
@@ -64,5 +70,49 @@ public class ApiPostController {
     @JsonView(JsonViews.EntityIdName.class)
     public ResponseEntity<?> searchPosts(@PathVariable int id) {
         return postsService.getPost(id);
+    }
+
+    @PreAuthorize("hasAuthority('user:moderate')")
+    @GetMapping(value = "/moderation", produces = MediaType.APPLICATION_JSON_VALUE)
+    @JsonView(JsonViews.IdName.class)
+    public ResponseEntity<?> getModeratedPosts(
+            @RequestParam(name = "offset") int offset,
+            @RequestParam(name = "limit") int limit,
+            @RequestParam(name = "status") String status,
+            Principal principal) {
+        ModerationStatus moderationStatus = new ModerationStatus.StringToEnumConverter().convert(status);
+        moderationStatus = (moderationStatus == null) ? ModerationStatus.NEW : moderationStatus;
+        return postsService.getModeratedPosts(offset, limit, moderationStatus, principal);
+    }
+
+    @PreAuthorize("hasAuthority('user:write')")
+    @GetMapping(value = "/my", produces = MediaType.APPLICATION_JSON_VALUE)
+    @JsonView(JsonViews.IdName.class)
+    public ResponseEntity<?> getMyPosts(
+            @RequestParam(name = "offset") int offset,
+            @RequestParam(name = "limit") int limit,
+            @RequestParam(name = "status") String status,
+            Principal principal) {
+        MyPostsStatus myPostsStatus = new MyPostsStatus.StringToEnumConverter().convert(status);
+        myPostsStatus = (myPostsStatus == null) ? MyPostsStatus.INACTIVE : myPostsStatus;
+        return postsService.getMyPosts(offset, limit, myPostsStatus, principal);
+    }
+
+    @PreAuthorize("hasAuthority('user:write')")
+    @PostMapping(value = "",
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> saveNewPost(@RequestBody @Valid NewPostDTO newPost, Principal principal, Errors errors) {
+                return postsService.savePost(null, newPost, principal, errors);
+    }
+
+    @PreAuthorize("hasAuthority('user:write')")
+    @PutMapping(value = "/{id:[1-9]\\d*}",
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> editPost(@PathVariable int id,
+                                      @RequestBody @Valid NewPostDTO newPostData, Principal principal, Errors errors) {
+        Post post = postsRepository.getById(id);
+        return postsService.savePost(post, newPostData, principal, errors);
     }
 }

@@ -6,8 +6,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import ru.pnapreenko.blogengine.enums.ModerationStatus;
 import ru.pnapreenko.blogengine.model.Post;
 import ru.pnapreenko.blogengine.model.Tag;
+import ru.pnapreenko.blogengine.model.User;
+
 import java.time.Instant;
 
 @Repository
@@ -19,7 +22,7 @@ public interface PostsRepository extends JpaRepository<Post, Integer> {
     @Query("select p from #{#entityName} p where p.isActive = 1 and p.moderationStatus = 'ACCEPTED' and p.time <= :date order by p.time")
     Page<Post> findAllOrderByTimeLessThen(@Param("date") Instant date, Pageable pageable);
 
-    @Query("select p from #{#entityName} p left join p.votes v " + "where p.isActive = 1 and p.moderationStatus = 'ACCEPTED' and p.time <= :date " +
+    @Query("select p from #{#entityName} p left join p.votes v where p.isActive = 1 and p.moderationStatus = 'ACCEPTED' and p.time <= :date " +
             "group by p.id order by (sum(case when v.value = 1 then 1 else 0 end)) desc")
     Page<Post> findAllOrderByVotesDescAndTimeLessThen(@Param("date") Instant date, Pageable pageable);
 
@@ -28,7 +31,7 @@ public interface PostsRepository extends JpaRepository<Post, Integer> {
     Page<Post> findAllOrderByCommentsDecsAndTimeLessThen(@Param("date") Instant date, Pageable pageable);
 
     @Query("select p from #{#entityName} p where p.isActive = 1 and p.moderationStatus = 'ACCEPTED' and p.time <= :date " +
-            "and date_format (p.time, '%Y-%m-%d') = str(:date_requested) group by p.id order by p.time desc")
+            "and date_format(p.time, '%Y-%m-%d') = str(:date_requested) group by p.id order by p.time desc")
     Page<Post> findAllByDate(
             @Param("date") Instant date,
             @Param("date_requested") String dateRequested,
@@ -51,6 +54,18 @@ public interface PostsRepository extends JpaRepository<Post, Integer> {
     @Query("select count(p) from #{#entityName} p where p.isActive = 1 and p.moderationStatus = 'ACCEPTED' and p.time <= :date")
     int countActivePosts(@Param("date") Instant date);
 
-    @Query("select count(p) from #{#entityName} p " + "where p.isActive = 1 AND p.moderationStatus = 'NEW' AND p.moderatedBy IS NULL")
+    @Query("select count(p) from #{#entityName} p " + "where p.isActive = 1 and p.moderationStatus = 'NEW' and p.moderatedBy is null")
     int countPostAwaitingModeration();
+
+    @Query("select p from #{#entityName} p where p.isActive = 1 and p.moderationStatus = :status and (:user is null or p.moderatedBy = :user)")
+    Page<Post> findAllModeratedPosts(@Param("status")ModerationStatus status,
+                                     @Param("user")User moderator,
+                                     Pageable pageable);
+
+    @Query("select p from #{#entityName} p left join p.votes v where p.author = :user and p.isActive = :is_active and " +
+            "(:status is null or p.moderationStatus = :status) group by p.id order by (sum(case when v.value = 1 then 1 else 0 end)) desc")
+    Page<Post> findMyPosts(@Param("user") User user,
+                           @Param("is_active") boolean isActive,
+                           @Param("status") ModerationStatus postStatus,
+                           Pageable pageable);
 }

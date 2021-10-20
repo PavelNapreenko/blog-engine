@@ -6,10 +6,12 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
+import lombok.SneakyThrows;
 import org.springframework.boot.jackson.JsonComponent;
 import ru.pnapreenko.blogengine.api.utils.DateUtils;
 import ru.pnapreenko.blogengine.api.utils.ConfigStrings;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 
@@ -34,10 +36,10 @@ public class PostDateConverter {
 
     public static class Deserialize extends JsonDeserializer<Instant> {
         @Override
-        public Instant deserialize(JsonParser jsonparser, DeserializationContext context) {
+        public Instant deserialize(JsonParser jsonparser, DeserializationContext context) throws IOException {
             try {
-                String date = jsonparser.getText();
-                return (date != null) ? Instant.ofEpochMilli(sdf.parse(date).getTime()) : null;
+                long timestamp = Long.parseLong(jsonparser.getText());
+                return Instant.ofEpochMilli(timestamp);
             } catch (Exception ignored) {
             }
             return null;
