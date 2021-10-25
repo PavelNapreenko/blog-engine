@@ -3,6 +3,7 @@ package ru.pnapreenko.blogengine.repositories.calendar;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+import ru.pnapreenko.blogengine.api.interfaces.CalendarRepositoryInterface;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Tuple;

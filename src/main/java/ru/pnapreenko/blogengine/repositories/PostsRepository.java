@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import ru.pnapreenko.blogengine.enums.ModerationStatus;
+import ru.pnapreenko.blogengine.enums.MyPostsStatus;
 import ru.pnapreenko.blogengine.model.Post;
 import ru.pnapreenko.blogengine.model.Tag;
 import ru.pnapreenko.blogengine.model.User;
@@ -58,7 +59,7 @@ public interface PostsRepository extends JpaRepository<Post, Integer> {
     int countPostAwaitingModeration();
 
     @Query("select p from #{#entityName} p where p.isActive = 1 and p.moderationStatus = :status and (:user is null or p.moderatedBy = :user)")
-    Page<Post> findAllModeratedPosts(@Param("status")ModerationStatus status,
+    Page<Post> findAllModeratedPosts(@Param("status") ModerationStatus status,
                                      @Param("user")User moderator,
                                      Pageable pageable);
 
