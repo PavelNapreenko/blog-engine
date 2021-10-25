@@ -1,6 +1,5 @@
 package ru.pnapreenko.blogengine.api.components;
 
-import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.stereotype.Component;
@@ -17,6 +16,7 @@ import ru.pnapreenko.blogengine.api.utils.ErrorsValidation;
 import ru.pnapreenko.blogengine.services.ImageStorageService;
 
 import javax.validation.ConstraintViolationException;
+import javax.validation.Path;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,36 +24,33 @@ import java.util.Map;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler
-    @ResponseBody
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Object handleConstraintViolationException(ConstraintViolationException e) {
-        Map<String, Object> errors = new HashMap<>();
-
-        e.getConstraintViolations()
-                .forEach(constraint -> {
-                    PathImpl path = (PathImpl)constraint.getPropertyPath();
-                    errors.put(path.getLeafNode().getName(), constraint.getMessage());
-                });
-
-        return APIResponse.error(ConfigStrings.VALIDATION_MESSAGE, errors);
-    }
-
-    @ExceptionHandler
-    @ResponseBody
-    @ResponseStatus(HttpStatus.OK)
-    public Object handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
-        Map<String, Object> errors = ErrorsValidation.getValidationErrors(e.getBindingResult());
-
-        return APIResponse.error(ConfigStrings.VALIDATION_MESSAGE, errors);
-    }
-
-    @ExceptionHandler
-    @ResponseBody
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Object handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
-        return APIResponse.error(e.getMessage());
-    }
+//    @ExceptionHandler
+//    @ResponseBody
+//    @ResponseStatus(HttpStatus.BAD_REQUEST)
+//    public Object handleConstraintViolationException(ConstraintViolationException e) {
+//        Map<String, Object> errors = new HashMap<>();
+//        e.getConstraintViolations()
+//                .forEach(constraint -> {
+//                    Path path = constraint.getPropertyPath();
+//                    errors.put(path.toString(), constraint.getMessage());
+//                });
+//        return APIResponse.error(ConfigStrings.VALIDATION_MESSAGE, errors);
+//    }
+//
+//    @ExceptionHandler
+//    @ResponseBody
+//    @ResponseStatus(HttpStatus.OK)
+//    public Object handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+//        Map<String, Object> errors = ErrorsValidation.getValidationErrors(e.getBindingResult());
+//        return APIResponse.error(ConfigStrings.VALIDATION_MESSAGE, errors);
+//    }
+//
+//    @ExceptionHandler
+//    @ResponseBody
+//    @ResponseStatus(HttpStatus.BAD_REQUEST)
+//    public Object handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
+//        return APIResponse.error(e.getMessage());
+//    }
 
     @ExceptionHandler
     @ResponseBody
@@ -69,22 +66,22 @@ public class GlobalExceptionHandler {
         return APIResponse.error(e.getMessage());
     }
 
-    @ExceptionHandler
-    @ResponseBody
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Object handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException e) {
-        return APIResponse.error(new HashMap<>() {{
-            put(e.getName(), String.format(ConfigStrings.ERROR_HANDLER_INVALID_OPTION,
-                    e.getName(), e.getValue()));
-        }});
-    }
-
-    @ExceptionHandler
-    @ResponseBody
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Object handleMissingServletRequestParameterException(MissingServletRequestParameterException e) {
-        return APIResponse.error(new HashMap<>() {{
-            put(e.getParameterName(), e.getMessage());
-        }});
-    }
+//    @ExceptionHandler
+//    @ResponseBody
+//    @ResponseStatus(HttpStatus.BAD_REQUEST)
+//    public Object handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException e) {
+//        return APIResponse.error(new HashMap<>() {{
+//            put(e.getName(), String.format(ConfigStrings.ERROR_HANDLER_INVALID_OPTION,
+//                    e.getName(), e.getValue()));
+//        }});
+//    }
+//
+//    @ExceptionHandler
+//    @ResponseBody
+//    @ResponseStatus(HttpStatus.BAD_REQUEST)
+//    public Object handleMissingServletRequestParameterException(MissingServletRequestParameterException e) {
+//        return APIResponse.error(new HashMap<>() {{
+//            put(e.getParameterName(), e.getMessage());
+//        }});
+//    }
 }
