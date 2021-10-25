@@ -32,5 +32,4 @@ public class ApiImageController {
                 .buildAndExpand(storageService.getRootLocation(), pathToSavedFile);
         return ResponseEntity.ok(APIResponse.ok(uri.toUriString()));
     }
-
 }

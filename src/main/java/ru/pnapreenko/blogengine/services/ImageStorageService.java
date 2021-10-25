@@ -47,21 +47,21 @@ public class ImageStorageService implements StorageService {
 
         try {
             if (file.isEmpty()) {
-                throw new StorageException("Failed to store empty file: " + filename);
+                throw new StorageException("Не удалось сохранить пустой файл: " + filename);
             }
 
             if(file.getSize() > maxFileSize) {
-                throw new StorageException("The file exceeds the allowed size.");
+                throw new StorageException("Файл превышает допустимый размер.");
             }
 
             if (filename.contains("..")) {
                 throw new StorageException(
-                        "Cannot store file with relative path outside current directory: "
+                        "Не удается сохранить файл с относительным путем за пределами текущего каталога: "
                                 + filename);
             }
 
             if (!FILE_PATTERN.matcher(filename).matches()) {
-                throw new StorageException("Can store PNG & JPE?G images only: " + filename);
+                throw new StorageException("Можно хранить только PNG и JPE?G изображения: " + filename);
             }
 
             try (InputStream inputStream = file.getInputStream()) {
@@ -75,7 +75,7 @@ public class ImageStorageService implements StorageService {
                         StandardCopyOption.REPLACE_EXISTING);
             }
         } catch (IOException e) {
-            throw new StorageException("Failed to store file: " + filename, e);
+            throw new StorageException("Не удалось сохранить файл: " + filename, e);
         }
 
         return this.rootLocation.relativize(fullFilePath).toString()
@@ -97,9 +97,9 @@ public class ImageStorageService implements StorageService {
         try {
             result = Files.deleteIfExists(load(filename));
         } catch (NoSuchFileException e) {
-            throw new StorageException("No such file exists: " + filename, e);
+            throw new StorageFileNotFoundException("Такого файла не существует: " + filename, e);
         } catch (IOException e) {
-            throw new StorageException("Invalid permissions for file: " + filename, e);
+            throw new StorageException("Недопустимые разрешения для файла: " + filename, e);
         }
 
         return result;
@@ -122,10 +122,6 @@ public class ImageStorageService implements StorageService {
     }
 
     public static class StorageFileNotFoundException extends StorageException {
-
-        public StorageFileNotFoundException(String message) {
-            super(message);
-        }
 
         public StorageFileNotFoundException(String message, Throwable cause) {
             super(message, cause);
