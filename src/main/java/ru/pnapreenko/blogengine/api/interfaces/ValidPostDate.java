@@ -1,4 +1,4 @@
-package ru.pnapreenko.blogengine.api.components;
+package ru.pnapreenko.blogengine.api.interfaces;
 
 import ru.pnapreenko.blogengine.api.utils.ConfigStrings;
 

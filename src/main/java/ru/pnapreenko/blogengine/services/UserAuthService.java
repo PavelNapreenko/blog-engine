@@ -5,14 +5,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
-import org.springframework.security.web.authentication.ForwardAuthenticationSuccessHandler;
-import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.Errors;
 import ru.pnapreenko.blogengine.api.responses.APIResponse;
@@ -33,7 +29,7 @@ import java.util.Map;
 
 @Slf4j
 @Service
-public class AuthService {
+public class UserAuthService {
 
     private final AuthenticationManager authenticationManager;
     private final UsersRepository usersRepository;
@@ -43,8 +39,8 @@ public class AuthService {
     PasswordEncoder passwordEncoder;
     Authentication auth;
 
-    public AuthService(AuthenticationManager authenticationManager, UsersRepository usersRepository, PostsRepository postsRepository,
-                       CaptchaService captchaService) {
+    public UserAuthService(AuthenticationManager authenticationManager, UsersRepository usersRepository, PostsRepository postsRepository,
+                           CaptchaService captchaService) {
         this.authenticationManager = authenticationManager;
         this.usersRepository = usersRepository;
         this.postsRepository = postsRepository;
@@ -125,11 +121,11 @@ public class AuthService {
         return captchaService.getCaptcha();
     }
 
-    private User getUserFromDB (String email) {
+    public User getUserFromDB (String email) {
         return usersRepository.findByEmail(email);
     }
 
-    private UserAuthDTO getAuthUser(User user) {
+    public UserAuthDTO getAuthUser(User user) {
         UserAuthDTO userAuthDTO = new UserAuthDTO(user.getId(), user.getName(), user.getPhoto(), user.getEmail());
         if (user.isModerator()) {
             userAuthDTO.setUserModeratorStatus(postsRepository.countPostAwaitingModeration());
@@ -140,6 +136,7 @@ public class AuthService {
     private Map<String, Object> validateUserInputAndGetErrors(NewUserDTO user, Errors validationErrors) {
         final String email = user.getEmail();
         final String password = user.getPassword();
+        final String name = user.getName();
         final String captcha = user.getCaptcha();
         final String captchaSecretCode = user.getCaptchaSecret();
 
@@ -152,6 +149,9 @@ public class AuthService {
 
         if (userFromDB.getEmail().equals(email))
             errors.put("email", ConfigStrings.AUTH_EMAIL_ALREADY_REGISTERED);
+
+        if (name == null || name.equals(""))
+            errors.put("name", ConfigStrings.AUTH_INVALID_NAME);
 
         if (password == null || password.length() < ConfigStrings.AUTH_MIN_PASSWORD_LENGTH)
             errors.put("password", ConfigStrings.AUTH_INVALID_PASSWORD_LENGTH);

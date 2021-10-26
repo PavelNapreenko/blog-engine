@@ -1,17 +1,16 @@
-server.port:   8090
+server.port:  ${PORT:8090}
 
 spring:
   autoconfigure:
     exclude: org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
   datasource:
-    url: jdbc:mysql://${MYSQL_HOST:localhost}:3306/blogapp?createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
+    url: jdbc:${JAWSDB_DATABASE_URL:mysql://localhost:3306/blogapp}?createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
     username: root
     password: admin
     driver-class-name: com.mysql.cj.jdbc.Driver
-    hikari:
-      connection-timeout: 30000
-      maximum-pool-size: 10
-
+  hikari:
+    connection-timeout: 30_000
+    maximum-pool-size: 10
   jpa:
     open-in-view: false
     generate-ddl: true
@@ -34,7 +33,7 @@ blogapp:
   properties:
     title: BlogSite
     subtitle: Все обо Всём
-    phone: +7 929 591 59155
+    phone: +7 *** 591 5915
     email: pavel1119@mail.ru
     copyright: Павел Напреенко
     copyrightFrom: 2021
@@ -45,3 +44,6 @@ blogapp:
   captcha:
     code-length: 6
     code-ttl: 1
+  upload-dir:
+      location: ${IMAGES_UPLOAD_DIR:upload}
+

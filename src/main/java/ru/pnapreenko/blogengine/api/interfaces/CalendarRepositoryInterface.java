@@ -1,4 +1,4 @@
-package ru.pnapreenko.blogengine.repositories.calendar;
+package ru.pnapreenko.blogengine.api.interfaces;
 
 import java.util.List;
 import java.util.Map;

@@ -1,5 +1,8 @@
 package ru.pnapreenko.blogengine.api.utils;
 
+import java.util.Locale;
+import java.util.Map;
+
 public class ConfigStrings {
 
     public static final String MULTIUSER_MODE = "Многопользовательский режим";
@@ -34,10 +37,10 @@ public class ConfigStrings {
 
     public static final String MODERATION_WRONG_DECISION = "Неверное значение параметра! Используйте 'accept' или 'decline'.";
 
-    public static final String AUTH_INVALID_EMAIL = "Почтовый адрес указан неверно.";
+    public static final String AUTH_INVALID_EMAIL = "E-mail указан неверно.";
     public static final String AUTH_SHORT_PASSWORD = "Слишком короткий пароль.";
     public static final int AUTH_BCRYPT_STRENGTH = 8;
-    public static final String AUTH_EMAIL_ALREADY_REGISTERED = "Этот почтовый адрес уже зарегистрирован.";
+    public static final String AUTH_EMAIL_ALREADY_REGISTERED = "Этот e-mail уже зарегистрирован.";
     public static final int AUTH_MIN_PASSWORD_LENGTH = 6;
     public static final String AUTH_INVALID_PASSWORD_LENGTH = String.format("Пароль короче " +
             "%d символов.", AUTH_MIN_PASSWORD_LENGTH);
@@ -46,4 +49,21 @@ public class ConfigStrings {
     public static final String AUTH_EMPTY_EMAIL_OR_PASSWORD = "Адрес или пароль не указаны.";
     public static final String AUTH_LOGIN_NO_SUCH_USER = "Пользователь не найден.";
     public static final String AUTH_WRONG_PASSWORD = "Пароль указан неверно.";
+    public static final String AUTH_INVALID_NAME = "Имя указано неверно.";
+    public static final int POST_NEW_TITLE_MIN_LENGTH = 3;
+    public static final String POST_INVALID_NEW_TITLE = "Заголовок поста не установлен.";
+    public static final int POST_NEW_TEXT_MIN_LENGTH = 50;
+    public static final String POST_INVALID_NEW_TEXT = "Текст публикации слишком короткий.";
+    public static final String IMAGE_INVALID_SIZE = "Размер файла превышает допустимый размер.";
+    public static final long IMAGE_MAX_SIZE = 5_000_000;
+    public static final String IMAGE_INVALID_TYPE = "Неверный формат файла.";
+    public static final int IMAGES_MAX_CACHE_AGE = 3;
+
+
+    public static final String VALIDATION_MESSAGE = "Тело запроса пустое, сформировано неверно или содержит ошибки.";
+    public static final String ERROR_HANDLER_INVALID_OPTION = "Параметру '%s' установлено неверное значение: '%s'.";
+    public static final String COMMENT_POST_ID_IS_MANDATORY = "Поле 'post_id' является обязательным.";
+    public static final String WRONG_POST_ID = "Поле 'post_id' содержит неверный идентификатор.";
+    public static final String COMMENT_WRONG_PARENT_ID = "Поле 'parent_id' содержит неверный идентификатор.";
+    public static final String COMMENT_WRONG_TEXT = "Поле 'text' является обязательным и не может быть пустым.";
 }
