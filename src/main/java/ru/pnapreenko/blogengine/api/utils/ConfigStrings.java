@@ -62,4 +62,8 @@ public class ConfigStrings {
 
     public static final String VALIDATION_MESSAGE = "Тело запроса пустое, сформировано неверно или содержит ошибки.";
     public static final String ERROR_HANDLER_INVALID_OPTION = "Параметру '%s' установлено неверное значение: '%s'.";
+    public static final String COMMENT_POST_ID_IS_MANDATORY = "Поле 'post_id' является обязательным.";
+    public static final String WRONG_POST_ID = "Поле 'post_id' содержит неверный идентификатор.";
+    public static final String COMMENT_WRONG_PARENT_ID = "Поле 'parent_id' содержит неверный идентификатор.";
+    public static final String COMMENT_WRONG_TEXT = "Поле 'text' является обязательным и не может быть пустым.";
 }

@@ -39,7 +39,6 @@ public class ImageStorageService implements StorageService {
 
     @Override
     public String store(MultipartFile file) {
-
         final long maxFileSize = 5 * 1_024 * 1_024;
         final Pattern FILE_PATTERN = Pattern.compile("^(.*)(.)(png|jpe?g)$");
         Path fullFilePath;
@@ -77,7 +76,6 @@ public class ImageStorageService implements StorageService {
         } catch (IOException e) {
             throw new StorageException("Не удалось сохранить файл: " + filename, e);
         }
-
         return this.rootLocation.relativize(fullFilePath).toString()
                 .replace('\\', '/');
     }
@@ -93,7 +91,6 @@ public class ImageStorageService implements StorageService {
     @Override
     public boolean delete(String filename) {
         boolean result;
-
         try {
             result = Files.deleteIfExists(load(filename));
         } catch (NoSuchFileException e) {
@@ -101,7 +98,6 @@ public class ImageStorageService implements StorageService {
         } catch (IOException e) {
             throw new StorageException("Недопустимые разрешения для файла: " + filename, e);
         }
-
         return result;
     }
 
@@ -111,18 +107,15 @@ public class ImageStorageService implements StorageService {
     }
 
     public static class StorageException extends RuntimeException {
-
         public StorageException(String message) {
             super(message);
         }
-
         public StorageException(String message, Throwable cause) {
             super(message, cause);
         }
     }
 
     public static class StorageFileNotFoundException extends StorageException {
-
         public StorageFileNotFoundException(String message, Throwable cause) {
             super(message, cause);
         }

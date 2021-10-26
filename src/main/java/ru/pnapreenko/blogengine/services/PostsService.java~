@@ -42,18 +42,18 @@ public class PostsService {
     private final VotesRepository votesRepository;
     private final CommentsRepository commentsRepository;
     private final TagsService tagsService;
-    private final UserAuthService userAuthService;
+    private final AuthService authService;
     private Page<PostDTO> posts;
 
 
     public PostsService(PostsRepository postsRepository, TagsRepository tagsRepository, VotesRepository votesRepository,
-                        CommentsRepository commentsRepository, TagsService tagsService, UserAuthService userAuthService) {
+                        CommentsRepository commentsRepository, TagsService tagsService, AuthService authService) {
         this.postsRepository = postsRepository;
         this.tagsRepository = tagsRepository;
         this.votesRepository = votesRepository;
         this.commentsRepository = commentsRepository;
         this.tagsService = tagsService;
-        this.userAuthService = userAuthService;
+        this.authService = authService;
     }
 
     public ResponseEntity<?> getPosts(int offset, int limit, String postMode) {
@@ -148,7 +148,7 @@ public class PostsService {
     }
 
     public ResponseEntity<?> getModeratedPosts(int offset, int limit, ModerationStatus status, Principal principal) {
-        User moderator = userAuthService.getUserFromDB(principal.getName());
+        User moderator = authService.getUserFromDB(principal.getName());
         posts = getPageWithPostDTO(postsRepository.findAllModeratedPosts(status, moderator, getPageable(offset,limit)));
         return ResponseEntity.ok(new ListPostsDTO(posts));
     }
@@ -156,7 +156,7 @@ public class PostsService {
     public ResponseEntity<?> getMyPosts(int offset, int limit, MyPostsStatus myPostsStatus, Principal principal) {
         final boolean isActive = myPostsStatus.isActive();
         final ModerationStatus postStatus = myPostsStatus.getModerationStatus();
-        User user = userAuthService.getUserFromDB(principal.getName());
+        User user = authService.getUserFromDB(principal.getName());
         posts = getPageWithPostDTO(postsRepository.findMyPosts(user, isActive, postStatus, getPageable(offset, limit)));
         return ResponseEntity.ok(new ListPostsDTO(posts));
     }
@@ -167,7 +167,7 @@ public class PostsService {
         if (errors.size() > 0)
             return ResponseEntity.ok(APIResponse.error(errors));
 
-        User editor = userAuthService.getUserFromDB(principal.getName());
+        User editor = authService.getUserFromDB(principal.getName());
         Post postToSave = (post == null) ? new Post() : post;
         Instant now = Instant.now();
         Instant postDate = Instant.ofEpochMilli(newPost.getTimestamp());

@@ -29,7 +29,7 @@ import java.util.Map;
 
 @Slf4j
 @Service
-public class AuthService {
+public class UserAuthService {
 
     private final AuthenticationManager authenticationManager;
     private final UsersRepository usersRepository;
@@ -39,8 +39,8 @@ public class AuthService {
     PasswordEncoder passwordEncoder;
     Authentication auth;
 
-    public AuthService(AuthenticationManager authenticationManager, UsersRepository usersRepository, PostsRepository postsRepository,
-                       CaptchaService captchaService) {
+    public UserAuthService(AuthenticationManager authenticationManager, UsersRepository usersRepository, PostsRepository postsRepository,
+                           CaptchaService captchaService) {
         this.authenticationManager = authenticationManager;
         this.usersRepository = usersRepository;
         this.postsRepository = postsRepository;
