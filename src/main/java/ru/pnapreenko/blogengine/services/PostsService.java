@@ -12,6 +12,7 @@ import ru.pnapreenko.blogengine.api.utils.ConfigStrings;
 import ru.pnapreenko.blogengine.api.utils.DateUtils;
 import ru.pnapreenko.blogengine.api.utils.ErrorsValidation;
 import ru.pnapreenko.blogengine.api.utils.PostDTOConverter;
+import ru.pnapreenko.blogengine.enums.ModerationDecision;
 import ru.pnapreenko.blogengine.enums.ModerationStatus;
 import ru.pnapreenko.blogengine.enums.MyPostsStatus;
 import ru.pnapreenko.blogengine.enums.PostMode;
@@ -19,6 +20,7 @@ import ru.pnapreenko.blogengine.model.Post;
 import ru.pnapreenko.blogengine.model.PostComment;
 import ru.pnapreenko.blogengine.model.Tag;
 import ru.pnapreenko.blogengine.model.User;
+import ru.pnapreenko.blogengine.model.dto.ModerationDTO;
 import ru.pnapreenko.blogengine.model.dto.post.ListPostsDTO;
 import ru.pnapreenko.blogengine.model.dto.post.NewPostDTO;
 import ru.pnapreenko.blogengine.model.dto.post.PostDTO;
@@ -43,17 +45,20 @@ public class PostsService {
     private final CommentsRepository commentsRepository;
     private final TagsService tagsService;
     private final UserAuthService userAuthService;
+    private final SettingsService settingsService;
     private Page<PostDTO> posts;
 
 
     public PostsService(PostsRepository postsRepository, TagsRepository tagsRepository, VotesRepository votesRepository,
-                        CommentsRepository commentsRepository, TagsService tagsService, UserAuthService userAuthService) {
+                        CommentsRepository commentsRepository, TagsService tagsService, UserAuthService userAuthService,
+                        SettingsService settingsService) {
         this.postsRepository = postsRepository;
         this.tagsRepository = tagsRepository;
         this.votesRepository = votesRepository;
         this.commentsRepository = commentsRepository;
         this.tagsService = tagsService;
         this.userAuthService = userAuthService;
+        this.settingsService = settingsService;
     }
 
     public ResponseEntity<?> getPosts(int offset, int limit, String postMode) {
@@ -149,6 +154,10 @@ public class PostsService {
 
     public ResponseEntity<?> getModeratedPosts(int offset, int limit, ModerationStatus status, Principal principal) {
         User moderator = userAuthService.getUserFromDB(principal.getName());
+
+        if (!moderator.isModerator()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(APIResponse.error());
+        }
         posts = getPageWithPostDTO(postsRepository.findAllModeratedPosts(status, moderator, getPageable(offset,limit)));
         return ResponseEntity.ok(new ListPostsDTO(posts));
     }
@@ -157,17 +166,24 @@ public class PostsService {
         final boolean isActive = myPostsStatus.isActive();
         final ModerationStatus postStatus = myPostsStatus.getModerationStatus();
         User user = userAuthService.getUserFromDB(principal.getName());
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(APIResponse.error());
+        }
         posts = getPageWithPostDTO(postsRepository.findMyPosts(user, isActive, postStatus, getPageable(offset, limit)));
         return ResponseEntity.ok(new ListPostsDTO(posts));
     }
 
     public ResponseEntity<?> savePost(Post post, NewPostDTO newPost, Principal principal, Errors validationErrors) {
+
         Map<String, Object> errors = validateNewPostSaveDataInputAndGetErrors(newPost, validationErrors);
 
         if (errors.size() > 0)
             return ResponseEntity.ok(APIResponse.error(errors));
 
         User editor = userAuthService.getUserFromDB(principal.getName());
+        if (editor == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(APIResponse.error());
+        }
         Post postToSave = (post == null) ? new Post() : post;
         Instant now = Instant.now();
         Instant postDate = Instant.ofEpochMilli(newPost.getTimestamp());
@@ -178,8 +194,15 @@ public class PostsService {
         postToSave.setTime(postDate.isBefore(now) ? now : postDate);
         postToSave.setAuthor((postToSave.getId() == 0) ? editor : postToSave.getAuthor());
 
+        boolean isPostPremoderation = settingsService.isPostPremoderation();
+
         if ((post == null) || (editor.equals(postToSave.getAuthor()) && !editor.isModerator())) {
-            postToSave.setModerationStatus(ModerationStatus.NEW);
+            if(isPostPremoderation){
+                postToSave.setModerationStatus(ModerationStatus.NEW);
+            }
+            if (!isPostPremoderation && postToSave.isActive()) {
+                postToSave.setModerationStatus(ModerationStatus.ACCEPTED);
+            }
         }
 
         if (newPost.getTags() != null) {
@@ -222,4 +245,40 @@ public class PostsService {
 
         return errors;
     }
+
+    public ResponseEntity<?> updatePostModerationStatus(ModerationDTO moderation, Principal principal) {
+        User moderator = userAuthService.getUserFromDB(principal.getName());
+
+        if (!moderator.isModerator())
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(APIResponse.error());
+
+        final Optional<Post> postOptional = postsRepository.findById(moderation.getPostId());
+
+        if (postOptional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                    APIResponse.error(String.format(ConfigStrings.POST_NOT_FOUND, moderation.getPostId()))
+            );
+        }
+
+        final Post post = postOptional.get();
+        final ModerationDecision decision = ModerationDecision.valueOf(moderation.getDecision().toUpperCase());
+        final User postModerator = post.getModeratedBy();
+
+        if (postModerator != null && !postModerator.equals(moderator)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
+                    APIResponse.error(ConfigStrings.MODERATION_INVALID_POST)
+            );
+        }
+
+        ModerationStatus status = (decision == ModerationDecision.ACCEPT)
+                ? ModerationStatus.ACCEPTED
+                : ModerationStatus.DECLINED;
+
+        post.setModerationStatus(status);
+        post.setModeratedBy(moderator);
+        postsRepository.save(post);
+
+        return ResponseEntity.ok(APIResponse.ok());
+    }
+
 }

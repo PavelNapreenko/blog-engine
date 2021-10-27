@@ -2,6 +2,8 @@ package ru.pnapreenko.blogengine.services;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.env.Environment;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -15,17 +17,17 @@ import ru.pnapreenko.blogengine.api.responses.APIResponse;
 import ru.pnapreenko.blogengine.api.utils.ConfigStrings;
 import ru.pnapreenko.blogengine.api.utils.ErrorsValidation;
 import ru.pnapreenko.blogengine.model.User;
-import ru.pnapreenko.blogengine.model.dto.auth.NewUserDTO;
-import ru.pnapreenko.blogengine.model.dto.auth.UserAuthDTO;
-import ru.pnapreenko.blogengine.model.dto.auth.UserUnAuthDTO;
+import ru.pnapreenko.blogengine.model.dto.auth.*;
 import ru.pnapreenko.blogengine.repositories.PostsRepository;
 import ru.pnapreenko.blogengine.repositories.UsersRepository;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.security.Principal;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -35,16 +37,21 @@ public class UserAuthService {
     private final UsersRepository usersRepository;
     private final PostsRepository postsRepository;
     private final CaptchaService captchaService;
+    private final MailSendService mailSendService;
+    private final SettingsService settingsService;
 
     PasswordEncoder passwordEncoder;
     Authentication auth;
+    Environment environment;
 
     public UserAuthService(AuthenticationManager authenticationManager, UsersRepository usersRepository, PostsRepository postsRepository,
-                           CaptchaService captchaService) {
+                           CaptchaService captchaService, MailSendService mailSendService, SettingsService settingsService) {
         this.authenticationManager = authenticationManager;
         this.usersRepository = usersRepository;
         this.postsRepository = postsRepository;
         this.captchaService = captchaService;
+        this.mailSendService = mailSendService;
+        this.settingsService = settingsService;
     }
 
     @Bean
@@ -53,10 +60,17 @@ public class UserAuthService {
     }
 
     public ResponseEntity<?> registerUser(NewUserDTO user, Errors validationErrors) {
+        boolean isMultiuserMode = settingsService.isMultiuserMode();
+
+        if (!isMultiuserMode) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(APIResponse.error());
+        }
+
         Map<String, Object> errors = validateUserInputAndGetErrors(user, validationErrors);
 
-        if (errors.size() > 0)
+        if (errors.size() > 0) {
             return ResponseEntity.ok(APIResponse.error(errors));
+        }
 
         User newUser = new User();
         newUser.setName(user.getName());
@@ -167,4 +181,65 @@ public class UserAuthService {
     }
 
 
+    public ResponseEntity<?> restoreUserPassword(EmailDTO email, Errors validationErrors) {
+        if (validationErrors.hasErrors())
+            return ResponseEntity.ok(
+                    APIResponse.error(ErrorsValidation.getValidationErrors(validationErrors))
+            );
+
+        final String userEmail = email.getEmail();
+        User userFromDB = usersRepository.findByEmail(userEmail);
+
+        if (userFromDB == null)
+            return ResponseEntity.ok(APIResponse.error(ConfigStrings.AUTH_LOGIN_NO_SUCH_USER));
+
+        log.info(String.format("User with email '%s' found: %s", userEmail, userFromDB));
+
+        final String code = UUID.randomUUID().toString();
+
+        userFromDB.setCode(code);
+        User updatedUser = usersRepository.save(userFromDB);
+
+        final String port = environment.getProperty("server.port");
+        final String hostName = InetAddress.getLoopbackAddress().getHostName();
+        final String url = String.format(ConfigStrings.AUTH_SERVER_URL, hostName, port);
+
+        mailSendService.send(
+                updatedUser.getEmail(),
+                ConfigStrings.AUTH_MAIL_SUBJECT,
+                String.format(ConfigStrings.AUTH_MAIL_MESSAGE, url, code)
+        );
+        return ResponseEntity.ok(APIResponse.ok());
+    }
+
+    public ResponseEntity<?> resetUserPassword(PasswordRestoreDTO request, Errors validationErrors) {
+        if (validationErrors.hasErrors())
+            return ResponseEntity.ok(
+                    APIResponse.error(ErrorsValidation.getValidationErrors(validationErrors))
+            );
+
+        final Map<String, Object> errors = new HashMap<>();
+
+        if (!captchaService.isValidCaptcha(request.getCaptcha(), request.getCaptchaSecret()))
+            errors.put("captcha", ConfigStrings.AUTH_INVALID_CAPTCHA);
+
+        if (request.getPassword().length() < ConfigStrings.AUTH_MIN_PASSWORD_LENGTH)
+            errors.put("password", ConfigStrings.AUTH_INVALID_PASSWORD_LENGTH);
+
+        if (!errors.isEmpty())
+            return ResponseEntity.ok(APIResponse.error(errors));
+
+        User userFromDB = usersRepository.findByCode(request.getCode());
+
+        if (userFromDB == null) {
+            errors.put("code", ConfigStrings.AUTH_CODE_IS_OUTDATED);
+            return ResponseEntity.ok(APIResponse.error(errors));
+        }
+
+        userFromDB.setCode(null);
+        userFromDB.setPassword(passwordEncoder.encode(request.getPassword()));
+        usersRepository.save(userFromDB);
+
+        return ResponseEntity.ok(APIResponse.ok());
+    }
 }

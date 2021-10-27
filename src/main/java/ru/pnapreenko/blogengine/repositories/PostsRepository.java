@@ -69,4 +69,13 @@ public interface PostsRepository extends JpaRepository<Post, Integer> {
                            @Param("is_active") boolean isActive,
                            @Param("status") ModerationStatus postStatus,
                            Pageable pageable);
+
+    @Query("select count(p) from #{#entityName} p where (:user is null or p.author = :user)")
+    int countByAuthor(@Param("user") User user);
+
+    @Query("select sum(p.viewCount) from #{#entityName} p where (:user is null or p.author = :user)")
+    int getViewsByUser(@Param("user") User user);
+
+    @Query("select min(p.time) from #{#entityName} p where (:user is null or p.author = :user)")
+    Instant getFirstPostDateByUser(@Param("user") User user);
 }

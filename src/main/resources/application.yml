@@ -29,6 +29,18 @@ spring:
       org.springframework:
        INFO
 
+  mail:
+    host: smtp.gmail.com
+    username: skillbox.blog.engine2021@gmail.com
+    password: eYbbrdF24n4YYPg
+    port: 465
+    protocol: smtps
+    test-connection: true
+    properties:
+      "mail.smtp.auth": true
+      "mail.transport.protocol": smtps
+      "mail.debug": false
+
 blogapp:
   properties:
     title: BlogSite

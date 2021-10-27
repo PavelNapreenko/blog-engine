@@ -21,8 +21,9 @@ public class WebContextConfig implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         final String uploadPath = storageProperties.getLocation();
-
-        registry.addResourceHandler(String.format("/%s/**", uploadPath))
+        registry.addResourceHandler("/**")
+                .addResourceLocations(String.format("classpath:/%s", uploadPath));
+        registry.addResourceHandler("/**")
                 .addResourceLocations(String.format("file:%s/", uploadPath))
                 .setCacheControl(CacheControl.maxAge(ConfigStrings.IMAGES_MAX_CACHE_AGE, TimeUnit.HOURS).cachePublic());
     }

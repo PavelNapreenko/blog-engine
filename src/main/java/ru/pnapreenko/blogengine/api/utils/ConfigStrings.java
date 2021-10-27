@@ -1,7 +1,6 @@
 package ru.pnapreenko.blogengine.api.utils;
 
 import java.util.Locale;
-import java.util.Map;
 
 public class ConfigStrings {
 
@@ -25,7 +24,7 @@ public class ConfigStrings {
             "должен состоять не менее чем из 5 символов и не более чем из 255 символов.";
 
     public static final int POST_TEXT_MIN_LENGTH = 10;
-    public static final int POST_TEXT_MAX_LENGTH = 5000;
+    public static final int POST_TEXT_MAX_LENGTH = 5_000;
     public static final String POST_INVALID_TEXT = "Текст поста поста не может быть пустым и " +
             "должен состоять не менее чем из 10 символов и не более чем из 500 символов.";
 
@@ -66,4 +65,15 @@ public class ConfigStrings {
     public static final String WRONG_POST_ID = "Поле 'post_id' содержит неверный идентификатор.";
     public static final String COMMENT_WRONG_PARENT_ID = "Поле 'parent_id' содержит неверный идентификатор.";
     public static final String COMMENT_WRONG_TEXT = "Поле 'text' является обязательным и не может быть пустым.";
+    public static final String MODERATION_INVALID_POST = "Модерирование постов, закрепленных за другими модераторами запрещено!";
+    public static final String EMAIL_PATTERN = "^(.+)@(.+)\\.(.+)$";
+    public static final int AUTH_MIN_NAME_LENGTH = 3;
+    public static final int AUTH_MAX_FIELD_LENGTH = 255;
+    public static final String AUTH_WRONG_NAME = "Имя указано неверно.";
+    public static final String AUTH_SERVER_URL = "http://%s:%s";
+    public static final String AUTH_MAIL_SUBJECT = "Ссылка на восстановление пароля";
+    public static final String AUTH_MAIL_MESSAGE = "Для восстановления пароля, " +
+            "пройдите по этой ссылке: %s/login/change-password/%s";
+    public static final String AUTH_CODE_IS_OUTDATED = "Ссылка для восстановления пароля устарела. " +
+            "Вы можете <a href=\"/login/restore-password\">запросить ссылку снова</a>.";
 }

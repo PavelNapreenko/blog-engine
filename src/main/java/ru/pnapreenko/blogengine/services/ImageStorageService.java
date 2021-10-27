@@ -1,6 +1,10 @@
 package ru.pnapreenko.blogengine.services;
 
 import lombok.Getter;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
+import org.imgscalr.Scalr;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileSystemUtils;
 import org.springframework.util.StringUtils;
@@ -8,8 +12,9 @@ import org.springframework.web.multipart.MultipartFile;
 import ru.pnapreenko.blogengine.api.interfaces.StorageService;
 import ru.pnapreenko.blogengine.config.ImageStorageProperties;
 
-import java.io.IOException;
-import java.io.InputStream;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.*;
 import java.nio.file.*;
 import java.util.Objects;
 import java.util.Random;
@@ -39,41 +44,35 @@ public class ImageStorageService implements StorageService {
 
     @Override
     public String store(MultipartFile file) {
+
         final long maxFileSize = 5 * 1_024 * 1_024;
         final Pattern FILE_PATTERN = Pattern.compile("^(.*)(.)(png|jpe?g)$");
-        Path fullFilePath;
+        final Path randomSubPath = Paths.get(getRandomPath());
+        final Path fullUploadPath = this.rootLocation.resolve(randomSubPath);
         String filename = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
+        Path fullFilePath = fullUploadPath.resolve(filename);
 
         try {
             if (file.isEmpty()) {
                 throw new StorageException("Не удалось сохранить пустой файл: " + filename);
             }
-
-            if(file.getSize() > maxFileSize) {
+            if (file.getSize() > maxFileSize) {
                 throw new StorageException("Файл превышает допустимый размер.");
             }
-
             if (filename.contains("..")) {
-                throw new StorageException(
-                        "Не удается сохранить файл с относительным путем за пределами текущего каталога: "
-                                + filename);
+                throw new StorageException("Не удается сохранить файл с относительным путем за пределами текущего каталога: " + filename);
             }
-
             if (!FILE_PATTERN.matcher(filename).matches()) {
                 throw new StorageException("Можно хранить только PNG и JPE?G изображения: " + filename);
             }
-
-            try (InputStream inputStream = file.getInputStream()) {
-                final Path randomSubPath = Paths.get(getRandomPath());
-                final Path fullUploadPath = this.rootLocation.resolve(randomSubPath);
-                fullFilePath = fullUploadPath.resolve(filename);
-
+            try (InputStream inputStream = getResizeFile(file).getInputStream()) {
                 Files.createDirectories(fullUploadPath);
-
                 Files.copy(inputStream, fullFilePath,
                         StandardCopyOption.REPLACE_EXISTING);
+            } catch (IOException ex) {
+                ex.printStackTrace();
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new StorageException("Не удалось сохранить файл: " + filename, e);
         }
         return this.rootLocation.relativize(fullFilePath).toString()
@@ -110,6 +109,7 @@ public class ImageStorageService implements StorageService {
         public StorageException(String message) {
             super(message);
         }
+
         public StorageException(String message, Throwable cause) {
             super(message, cause);
         }
@@ -131,6 +131,29 @@ public class ImageStorageService implements StorageService {
             sb.append("/");
         }
         return sb.deleteCharAt(sb.length() - 1).toString();
+    }
+
+    private MultipartFile getResizeFile(MultipartFile file) {
+        MultipartFile multipartFile = null;
+        try {
+            BufferedInputStream in = new BufferedInputStream(file.getInputStream());
+            String fileEnd = FilenameUtils.getExtension(file.getOriginalFilename());
+            BufferedImage image = ImageIO.read(in);
+            BufferedImage newImage = Scalr.resize(
+                    image,
+                    Scalr.Method.ULTRA_QUALITY,
+                    Scalr.Mode.AUTOMATIC,
+                    36, 36);
+
+            File newFile = new File(this.rootLocation + "/" + file.getName());
+            assert fileEnd != null;
+            ImageIO.write(newImage, fileEnd, newFile);
+            multipartFile = new MockMultipartFile(file.getName(),
+                    newFile.getName(), file.getContentType(), IOUtils.toByteArray(new FileInputStream(newFile.getAbsolutePath())));
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        return multipartFile;
     }
 }
 

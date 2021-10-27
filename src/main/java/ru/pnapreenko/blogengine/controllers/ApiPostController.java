@@ -13,10 +13,12 @@ import ru.pnapreenko.blogengine.enums.MyPostsStatus;
 import ru.pnapreenko.blogengine.model.Post;
 import ru.pnapreenko.blogengine.model.dto.post.NewPostDTO;
 import ru.pnapreenko.blogengine.repositories.PostsRepository;
+import ru.pnapreenko.blogengine.services.PostVotesService;
 import ru.pnapreenko.blogengine.services.PostsService;
 
 import javax.validation.Valid;
 import java.security.Principal;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/api/post")
@@ -24,10 +26,13 @@ public class ApiPostController {
 
     private final PostsService postsService;
     private final PostsRepository postsRepository;
+    private final PostVotesService postVotesService;
 
-    public ApiPostController(PostsService postsService, PostsRepository postsRepository) {
+    public ApiPostController(PostsService postsService, PostsRepository postsRepository,
+                             PostVotesService postVotesService) {
         this.postsService = postsService;
         this.postsRepository = postsRepository;
+        this.postVotesService = postVotesService;
     }
 
     @GetMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -114,5 +119,16 @@ public class ApiPostController {
                                       @RequestBody @Valid NewPostDTO newPostData, Principal principal, Errors errors) {
         Post post = postsRepository.getById(id);
         return postsService.savePost(post, newPostData, principal, errors);
+    }
+
+    @PreAuthorize("hasAuthority('user:write')")
+    @PostMapping(value = "/{voteType:(?:dis)?like}",
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> vote(@PathVariable(value = "voteType") String voteType,
+                                  @RequestBody Map<String, Integer> payload, Principal principal) {
+
+        Integer postId = payload.getOrDefault("post_id", 0);
+        return postVotesService.vote(voteType, principal, postId);
     }
 }
