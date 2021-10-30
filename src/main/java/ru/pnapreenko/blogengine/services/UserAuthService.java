@@ -170,7 +170,7 @@ public class UserAuthService {
         if (password == null || password.length() < ConfigStrings.AUTH_MIN_PASSWORD_LENGTH)
             errors.put("password", ConfigStrings.AUTH_INVALID_PASSWORD_LENGTH);
 
-        if (captchaService.isValidCaptcha(captcha, captchaSecretCode))
+        if (!captchaService.isValidCaptcha(captcha, captchaSecretCode))
             errors.put("captcha", ConfigStrings.AUTH_INVALID_CAPTCHA);
 
         return errors;
