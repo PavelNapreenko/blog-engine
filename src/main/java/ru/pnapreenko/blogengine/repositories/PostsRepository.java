@@ -7,7 +7,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import ru.pnapreenko.blogengine.enums.ModerationStatus;
-import ru.pnapreenko.blogengine.enums.MyPostsStatus;
 import ru.pnapreenko.blogengine.model.Post;
 import ru.pnapreenko.blogengine.model.Tag;
 import ru.pnapreenko.blogengine.model.User;
@@ -16,7 +15,6 @@ import java.time.Instant;
 
 @Repository
 public interface PostsRepository extends JpaRepository<Post, Integer> {
-
     @Query("select p from #{#entityName} p where p.isActive = 1 and p.moderationStatus = 'ACCEPTED' and p.time <= :date order by p.time desc")
     Page<Post> findAllOrderByTimeLessThen_Desc(@Param("date") Instant date, Pageable pageable);
 
@@ -60,7 +58,7 @@ public interface PostsRepository extends JpaRepository<Post, Integer> {
 
     @Query("select p from #{#entityName} p where p.isActive = 1 and p.moderationStatus = :status and (:user is null or p.moderatedBy = :user)")
     Page<Post> findAllModeratedPosts(@Param("status") ModerationStatus status,
-                                     @Param("user")User moderator,
+                                     @Param("user") User moderator,
                                      Pageable pageable);
 
     @Query("select p from #{#entityName} p left join p.votes v where p.author = :user and p.isActive = :is_active and " +
@@ -69,4 +67,13 @@ public interface PostsRepository extends JpaRepository<Post, Integer> {
                            @Param("is_active") boolean isActive,
                            @Param("status") ModerationStatus postStatus,
                            Pageable pageable);
+
+    @Query("select count(p) from #{#entityName} p where (:user is null or p.author = :user)")
+    int countByAuthor(@Param("user") User user);
+
+    @Query("select sum(p.viewCount) from #{#entityName} p where (:user is null or p.author = :user)")
+    int getViewsByUser(@Param("user") User user);
+
+    @Query("select date_format(min(p.time),'%Y-%m-%d %H:%m') from  #{#entityName} p where (:user is null or p.author = :user)")
+    String getFirstPostDateByUser(@Param("user") User user);
 }

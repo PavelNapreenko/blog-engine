@@ -3,10 +3,13 @@ package ru.pnapreenko.blogengine.controllers;
 import com.fasterxml.jackson.annotation.JsonView;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 import ru.pnapreenko.blogengine.api.utils.JsonViews;
+import ru.pnapreenko.blogengine.model.dto.auth.EmailDTO;
 import ru.pnapreenko.blogengine.model.dto.auth.NewUserDTO;
+import ru.pnapreenko.blogengine.model.dto.auth.PasswordRestoreDTO;
 import ru.pnapreenko.blogengine.model.dto.auth.UserUnAuthDTO;
 import ru.pnapreenko.blogengine.services.UserAuthService;
 
@@ -43,6 +46,7 @@ public class ApiAuthController {
         return userAuthService.getCheckedUser(principal);
     }
 
+    @PreAuthorize("hasAuthority('user:write')")
     @GetMapping(value="/logout", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> logoutUser() {
         return userAuthService.logoutUser();
@@ -52,6 +56,21 @@ public class ApiAuthController {
     @JsonView(JsonViews.Name.class)
     public ResponseEntity<?> getCaptcha() throws IOException {
         return userAuthService.getCaptcha();
+    }
+
+    @PostMapping(value = "/restore",
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> restoreUserPassword(@RequestBody @Valid EmailDTO email, Errors errors) {
+        return userAuthService.restoreUserPassword(email, errors);
+    }
+
+    @PostMapping(value = "/password",
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> resetUserPassword(@RequestBody @Valid PasswordRestoreDTO request,
+                                               Errors errors) {
+        return userAuthService.resetUserPassword(request, errors);
     }
 
 }
