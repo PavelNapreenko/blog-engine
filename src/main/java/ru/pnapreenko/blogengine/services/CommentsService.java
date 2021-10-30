@@ -18,7 +18,6 @@ import java.util.Set;
 
 @Service
 public class CommentsService {
-
     private final CommentsRepository commentsRepository;
     private final PostsRepository postsRepository;
     private final UserAuthService userAuthService;
@@ -30,12 +29,10 @@ public class CommentsService {
     }
 
     public ResponseEntity<?> addComment(NewCommentDTO comment, Principal principal) {
-
         User user = userAuthService.getUserFromDB(principal.getName());
         Optional<Post> post = postsRepository.findById(comment.getPostId());
         Optional<PostComment> parentComment = Optional.empty();
         String text = comment.getText();
-
         if (post.isEmpty()) {
             return ResponseEntity.badRequest().body(
                     APIResponse.error(ConfigStrings.WRONG_POST_ID, new HashMap<>() {{
@@ -43,7 +40,6 @@ public class CommentsService {
                     }})
             );
         }
-
         if (comment.getParentId() != null) {
             Set<PostComment> postComments = post.get().getComments();
             parentComment = commentsRepository.findById(comment.getParentId());
@@ -56,13 +52,11 @@ public class CommentsService {
                 );
             }
         }
-
         PostComment newComment = new PostComment();
         newComment.setParentComment(parentComment.orElse(null));
         newComment.setUser(user);
         newComment.setPost(post.get());
         newComment.setText(text);
-
         PostComment savedComment = commentsRepository.save(newComment);
         int newCommentId = savedComment.getId();
         return ResponseEntity.ok(APIResponse.ok("id", newCommentId));

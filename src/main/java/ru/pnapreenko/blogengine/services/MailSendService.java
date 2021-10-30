@@ -7,9 +7,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 
 @Service
 public class MailSendService {
-
     private final JavaMailSender mailSender;
-
     @Value("${spring.mail.username}")
     private String emailFrom;
 
@@ -19,12 +17,10 @@ public class MailSendService {
 
     public void send(String recipientEmail, String subject, String message) {
         SimpleMailMessage mailMessage = new SimpleMailMessage();
-
         mailMessage.setFrom(emailFrom);
         mailMessage.setTo(recipientEmail);
         mailMessage.setSubject(subject);
         mailMessage.setText(message);
-
         mailSender.send(mailMessage);
     }
 }

@@ -44,6 +44,6 @@ public class CaptchaService {
         Optional<CaptchaCode> captchaOpt = Optional.ofNullable(
                 captchaCodesRepository.findBySecretCode(userCaptchaSecretCode)
         );
-        return captchaOpt.isPresent() && captchaOpt.get().isValidCode(userCaptcha);
+        return captchaOpt.isEmpty() || !captchaOpt.get().isValidCode(userCaptcha);
     }
 }

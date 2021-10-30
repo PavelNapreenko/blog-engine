@@ -4,7 +4,7 @@ spring:
   autoconfigure:
     exclude: org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
   datasource:
-    url: jdbc:${JAWSDB_DATABASE_URL:mysql://localhost:3306/blogapp}?createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
+    url: jdbc:mysql://localhost:3306/blogapp?createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
     username: root
     password: admin
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -28,11 +28,10 @@ spring:
     level:
       org.springframework:
        INFO
-
   mail:
-    host: smtp.gmail.com
-    username: skillbox.blog.engine2021@gmail.com
-    password: eYbbrdF24n4YYPg
+    host: smtp.mail.ru
+    username: pavel1119@mail.ru
+    password: p@shtEt123
     port: 465
     protocol: smtps
     test-connection: true

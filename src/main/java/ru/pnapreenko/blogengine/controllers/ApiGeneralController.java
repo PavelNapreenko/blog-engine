@@ -37,13 +37,13 @@ public class ApiGeneralController {
 
     @GetMapping("/settings")
     private ResponseEntity<?> getSettings() {
-        return ResponseEntity.status(HttpStatus.OK).body(settingsService.getSettings());
+        return settingsService.getSettings();
     }
 
     @PreAuthorize("hasAuthority('user:moderate')")
     @PutMapping("/settings")
-    public ResponseEntity<?> updateSettings(@RequestBody @Valid SettingsDTO settings, Principal principal) {
-        return settingsService.saveSettings(settings, principal);
+    public ResponseEntity<?> updateSettings(@RequestBody @Valid SettingsDTO settings) {
+        return settingsService.saveSettings(settings);
     }
 
     @PreAuthorize("hasAuthority('user:write')")

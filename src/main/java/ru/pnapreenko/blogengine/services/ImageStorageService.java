@@ -11,7 +11,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import ru.pnapreenko.blogengine.api.interfaces.StorageService;
 import ru.pnapreenko.blogengine.config.ImageStorageProperties;
-
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
@@ -22,7 +21,6 @@ import java.util.regex.Pattern;
 
 @Service
 public class ImageStorageService implements StorageService {
-
     @Getter
     private final Path rootLocation;
 
@@ -44,7 +42,6 @@ public class ImageStorageService implements StorageService {
 
     @Override
     public String store(MultipartFile file) {
-
         final long maxFileSize = 5 * 1_024 * 1_024;
         final Pattern FILE_PATTERN = Pattern.compile("^(.*)(.)(png|jpe?g)$");
         final Path randomSubPath = Paths.get(getRandomPath());
@@ -109,7 +106,6 @@ public class ImageStorageService implements StorageService {
         public StorageException(String message) {
             super(message);
         }
-
         public StorageException(String message, Throwable cause) {
             super(message, cause);
         }
@@ -123,7 +119,6 @@ public class ImageStorageService implements StorageService {
 
     private static String getRandomPath() {
         StringBuilder sb = new StringBuilder();
-
         for (int iteration = 0; iteration < 3; iteration++) {
             for (int ch = 0; ch < 2; ch++) {
                 sb.append((char) (new Random().nextInt('z' - 'a') + 'a'));
@@ -144,7 +139,6 @@ public class ImageStorageService implements StorageService {
                     Scalr.Method.ULTRA_QUALITY,
                     Scalr.Mode.AUTOMATIC,
                     36, 36);
-
             File newFile = new File(this.rootLocation + "/" + file.getName());
             assert fileEnd != null;
             ImageIO.write(newImage, fileEnd, newFile);

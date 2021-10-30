@@ -9,7 +9,6 @@ import ru.pnapreenko.blogengine.repositories.UsersRepository;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
-
     private final UsersRepository usersRepository;
 
     public UserDetailsServiceImpl(UsersRepository usersRepository) {

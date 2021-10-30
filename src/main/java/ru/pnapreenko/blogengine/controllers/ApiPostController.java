@@ -127,7 +127,6 @@ public class ApiPostController {
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> vote(@PathVariable(value = "voteType") String voteType,
                                   @RequestBody Map<String, Integer> payload, Principal principal) {
-
         Integer postId = payload.getOrDefault("post_id", 0);
         return postVotesService.vote(voteType, principal, postId);
     }

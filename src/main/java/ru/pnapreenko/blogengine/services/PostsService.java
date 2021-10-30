@@ -38,7 +38,6 @@ import java.util.Optional;
 
 @Service
 public class PostsService {
-
     private final PostsRepository postsRepository;
     private final TagsRepository tagsRepository;
     private final VotesRepository votesRepository;
@@ -46,8 +45,6 @@ public class PostsService {
     private final TagsService tagsService;
     private final UserAuthService userAuthService;
     private final SettingsService settingsService;
-    private Page<PostDTO> posts;
-
 
     public PostsService(PostsRepository postsRepository, TagsRepository tagsRepository, VotesRepository votesRepository,
                         CommentsRepository commentsRepository, TagsService tagsService, UserAuthService userAuthService,
@@ -62,10 +59,9 @@ public class PostsService {
     }
 
     public ResponseEntity<?> getPosts(int offset, int limit, String postMode) {
-
         final Instant now = Instant.now();
         final PostMode mode;
-        posts = getAllActivePosts(now, offset, limit);
+        Page<PostDTO> posts = getAllActivePosts(now, offset, limit);
 
         try {
             mode = PostMode.getByName(postMode);
@@ -95,29 +91,24 @@ public class PostsService {
 
     public ResponseEntity<?> getPost(int id) {
         Optional<Post> postOptional = postsRepository.findById(id);
-
         if (postOptional.isEmpty())
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                    
                     APIResponse.error(String.format(ConfigStrings.POST_NOT_FOUND, id))
             );
-
         Post post = postOptional.get();
         PostDTO postDTO = new PostDTO(post);
-
         postDTO.setTimestamp(post.getTime().getEpochSecond());
         postDTO.setLikeCount(votesRepository.findByPostAndValue(post, (byte) 1).size());
         postDTO.setDislikeCount(votesRepository.findByPostAndValue(post, (byte) -1).size());
         postDTO.setTags(tagsRepository.findTagNamesUsingPost(post));
-
         final List<PostComment> comments = commentsRepository.findByPost(post);
         postDTO.setComments(comments);
         post.updateViewCount();
         Post savedPost = postsRepository.save(post);
-
         if (post.getId() != savedPost.getId()) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
-
         return ResponseEntity.ok(postDTO);
     }
 
@@ -125,69 +116,50 @@ public class PostsService {
         if (query == null || query.length() < ConfigStrings.POST_MIN_QUERY_LENGTH) {
             return ResponseEntity.badRequest().body(APIResponse.error(ConfigStrings.POST_INVALID_QUERY));
         }
-
-        posts = getPageWithPostDTO(postsRepository.findAllBySearchQuery(Instant.now(), query, getPageable(offset, limit)));
-        return ResponseEntity.ok(new ListPostsDTO(posts));
+        return ResponseEntity.ok(new ListPostsDTO(getPageWithPostDTO(postsRepository.findAllBySearchQuery(Instant.now(), query,
+                getPageable(offset, limit)))));
     }
 
     public ResponseEntity<?> searchByDate(int offset, int limit, String date) {
         if (!DateUtils.isValidDate(date)) {
             return ResponseEntity.badRequest().body(APIResponse.error(ConfigStrings.POST_INVALID_DATE));
         }
-
-        posts = getPageWithPostDTO(postsRepository.findAllByDate(Instant.now(), date, getPageable(offset, limit)));
-
-        return ResponseEntity.ok(new ListPostsDTO(posts));
+        return ResponseEntity.ok(new ListPostsDTO(getPageWithPostDTO(postsRepository.findAllByDate(Instant.now(), date,
+                getPageable(offset, limit)))));
     }
 
     public ResponseEntity<?> searchByTag(int offset, int limit, String tagName) {
         Tag tag = tagsRepository.findByNameIgnoreCase(tagName);
-
         if (tag == null)
             return ResponseEntity.badRequest().body(
                     APIResponse.error(String.format(ConfigStrings.POST_INVALID_TAG, tagName))
             );
-
-        posts = getPageWithPostDTO(postsRepository.findAllByTag(Instant.now(), tag, getPageable(offset, limit)));
-        return ResponseEntity.ok(new ListPostsDTO(posts));
+        return ResponseEntity.ok(new ListPostsDTO(getPageWithPostDTO(postsRepository.findAllByTag(Instant.now(), tag, getPageable(offset, limit)))));
     }
 
     public ResponseEntity<?> getModeratedPosts(int offset, int limit, ModerationStatus status, Principal principal) {
         User moderator = userAuthService.getUserFromDB(principal.getName());
-
-        if (!moderator.isModerator()) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(APIResponse.error());
-        }
-        posts = getPageWithPostDTO(postsRepository.findAllModeratedPosts(status, moderator, getPageable(offset,limit)));
-        return ResponseEntity.ok(new ListPostsDTO(posts));
+        return ResponseEntity.ok(new ListPostsDTO(getPageWithPostDTO(postsRepository.findAllModeratedPosts(status, moderator,
+                getPageable(offset, limit)))));
     }
 
     public ResponseEntity<?> getMyPosts(int offset, int limit, MyPostsStatus myPostsStatus, Principal principal) {
         final boolean isActive = myPostsStatus.isActive();
         final ModerationStatus postStatus = myPostsStatus.getModerationStatus();
         User user = userAuthService.getUserFromDB(principal.getName());
-        if (user == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(APIResponse.error());
-        }
-        posts = getPageWithPostDTO(postsRepository.findMyPosts(user, isActive, postStatus, getPageable(offset, limit)));
-        return ResponseEntity.ok(new ListPostsDTO(posts));
+        return ResponseEntity.ok(new ListPostsDTO(getPageWithPostDTO(postsRepository.findMyPosts(user, isActive, postStatus,
+                getPageable(offset, limit)))));
     }
 
     public ResponseEntity<?> savePost(Post post, NewPostDTO newPost, Principal principal, Errors validationErrors) {
-
-        Map<String, Object> errors = validateNewPostSaveDataInputAndGetErrors(newPost, validationErrors);
-
-        if (errors.size() > 0)
-            return ResponseEntity.ok(APIResponse.error(errors));
-
         User editor = userAuthService.getUserFromDB(principal.getName());
-        if (editor == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(APIResponse.error());
-        }
         Post postToSave = (post == null) ? new Post() : post;
         Instant now = Instant.now();
         Instant postDate = Instant.ofEpochMilli(newPost.getTimestamp());
-
+        Map<String, Object> errors = validateNewPostSaveDataInputAndGetErrors(newPost, validationErrors);
+        if (errors.size() > 0) {
+            return ResponseEntity.ok(APIResponse.error(errors));
+        }
         postToSave.setTitle(newPost.getTitle());
         postToSave.setText(newPost.getText());
         postToSave.setActive(newPost.getActive());
@@ -195,29 +167,48 @@ public class PostsService {
         postToSave.setAuthor((postToSave.getId() == 0) ? editor : postToSave.getAuthor());
 
         boolean isPostPremoderation = settingsService.isPostPremoderation();
-
         if ((post == null) || (editor.equals(postToSave.getAuthor()) && !editor.isModerator())) {
-            if(isPostPremoderation){
+            if (isPostPremoderation) {
                 postToSave.setModerationStatus(ModerationStatus.NEW);
             }
-            if (!isPostPremoderation && postToSave.isActive()) {
-                postToSave.setModerationStatus(ModerationStatus.ACCEPTED);
-            }
         }
-
+        if (!isPostPremoderation && postToSave.isActive()) {
+            postToSave.setModerationStatus(ModerationStatus.ACCEPTED);
+        }
         if (newPost.getTags() != null) {
             newPost.getTags().forEach(tag -> postToSave.getTags().add(tagsService.saveTag(tag)));
         }
-
         postsRepository.save(postToSave);
         return ResponseEntity.ok(APIResponse.ok());
     }
 
+    public ResponseEntity<?> updatePostModerationStatus(ModerationDTO moderation, Principal principal) {
+        User moderator = userAuthService.getUserFromDB(principal.getName());
+        final Optional<Post> postOptional = postsRepository.findById(moderation.getPostId());
+        if (postOptional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                    APIResponse.error(String.format(ConfigStrings.POST_NOT_FOUND, moderation.getPostId()))
+            );
+        }
+        final Post post = postOptional.get();
+        final ModerationDecision decision = ModerationDecision.valueOf(moderation.getDecision().toUpperCase());
+        final User postModerator = post.getModeratedBy();
+        if (!postModerator.equals(moderator)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
+                    APIResponse.error(ConfigStrings.MODERATION_INVALID_POST)
+            );
+        }
+        ModerationStatus status = (decision == ModerationDecision.ACCEPT)
+                ? ModerationStatus.ACCEPTED
+                : ModerationStatus.DECLINED;
+        post.setModerationStatus(status);
+        post.setModeratedBy(moderator);
+        postsRepository.save(post);
+        return ResponseEntity.ok(APIResponse.ok());
+    }
 
-
-    private Page<PostDTO> getAllActivePosts (Instant now, int offset, int limit) {
-        Page<Post> source = postsRepository.findAllOrderByTimeLessThen_Desc(now, getPageable(offset, limit));
-        return getPageWithPostDTO(source);
+    private Page<PostDTO> getAllActivePosts(Instant now, int offset, int limit) {
+        return getPageWithPostDTO(postsRepository.findAllOrderByTimeLessThen_Desc(now, getPageable(offset, limit)));
     }
 
     private Pageable getPageable(int offset, int limit) {
@@ -231,54 +222,16 @@ public class PostsService {
     private Map<String, Object> validateNewPostSaveDataInputAndGetErrors(NewPostDTO newPost, Errors validationErrors) {
         final String title = newPost.getTitle();
         final String text = newPost.getText();
-
         Map<String, Object> errors = new HashMap<>();
-
-        if (validationErrors.hasErrors())
+        if (validationErrors.hasErrors()) {
             return ErrorsValidation.getValidationErrors(validationErrors);
-
-        if (title == null || title.length() < ConfigStrings.POST_NEW_TITLE_MIN_LENGTH)
+        }
+        if (title == null || title.length() < ConfigStrings.POST_NEW_TITLE_MIN_LENGTH) {
             errors.put("title", ConfigStrings.POST_INVALID_NEW_TITLE);
-
-        if (text == null || text.length() < ConfigStrings.POST_NEW_TEXT_MIN_LENGTH)
+        }
+        if (text == null || text.length() < ConfigStrings.POST_NEW_TEXT_MIN_LENGTH) {
             errors.put("text", ConfigStrings.POST_INVALID_NEW_TEXT);
-
+        }
         return errors;
     }
-
-    public ResponseEntity<?> updatePostModerationStatus(ModerationDTO moderation, Principal principal) {
-        User moderator = userAuthService.getUserFromDB(principal.getName());
-
-        if (!moderator.isModerator())
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(APIResponse.error());
-
-        final Optional<Post> postOptional = postsRepository.findById(moderation.getPostId());
-
-        if (postOptional.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                    APIResponse.error(String.format(ConfigStrings.POST_NOT_FOUND, moderation.getPostId()))
-            );
-        }
-
-        final Post post = postOptional.get();
-        final ModerationDecision decision = ModerationDecision.valueOf(moderation.getDecision().toUpperCase());
-        final User postModerator = post.getModeratedBy();
-
-        if (postModerator != null && !postModerator.equals(moderator)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
-                    APIResponse.error(ConfigStrings.MODERATION_INVALID_POST)
-            );
-        }
-
-        ModerationStatus status = (decision == ModerationDecision.ACCEPT)
-                ? ModerationStatus.ACCEPTED
-                : ModerationStatus.DECLINED;
-
-        post.setModerationStatus(status);
-        post.setModeratedBy(moderator);
-        postsRepository.save(post);
-
-        return ResponseEntity.ok(APIResponse.ok());
-    }
-
 }

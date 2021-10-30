@@ -11,7 +11,6 @@ import java.time.Instant;
 @Repository
 @Transactional
 public interface CaptchaCodesRepository extends CrudRepository<CaptchaCode, Integer> {
-
     @Modifying
     void deleteByTimeBefore(Instant time);
     CaptchaCode findBySecretCode(String secretCode);

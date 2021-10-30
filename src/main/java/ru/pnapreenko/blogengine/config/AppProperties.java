@@ -2,9 +2,7 @@ package ru.pnapreenko.blogengine.config;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.validation.annotation.Validated;
 import ru.pnapreenko.blogengine.api.components.AppPropertiesValues;
 
 import javax.validation.constraints.Max;
@@ -18,7 +16,6 @@ public class AppProperties {
     private final AppPropertiesValues blogProperties;
     private final Captcha captcha = new Captcha();
 
-    @Autowired
     public AppProperties(AppPropertiesValues blogProperties) {
         this.blogProperties = blogProperties;
     }

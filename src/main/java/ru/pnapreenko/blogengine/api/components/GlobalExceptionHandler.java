@@ -29,11 +29,13 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Object handleConstraintViolationException(ConstraintViolationException e) {
         Map<String, Object> errors = new HashMap<>();
+
         e.getConstraintViolations()
                 .forEach(constraint -> {
                     PathImpl path = (PathImpl) constraint.getPropertyPath();
                     errors.put(path.getLeafNode().getName(), constraint.getMessage());
                 });
+
         return APIResponse.error(ConfigStrings.VALIDATION_MESSAGE, errors);
     }
 

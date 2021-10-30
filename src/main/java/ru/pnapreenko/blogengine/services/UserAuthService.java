@@ -170,7 +170,7 @@ public class UserAuthService {
         if (password == null || password.length() < ConfigStrings.AUTH_MIN_PASSWORD_LENGTH)
             errors.put("password", ConfigStrings.AUTH_INVALID_PASSWORD_LENGTH);
 
-        if (!captchaService.isValidCaptcha(captcha, captchaSecretCode))
+        if (captchaService.isValidCaptcha(captcha, captchaSecretCode))
             errors.put("captcha", ConfigStrings.AUTH_INVALID_CAPTCHA);
 
         return errors;
@@ -220,7 +220,7 @@ public class UserAuthService {
 
         final Map<String, Object> errors = new HashMap<>();
 
-        if (!captchaService.isValidCaptcha(request.getCaptcha(), request.getCaptchaSecret()))
+        if (captchaService.isValidCaptcha(request.getCaptcha(), request.getCaptchaSecret()))
             errors.put("captcha", ConfigStrings.AUTH_INVALID_CAPTCHA);
 
         if (request.getPassword().length() < ConfigStrings.AUTH_MIN_PASSWORD_LENGTH)
