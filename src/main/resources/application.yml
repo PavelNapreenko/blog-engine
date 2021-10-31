@@ -30,8 +30,8 @@ spring:
        INFO
   mail:
     host: smtp.mail.ru
-    username: pavel1119@mail.ru
-    password: p@shtEt123
+    username: sender.sender.sender.sender@mail.ru
+    password: NCBnSqwmgpP7VjficJVm
     port: 465
     protocol: smtps
     test-connection: true
