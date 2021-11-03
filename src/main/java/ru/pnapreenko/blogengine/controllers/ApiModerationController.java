@@ -1,5 +1,6 @@
 package ru.pnapreenko.blogengine.controllers;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -15,13 +16,10 @@ import java.security.Principal;
 
 @RestController
 @RequestMapping("/api/moderation")
+@RequiredArgsConstructor
 public class ApiModerationController {
 
     private final PostsService postsService;
-
-    public ApiModerationController(PostsService postsService) {
-        this.postsService = postsService;
-    }
 
     @PreAuthorize("hasAuthority('user:moderate')")
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)

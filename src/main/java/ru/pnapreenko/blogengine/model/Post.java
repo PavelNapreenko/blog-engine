@@ -27,8 +27,8 @@ public class Post extends AbstractEntity {
     @Column(name = "is_active", nullable = false)
     private boolean isActive;
 
-    @Enumerated(EnumType.STRING)
     @NotNull
+    @Enumerated(EnumType.STRING)
     @Column(name = "moderation_status", length = 10, nullable = false)
     private ModerationStatus moderationStatus = ModerationStatus.NEW;
 
@@ -68,12 +68,12 @@ public class Post extends AbstractEntity {
     @NotNull
     @OneToMany(mappedBy = "post", fetch = FetchType.LAZY, orphanRemoval = true)
     @LazyCollection(LazyCollectionOption.EXTRA)
-    private Set<PostVote> votes = new HashSet<>();
+    private final Set<PostVote> votes = new HashSet<>();
 
     @NotNull
     @OneToMany(mappedBy = "post", fetch = FetchType.LAZY, orphanRemoval = true)
     @LazyCollection(LazyCollectionOption.EXTRA)
-    private Set<PostComment> comments = new HashSet<>();
+    private final Set<PostComment> comments = new HashSet<>();
 
     public void addTag(@NotNull Tag tag) {
         tags.add(tag);

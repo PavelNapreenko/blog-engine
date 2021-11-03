@@ -1,9 +1,11 @@
 package ru.pnapreenko.blogengine.services;
 
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import ru.pnapreenko.blogengine.api.responses.APIResponse;
 import ru.pnapreenko.blogengine.model.User;
 import ru.pnapreenko.blogengine.model.dto.StatsDTO;
 import ru.pnapreenko.blogengine.repositories.PostsRepository;
@@ -17,6 +19,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
 @Service
+@RequiredArgsConstructor
 public class StatisticsService {
 
     private final PostsRepository postsRepository;
@@ -24,18 +27,15 @@ public class StatisticsService {
     private final UserAuthService userAuthService;
     private final SettingsService settingsService;
 
-    public StatisticsService(PostsRepository postsRepository, VotesRepository votesRepository, UserAuthService userAuthService,
-                             SettingsService settingsService) {
-        this.postsRepository = postsRepository;
-        this.votesRepository = votesRepository;
-        this.userAuthService = userAuthService;
-        this.settingsService = settingsService;
-    }
-
     public ResponseEntity<?> getStats(String statsType, Principal principal) {
+        if (principal == null) {
+            return ResponseEntity.ok(APIResponse.error());
+        }
+
         User user = userAuthService.getUserFromDB(principal.getName());
         boolean isStatsPublic = settingsService.isStatsPublic();
-        if (statsType.equalsIgnoreCase("all") && isStatsPublic) {
+
+        if ((statsType.equalsIgnoreCase("all") && isStatsPublic) || user.isModerator()) {
             return ResponseEntity.status(HttpStatus.OK).body(getStatsDTO(null));
         } else {
         return ResponseEntity.status(HttpStatus.OK).body(getStatsDTO(user));

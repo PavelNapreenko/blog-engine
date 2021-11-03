@@ -10,7 +10,6 @@ import javax.validation.constraints.Min;
 
 @ConfigurationProperties(prefix = "blogapp")
 @Data
-@NoArgsConstructor(force = true)
 public class AppProperties {
 
     private final AppPropertiesValues blogProperties;

@@ -1,5 +1,6 @@
 package ru.pnapreenko.blogengine.services;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import ru.pnapreenko.blogengine.api.utils.TagDTOConverter;
@@ -14,14 +15,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class TagsService {
     private final TagsRepository tagsRepository;
     private final PostsRepository postsRepository;
-
-    public TagsService(TagsRepository tagsRepository, PostsRepository postsRepository) {
-        this.tagsRepository = tagsRepository;
-        this.postsRepository = postsRepository;
-    }
 
     public ResponseEntity<?> getWeightedTags(String query) {
         final long NUM_POSTS = postsRepository.countActivePosts(Instant.now());

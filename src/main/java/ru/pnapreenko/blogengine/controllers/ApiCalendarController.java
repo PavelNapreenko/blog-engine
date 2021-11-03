@@ -1,6 +1,7 @@
 package ru.pnapreenko.blogengine.controllers;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -11,13 +12,10 @@ import ru.pnapreenko.blogengine.services.CalendarService;
 
 @RestController
 @RequestMapping("/api/calendar")
+@RequiredArgsConstructor
 public class ApiCalendarController {
 
     private final CalendarService calendarService;
-
-    public ApiCalendarController(CalendarService calendarService) {
-        this.calendarService = calendarService;
-    }
 
     @GetMapping(value="", produces = "application/json")
     @JsonView(JsonViews.IdName.class)

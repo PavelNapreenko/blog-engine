@@ -1,6 +1,7 @@
 package ru.pnapreenko.blogengine.controllers;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -19,13 +20,10 @@ import java.security.Principal;
 
 @RestController
 @RequestMapping("/api/auth")
+@RequiredArgsConstructor
 public class ApiAuthController {
 
     private final UserAuthService userAuthService;
-
-    public ApiAuthController(UserAuthService userAuthService) {
-        this.userAuthService = userAuthService;
-    }
 
     @PostMapping(value="/register",
             consumes = MediaType.APPLICATION_JSON_VALUE,

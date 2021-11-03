@@ -1,6 +1,5 @@
 package ru.pnapreenko.blogengine.api.components;
 
-import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.stereotype.Component;
@@ -31,11 +30,7 @@ public class GlobalExceptionHandler {
         Map<String, Object> errors = new HashMap<>();
 
         e.getConstraintViolations()
-                .forEach(constraint -> {
-                    PathImpl path = (PathImpl) constraint.getPropertyPath();
-                    errors.put(path.getLeafNode().getName(), constraint.getMessage());
-                });
-
+                .forEach(constraint -> errors.put(constraint.getPropertyPath().toString(), constraint.getMessage()));
         return APIResponse.error(ConfigStrings.VALIDATION_MESSAGE, errors);
     }
 

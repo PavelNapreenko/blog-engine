@@ -1,5 +1,6 @@
 package ru.pnapreenko.blogengine.services;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -37,6 +38,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class PostsService {
     private final PostsRepository postsRepository;
     private final TagsRepository tagsRepository;
@@ -45,18 +47,6 @@ public class PostsService {
     private final TagsService tagsService;
     private final UserAuthService userAuthService;
     private final SettingsService settingsService;
-
-    public PostsService(PostsRepository postsRepository, TagsRepository tagsRepository, VotesRepository votesRepository,
-                        CommentsRepository commentsRepository, TagsService tagsService, UserAuthService userAuthService,
-                        SettingsService settingsService) {
-        this.postsRepository = postsRepository;
-        this.tagsRepository = tagsRepository;
-        this.votesRepository = votesRepository;
-        this.commentsRepository = commentsRepository;
-        this.tagsService = tagsService;
-        this.userAuthService = userAuthService;
-        this.settingsService = settingsService;
-    }
 
     public ResponseEntity<?> getPosts(int offset, int limit, String postMode) {
         final Instant now = Instant.now();
@@ -102,7 +92,7 @@ public class PostsService {
         postDTO.setLikeCount(votesRepository.findByPostAndValue(post, (byte) 1).size());
         postDTO.setDislikeCount(votesRepository.findByPostAndValue(post, (byte) -1).size());
         postDTO.setTags(tagsRepository.findTagNamesUsingPost(post));
-        final List<PostComment> comments = commentsRepository.findByPost(post);
+        List<PostComment> comments = commentsRepository.findByPost(post);
         postDTO.setComments(comments);
         post.updateViewCount();
         Post savedPost = postsRepository.save(post);

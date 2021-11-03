@@ -1,5 +1,6 @@
 package ru.pnapreenko.blogengine.controllers;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -15,13 +16,10 @@ import java.security.Principal;
 
 @RestController
 @RequestMapping("/api/comment")
+@RequiredArgsConstructor
 public class ApiCommentController {
 
     private final CommentsService commentsService;
-
-    public ApiCommentController(CommentsService commentsService) {
-        this.commentsService = commentsService;
-    }
 
     @PreAuthorize("hasAuthority('user:write')")
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE,

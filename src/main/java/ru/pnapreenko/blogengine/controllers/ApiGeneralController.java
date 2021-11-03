@@ -36,7 +36,7 @@ public class ApiGeneralController {
     }
 
     @GetMapping("/settings")
-    private ResponseEntity<?> getSettings() {
+    public ResponseEntity<?> getSettings() {
         return settingsService.getSettings();
     }
 
@@ -47,7 +47,7 @@ public class ApiGeneralController {
     }
 
     @PreAuthorize("hasAuthority('user:write')")
-    @GetMapping(value = "/statistics/{statsType:(all|my)}",
+    @GetMapping(value = "/statistics/{statsType:(?:all|my)}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @JsonView(JsonViews.Name.class)
     public ResponseEntity<?> getStats(@PathVariable(value = "statsType") String statsType, Principal principal) {

@@ -1,6 +1,7 @@
 package ru.pnapreenko.blogengine.model;
 
 import lombok.*;
+import org.hibernate.annotations.NaturalId;
 import ru.pnapreenko.blogengine.enums.SettingsCodeAndValue;
 
 import javax.persistence.*;
@@ -12,13 +13,13 @@ import javax.validation.constraints.Size;
 @Table(name = "global_settings")
 @Data
 @NoArgsConstructor(force = true)
-@AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class GlobalSettings extends AbstractEntity {
 
-    @Enumerated(EnumType.STRING)
+    @NaturalId
     @NotNull
-    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    @Column(length = 30, nullable = false)
     private SettingsCodeAndValue.Code code;
 
     @NotBlank
@@ -26,7 +27,8 @@ public class GlobalSettings extends AbstractEntity {
     @Column(nullable = false)
     private String name;
 
-    @Enumerated(EnumType.STRING)
     @NotNull
+    @Enumerated(EnumType.STRING)
+    @Column(length = 5, nullable = false)
     private SettingsCodeAndValue.Value value;
 }

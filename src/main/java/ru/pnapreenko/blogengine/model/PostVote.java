@@ -38,7 +38,7 @@ public class PostVote extends AbstractEntity {
 
     @NotNull
     @Column(nullable = false)
-    private Instant time;
+    private Instant time = Instant.now();
 
     @Column(nullable = false)
     private byte value;

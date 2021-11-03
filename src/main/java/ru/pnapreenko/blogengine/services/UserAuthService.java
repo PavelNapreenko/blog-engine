@@ -1,5 +1,6 @@
 package ru.pnapreenko.blogengine.services;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
@@ -31,6 +32,7 @@ import java.util.UUID;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class UserAuthService {
 
     private final AuthenticationManager authenticationManager;
@@ -38,21 +40,11 @@ public class UserAuthService {
     private final PostsRepository postsRepository;
     private final CaptchaService captchaService;
     private final MailSendService mailSendService;
+    private final PasswordEncoder passwordEncoder;
     private final SettingsService settingsService;
 
-    PasswordEncoder passwordEncoder;
-    Authentication auth;
     Environment environment;
-
-    public UserAuthService(AuthenticationManager authenticationManager, UsersRepository usersRepository, PostsRepository postsRepository,
-                           CaptchaService captchaService, MailSendService mailSendService, SettingsService settingsService) {
-        this.authenticationManager = authenticationManager;
-        this.usersRepository = usersRepository;
-        this.postsRepository = postsRepository;
-        this.captchaService = captchaService;
-        this.mailSendService = mailSendService;
-        this.settingsService = settingsService;
-    }
+    Authentication auth;
 
     @Bean
     public PasswordEncoder BCryptEncoder() {
@@ -124,6 +116,7 @@ public class UserAuthService {
         if (principal == null) {
             return ResponseEntity.ok(APIResponse.error());
         }
+
         return ResponseEntity.ok(APIResponse.ok("user", getAuthUser(getUserFromDB(principal.getName()))));
     }
 
@@ -135,7 +128,7 @@ public class UserAuthService {
         return captchaService.getCaptcha();
     }
 
-    public User getUserFromDB (String email) {
+    public User getUserFromDB(String email) {
         return usersRepository.findByEmail(email);
     }
 

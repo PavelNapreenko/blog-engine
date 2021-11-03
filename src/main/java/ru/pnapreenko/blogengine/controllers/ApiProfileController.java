@@ -1,5 +1,6 @@
 package ru.pnapreenko.blogengine.controllers;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -19,17 +20,12 @@ import java.security.Principal;
 
 @RestController
 @RequestMapping("/api/profile/my")
+@RequiredArgsConstructor
 public class ApiProfileController {
 
     private final UserAuthService userAuthService;
     private final ProfileService profileService;
     private final ImageStorageService storageService;
-
-    public ApiProfileController(UserAuthService userAuthService, ProfileService profileService, ImageStorageService storageService) {
-        this.userAuthService = userAuthService;
-        this.profileService = profileService;
-        this.storageService = storageService;
-    }
 
     @PreAuthorize("hasAuthority('user:write')")
     @PostMapping(

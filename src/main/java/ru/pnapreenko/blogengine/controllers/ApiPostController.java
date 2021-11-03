@@ -1,6 +1,7 @@
 package ru.pnapreenko.blogengine.controllers;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -22,18 +23,12 @@ import java.util.Map;
 
 @Controller
 @RequestMapping("/api/post")
+@RequiredArgsConstructor
 public class ApiPostController {
 
     private final PostsService postsService;
     private final PostsRepository postsRepository;
     private final PostVotesService postVotesService;
-
-    public ApiPostController(PostsService postsService, PostsRepository postsRepository,
-                             PostVotesService postVotesService) {
-        this.postsService = postsService;
-        this.postsRepository = postsRepository;
-        this.postVotesService = postVotesService;
-    }
 
     @GetMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
     @JsonView(JsonViews.IdName.class)
