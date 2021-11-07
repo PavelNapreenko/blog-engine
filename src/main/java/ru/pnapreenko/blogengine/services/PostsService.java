@@ -9,10 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.Errors;
 import ru.pnapreenko.blogengine.api.responses.APIResponse;
-import ru.pnapreenko.blogengine.api.utils.ConfigStrings;
-import ru.pnapreenko.blogengine.api.utils.DateUtils;
-import ru.pnapreenko.blogengine.api.utils.ErrorsValidation;
-import ru.pnapreenko.blogengine.api.utils.PostDTOConverter;
+import ru.pnapreenko.blogengine.api.utils.*;
 import ru.pnapreenko.blogengine.enums.ModerationDecision;
 import ru.pnapreenko.blogengine.enums.ModerationStatus;
 import ru.pnapreenko.blogengine.enums.MyPostsStatus;
@@ -22,9 +19,7 @@ import ru.pnapreenko.blogengine.model.PostComment;
 import ru.pnapreenko.blogengine.model.Tag;
 import ru.pnapreenko.blogengine.model.User;
 import ru.pnapreenko.blogengine.model.dto.ModerationDTO;
-import ru.pnapreenko.blogengine.model.dto.post.ListPostsDTO;
-import ru.pnapreenko.blogengine.model.dto.post.NewPostDTO;
-import ru.pnapreenko.blogengine.model.dto.post.PostDTO;
+import ru.pnapreenko.blogengine.model.dto.post.*;
 import ru.pnapreenko.blogengine.repositories.CommentsRepository;
 import ru.pnapreenko.blogengine.repositories.PostsRepository;
 import ru.pnapreenko.blogengine.repositories.TagsRepository;
@@ -36,6 +31,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -79,27 +75,28 @@ public class PostsService {
         return ResponseEntity.ok(new ListPostsDTO(posts));
     }
 
-    public ResponseEntity<?> getPost(int id) {
+    public ResponseEntity<?> getPost(int id, Principal principal) {
+
         Optional<Post> postOptional = postsRepository.findById(id);
         if (postOptional.isEmpty())
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                    
                     APIResponse.error(String.format(ConfigStrings.POST_NOT_FOUND, id))
             );
         Post post = postOptional.get();
-        PostDTO postDTO = new PostDTO(post);
-        postDTO.setTimestamp(post.getTime().getEpochSecond());
-        postDTO.setLikeCount(votesRepository.findByPostAndValue(post, (byte) 1).size());
-        postDTO.setDislikeCount(votesRepository.findByPostAndValue(post, (byte) -1).size());
-        postDTO.setTags(tagsRepository.findTagNamesUsingPost(post));
-        List<PostComment> comments = commentsRepository.findByPost(post);
-        postDTO.setComments(comments);
-        post.updateViewCount();
+
+        if (principal == null) {
+            post.updateViewCount();
+        } else {
+            User user = userAuthService.getUserFromDB(principal.getName());
+            if (!user.isModerator() && user.getId() != post.getAuthor().getId()) {
+                post.updateViewCount();
+            }
+        }
         Post savedPost = postsRepository.save(post);
         if (post.getId() != savedPost.getId()) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
-        return ResponseEntity.ok(postDTO);
+        return ResponseEntity.ok(getPostIdDTO(post));
     }
 
     public ResponseEntity<?> searchPosts(int offset, int limit, String query) {
@@ -128,12 +125,18 @@ public class PostsService {
     }
 
     public ResponseEntity<?> getModeratedPosts(int offset, int limit, ModerationStatus status, Principal principal) {
+        if (principal == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(APIResponse.error());
+        }
         User moderator = userAuthService.getUserFromDB(principal.getName());
         return ResponseEntity.ok(new ListPostsDTO(getPageWithPostDTO(postsRepository.findAllModeratedPosts(status, moderator,
                 getPageable(offset, limit)))));
     }
 
     public ResponseEntity<?> getMyPosts(int offset, int limit, MyPostsStatus myPostsStatus, Principal principal) {
+        if (principal == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(APIResponse.error());
+        }
         final boolean isActive = myPostsStatus.isActive();
         final ModerationStatus postStatus = myPostsStatus.getModerationStatus();
         User user = userAuthService.getUserFromDB(principal.getName());
@@ -141,7 +144,10 @@ public class PostsService {
                 getPageable(offset, limit)))));
     }
 
-    public ResponseEntity<?> savePost(Post post, NewPostDTO newPost, Principal principal, Errors validationErrors) {
+    public ResponseEntity<?> savePost(Post post, NewPostDTO newPost, Errors validationErrors, Principal principal) {
+        if (principal == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(APIResponse.error());
+        }
         User editor = userAuthService.getUserFromDB(principal.getName());
         Post postToSave = (post == null) ? new Post() : post;
         Instant now = Instant.now();
@@ -161,9 +167,9 @@ public class PostsService {
             if (isPostPremoderation) {
                 postToSave.setModerationStatus(ModerationStatus.NEW);
             }
-        }
-        if (!isPostPremoderation && postToSave.isActive()) {
-            postToSave.setModerationStatus(ModerationStatus.ACCEPTED);
+            if (!isPostPremoderation && postToSave.isActive()) {
+                postToSave.setModerationStatus(ModerationStatus.ACCEPTED);
+            }
         }
         if (newPost.getTags() != null) {
             newPost.getTags().forEach(tag -> postToSave.getTags().add(tagsService.saveTag(tag)));
@@ -173,6 +179,9 @@ public class PostsService {
     }
 
     public ResponseEntity<?> updatePostModerationStatus(ModerationDTO moderation, Principal principal) {
+        if (principal == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(APIResponse.error());
+        }
         User moderator = userAuthService.getUserFromDB(principal.getName());
         final Optional<Post> postOptional = postsRepository.findById(moderation.getPostId());
         if (postOptional.isEmpty()) {
@@ -223,5 +232,20 @@ public class PostsService {
             errors.put("text", ConfigStrings.POST_INVALID_NEW_TEXT);
         }
         return errors;
+    }
+
+    private List<PostCommentDTO> getPostIdComments(List<PostComment> source) {
+        return source.stream().map(CommentDTOConverter::getConversion).collect(Collectors.toList());
+    }
+
+    private PostIdDTO getPostIdDTO(Post post) {
+        PostIdDTO postIdDTO = new PostIdDTO(post);
+        postIdDTO.setTimestamp(post.getTime().getEpochSecond());
+        postIdDTO.setLikeCount(votesRepository.findByPostAndValue(post, (byte) 1).size());
+        postIdDTO.setDislikeCount(votesRepository.findByPostAndValue(post, (byte) -1).size());
+        postIdDTO.setTags(tagsRepository.findTagNamesUsingPost(post));
+        List<PostCommentDTO> comments = getPostIdComments(commentsRepository.findByPost(post));
+        postIdDTO.setComments(comments);
+        return postIdDTO;
     }
 }

@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import ru.pnapreenko.blogengine.model.User;
 import ru.pnapreenko.blogengine.repositories.UsersRepository;
 
-@Service
+@Service("userDetailsServiceImpl")
 @RequiredArgsConstructor
 public class UserDetailsServiceImpl implements UserDetailsService {
     private final UsersRepository usersRepository;

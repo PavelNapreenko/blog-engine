@@ -1,7 +1,5 @@
 package ru.pnapreenko.blogengine.api.utils;
 
-import java.util.Locale;
-
 public class ConfigStrings {
 
     public static final String MULTIUSER_MODE = "Многопользовательский режим";
@@ -38,7 +36,7 @@ public class ConfigStrings {
 
     public static final String AUTH_INVALID_EMAIL = "E-mail указан неверно.";
     public static final String AUTH_SHORT_PASSWORD = "Слишком короткий пароль.";
-    public static final int AUTH_BCRYPT_STRENGTH = 8;
+    public static final int AUTH_BCRYPT_STRENGTH = 12;
     public static final String AUTH_EMAIL_ALREADY_REGISTERED = "Этот e-mail уже зарегистрирован.";
     public static final int AUTH_MIN_PASSWORD_LENGTH = 6;
     public static final String AUTH_INVALID_PASSWORD_LENGTH = String.format("Пароль короче " +

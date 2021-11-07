@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonView;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.jsoup.Jsoup;
 import ru.pnapreenko.blogengine.api.utils.JsonViews;
 import ru.pnapreenko.blogengine.model.Post;
 import ru.pnapreenko.blogengine.model.PostComment;
@@ -16,7 +15,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class PostDTO implements Comparable<PostDTO> {
+public class PostIdDTO {
 
 
     @JsonView({JsonViews.IdName.class, JsonViews.EntityId.class})
@@ -26,7 +25,7 @@ public class PostDTO implements Comparable<PostDTO> {
     private String title;
 
     @JsonView(JsonViews.IdName.class)
-    private String announce;
+    private boolean isActive;
 
     @JsonView(JsonViews.EntityIdName.class)
     private String text;
@@ -41,9 +40,6 @@ public class PostDTO implements Comparable<PostDTO> {
     private int viewCount;
 
     @JsonView({JsonViews.IdName.class, JsonViews.EntityIdName.class})
-    private int commentCount;
-
-    @JsonView({JsonViews.IdName.class, JsonViews.EntityIdName.class})
     private long likeCount;
 
     @JsonView({JsonViews.IdName.class, JsonViews.EntityIdName.class})
@@ -53,37 +49,23 @@ public class PostDTO implements Comparable<PostDTO> {
     private List<String> tags;
 
     @JsonView(JsonViews.EntityIdName.class)
-    private List<PostComment> comments;
+    private List<PostCommentDTO> comments;
 
     private Instant date;
 
-    public PostDTO(Post post) {
+    public PostIdDTO(Post post) {
         this.id = post.getId();
         this.title = post.getTitle();
         this.text = post.getText();
-        this.announce = Jsoup.parse(getAnnounce(post.getText())).text();
         this.timestamp = post.getTime().getEpochSecond();
 
         this.user = new PostAuthorDTO(post.getAuthor().getId(), post.getAuthor().getName());
         this.viewCount = post.getViewCount();
-        this.commentCount = post.getComments().size();
         this.likeCount = getLikeCount(post);
         this.dislikeCount = getDislikeCount(post);
 
         this.date = post.getTime();
         this.comments = new ArrayList<>();
-    }
-
-    @Override
-    public int compareTo(PostDTO o) {
-        int result = o.getCommentCount() - this.getCommentCount();
-        if (result == 0) result = o.getDate().compareTo(this.getDate());
-        return result;
-    }
-
-    private String getAnnounce(String text) {
-        text = text.substring(0,149).concat("...");
-        return text;
     }
 
     private long getLikeCount(Post post) {

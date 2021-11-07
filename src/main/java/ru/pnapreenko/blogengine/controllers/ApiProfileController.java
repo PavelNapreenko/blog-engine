@@ -37,12 +37,10 @@ public class ApiProfileController {
                                                     @RequestParam("email") String email,
                                                     @RequestParam("password") String password,
                                                     Principal principal) {
-
-        User user = userAuthService.getUserFromDB(principal.getName());
-
-        if (user == null) {
+        if (principal == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(APIResponse.error());
         }
+        User user = userAuthService.getUserFromDB(principal.getName());
 
         String pathToSavedFile = storageService.store(photo);
 
@@ -57,7 +55,6 @@ public class ApiProfileController {
                 .email(email)
                 .password(password)
                 .build();
-
         return profileService.updateUserProfile(user, profileData);
     }
 
@@ -66,12 +63,10 @@ public class ApiProfileController {
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> updateProfile(@RequestBody ProfileDTO profileData, Principal principal) {
-
-        User user = userAuthService.getUserFromDB(principal.getName());
-
-        if (user == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(APIResponse.error());
+        if (principal == null) {
+            return ResponseEntity.ok(APIResponse.error());
         }
+        User user = userAuthService.getUserFromDB(principal.getName());
         return profileService.updateUserProfile(user, profileData);
     }
 }

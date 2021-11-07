@@ -1,5 +1,6 @@
 package ru.pnapreenko.blogengine.services;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -13,19 +14,17 @@ import ru.pnapreenko.blogengine.repositories.VotesRepository;
 import java.security.Principal;
 
 @Service
+@RequiredArgsConstructor
 public class PostVotesService {
 
     private final VotesRepository votesRepository;
     private final UserAuthService userAuthService;
     private final PostsRepository postsRepository;
 
-    public PostVotesService(VotesRepository votesRepository, UserAuthService userAuthService, PostsRepository postsRepository) {
-        this.votesRepository = votesRepository;
-        this.userAuthService = userAuthService;
-        this.postsRepository = postsRepository;
-    }
-
-    public ResponseEntity<?> vote(String voteType, Principal principal, Integer postId) {
+    public ResponseEntity<?> vote(String voteType, Integer postId, Principal principal) {
+        if (principal == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(APIResponse.error());
+        }
         User user = userAuthService.getUserFromDB(principal.getName());
 
         if (postId <= 0) {
@@ -41,6 +40,9 @@ public class PostVotesService {
         byte voteRequested = voteType.equalsIgnoreCase("like") ? (byte) 1 : (byte) -1;
         PostVote vote = votesRepository.findByUserAndPost(user, post);
 
+        if (user.isModerator() || user.getId() == post.getAuthor().getId()) {
+            return ResponseEntity.ok(APIResponse.error());
+        }
         if (vote == null) {
             PostVote newVote = new PostVote(user, post);
             newVote.setValue(voteRequested);

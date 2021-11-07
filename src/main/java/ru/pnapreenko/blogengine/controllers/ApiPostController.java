@@ -68,8 +68,8 @@ public class ApiPostController {
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @JsonView(JsonViews.EntityIdName.class)
-    public ResponseEntity<?> searchPosts(@PathVariable int id) {
-        return postsService.getPost(id);
+    public ResponseEntity<?> searchPosts(@PathVariable int id, Principal principal) {
+        return postsService.getPost(id, principal);
     }
 
     @PreAuthorize("hasAuthority('user:moderate')")
@@ -78,8 +78,7 @@ public class ApiPostController {
     public ResponseEntity<?> getModeratedPosts(
             @RequestParam(name = "offset") int offset,
             @RequestParam(name = "limit") int limit,
-            @RequestParam(name = "status") String status,
-            Principal principal) {
+            @RequestParam(name = "status") String status, Principal principal) {
         ModerationStatus moderationStatus = new ModerationStatus.StringToEnumConverter().convert(status);
         moderationStatus = (moderationStatus == null) ? ModerationStatus.NEW : moderationStatus;
         return postsService.getModeratedPosts(offset, limit, moderationStatus, principal);
@@ -91,8 +90,7 @@ public class ApiPostController {
     public ResponseEntity<?> getMyPosts(
             @RequestParam(name = "offset") int offset,
             @RequestParam(name = "limit") int limit,
-            @RequestParam(name = "status") String status,
-            Principal principal) {
+            @RequestParam(name = "status") String status, Principal principal) {
         MyPostsStatus myPostsStatus = new MyPostsStatus.StringToEnumConverter().convert(status);
         myPostsStatus = (myPostsStatus == null) ? MyPostsStatus.INACTIVE : myPostsStatus;
         return postsService.getMyPosts(offset, limit, myPostsStatus, principal);
@@ -102,8 +100,8 @@ public class ApiPostController {
     @PostMapping(value = "",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> saveNewPost(@RequestBody @Valid NewPostDTO newPost, Principal principal, Errors errors) {
-                return postsService.savePost(null, newPost, principal, errors);
+    public ResponseEntity<?> saveNewPost(@RequestBody @Valid NewPostDTO newPost, Errors errors, Principal principal) {
+                return postsService.savePost(null, newPost, errors, principal);
     }
 
     @PreAuthorize("hasAuthority('user:write')")
@@ -111,9 +109,9 @@ public class ApiPostController {
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> editPost(@PathVariable int id,
-                                      @RequestBody @Valid NewPostDTO newPostData, Principal principal, Errors errors) {
+                                      @RequestBody @Valid NewPostDTO newPostData, Errors errors, Principal principal) {
         Post post = postsRepository.getById(id);
-        return postsService.savePost(post, newPostData, principal, errors);
+        return postsService.savePost(post, newPostData, errors, principal);
     }
 
     @PreAuthorize("hasAuthority('user:write')")
@@ -123,6 +121,6 @@ public class ApiPostController {
     public ResponseEntity<?> vote(@PathVariable(value = "voteType") String voteType,
                                   @RequestBody Map<String, Integer> payload, Principal principal) {
         Integer postId = payload.getOrDefault("post_id", 0);
-        return postVotesService.vote(voteType, principal, postId);
+        return postVotesService.vote(voteType, postId, principal);
     }
 }

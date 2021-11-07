@@ -12,7 +12,6 @@ import ru.pnapreenko.blogengine.repositories.PostsRepository;
 import ru.pnapreenko.blogengine.repositories.VotesRepository;
 
 import java.security.Principal;
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -28,30 +27,44 @@ public class StatisticsService {
     private final SettingsService settingsService;
 
     public ResponseEntity<?> getStats(String statsType, Principal principal) {
+        boolean isStatsPublic = settingsService.isStatsPublic();
+
         if (principal == null) {
-            return ResponseEntity.ok(APIResponse.error());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(APIResponse.error());
         }
 
         User user = userAuthService.getUserFromDB(principal.getName());
-        boolean isStatsPublic = settingsService.isStatsPublic();
 
-        if ((statsType.equalsIgnoreCase("all") && isStatsPublic) || user.isModerator()) {
+        if (statsType.equalsIgnoreCase("all") && (isStatsPublic || user.isModerator())) {
             return ResponseEntity.status(HttpStatus.OK).body(getStatsDTO(null));
-        } else {
-        return ResponseEntity.status(HttpStatus.OK).body(getStatsDTO(user));
         }
+        return ResponseEntity.status(HttpStatus.OK).body(getStatsDTO(user));
     }
 
     private StatsDTO getStatsDTO(User user) {
+        long firstPublication;
         StatsDTO stats = new StatsDTO();
-        Instant firstPublication = LocalDateTime.parse(postsRepository.getFirstPostDateByUser(user),
-                        DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm", Locale.US))
-                .atZone(ZoneId.of( "Europe/Moscow" )).toInstant();
-        stats.setPostsCount(postsRepository.countByAuthor(user));
-        stats.setLikesCount(votesRepository.countByUserAndValue(user, (byte) 1));
-        stats.setDislikesCount(votesRepository.countByUserAndValue(user, (byte) -1));
-        stats.setViewsCount(postsRepository.getViewsByUser(user));
-        stats.setFirstPublication(firstPublication.getEpochSecond());
+        stats.setPostsCount(getValue((postsRepository.countByAuthor(user))));
+        stats.setLikesCount(getValue((long) votesRepository.countByUserAndValue(user, (byte) 1)));
+        stats.setDislikesCount(getValue((long) votesRepository.countByUserAndValue(user, (byte) -1)));
+        stats.setViewsCount(getValue(postsRepository.getViewsByUser(user)));
+
+        String firstPostDate = postsRepository.getFirstPostDateByUser(user);
+        if (firstPostDate == null) {
+            firstPublication = 0;
+        } else {
+            firstPublication = LocalDateTime.parse(firstPostDate,
+                            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm", Locale.US))
+                    .atZone(ZoneId.of("Europe/Moscow")).toInstant().getEpochSecond();
+        }
+        stats.setFirstPublication(firstPublication);
         return stats;
+    }
+
+    private long getValue(Long value) {
+        if (value == null) {
+            return 0;
+        }
+        return value;
     }
 }
