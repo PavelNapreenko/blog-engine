@@ -1,9 +1,9 @@
 package ru.pnapreenko.blogengine.services;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -31,6 +31,7 @@ import java.util.UUID;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class UserAuthService {
 
     private final AuthenticationManager authenticationManager;
@@ -38,21 +39,10 @@ public class UserAuthService {
     private final PostsRepository postsRepository;
     private final CaptchaService captchaService;
     private final MailSendService mailSendService;
-    private final SettingsService settingsService;
+    private final PasswordEncoder passwordEncoder;
 
-    PasswordEncoder passwordEncoder;
-    Authentication auth;
+
     Environment environment;
-
-    public UserAuthService(AuthenticationManager authenticationManager, UsersRepository usersRepository, PostsRepository postsRepository,
-                           CaptchaService captchaService, MailSendService mailSendService, SettingsService settingsService) {
-        this.authenticationManager = authenticationManager;
-        this.usersRepository = usersRepository;
-        this.postsRepository = postsRepository;
-        this.captchaService = captchaService;
-        this.mailSendService = mailSendService;
-        this.settingsService = settingsService;
-    }
 
     @Bean
     public PasswordEncoder BCryptEncoder() {
@@ -60,12 +50,6 @@ public class UserAuthService {
     }
 
     public ResponseEntity<?> registerUser(NewUserDTO user, Errors validationErrors) {
-        boolean isMultiuserMode = settingsService.isMultiuserMode();
-
-        if (!isMultiuserMode) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(APIResponse.error());
-        }
-
         Map<String, Object> errors = validateUserInputAndGetErrors(user, validationErrors);
 
         if (errors.size() > 0) {
@@ -83,16 +67,16 @@ public class UserAuthService {
     }
 
     public ResponseEntity<?> loginUser(UserUnAuthDTO user, Errors errors) {
-        auth = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword()));
+        final Authentication auth = authenticationManager
+                .authenticate(
+                        new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(auth);
-        org.springframework.security.core.userdetails.User authUser = (org.springframework.security.core.userdetails.User) auth.getPrincipal();
 
         if (errors.hasErrors())
             return ResponseEntity.badRequest().body(APIResponse.error(ConfigStrings.AUTH_ERROR));
 
-        final String email = authUser.getUsername();
-        final String password = authUser.getPassword();
+        final String email = user.getEmail();
+        final String password = user.getPassword();
 
         if (email.isBlank() || password.isBlank())
             return ResponseEntity.badRequest().body(APIResponse.error(
@@ -117,14 +101,14 @@ public class UserAuthService {
         log.info(String.format("User with email '%s' successfully authenticated.",
                 userFromDB.getEmail()));
 
-        return ResponseEntity.ok(APIResponse.ok("user", getAuthUser(userFromDB)));
+        return ResponseEntity.ok(APIResponse.ok("user", getUserAuthDTO(userFromDB)));
     }
 
     public ResponseEntity<?> getCheckedUser(Principal principal) {
         if (principal == null) {
             return ResponseEntity.ok(APIResponse.error());
         }
-        return ResponseEntity.ok(APIResponse.ok("user", getAuthUser(getUserFromDB(principal.getName()))));
+        return ResponseEntity.ok(APIResponse.ok("user", getUserAuthDTO(getUserFromDB(principal.getName()))));
     }
 
     public ResponseEntity<?> logoutUser() {
@@ -135,11 +119,11 @@ public class UserAuthService {
         return captchaService.getCaptcha();
     }
 
-    public User getUserFromDB (String email) {
+    public User getUserFromDB(String email) {
         return usersRepository.findByEmail(email);
     }
 
-    public UserAuthDTO getAuthUser(User user) {
+    public UserAuthDTO getUserAuthDTO(User user) {
         UserAuthDTO userAuthDTO = new UserAuthDTO(user.getId(), user.getName(), user.getPhoto(), user.getEmail());
         if (user.isModerator()) {
             userAuthDTO.setUserModeratorStatus(postsRepository.countPostAwaitingModeration());
@@ -161,7 +145,7 @@ public class UserAuthService {
 
         User userFromDB = usersRepository.findByEmail(email);
 
-        if (userFromDB.getEmail().equals(email))
+        if (userFromDB != null && userFromDB.getEmail().equals(email))
             errors.put("email", ConfigStrings.AUTH_EMAIL_ALREADY_REGISTERED);
 
         if (name == null || name.equals(""))
@@ -189,9 +173,6 @@ public class UserAuthService {
 
         final String userEmail = email.getEmail();
         User userFromDB = usersRepository.findByEmail(userEmail);
-
-        if (userFromDB == null)
-            return ResponseEntity.ok(APIResponse.error(ConfigStrings.AUTH_LOGIN_NO_SUCH_USER));
 
         log.info(String.format("User with email '%s' found: %s", userEmail, userFromDB));
 

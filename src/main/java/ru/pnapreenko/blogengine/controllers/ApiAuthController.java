@@ -1,6 +1,7 @@
 package ru.pnapreenko.blogengine.controllers;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -19,15 +20,12 @@ import java.security.Principal;
 
 @RestController
 @RequestMapping("/api/auth")
+@RequiredArgsConstructor
 public class ApiAuthController {
 
     private final UserAuthService userAuthService;
 
-    public ApiAuthController(UserAuthService userAuthService) {
-        this.userAuthService = userAuthService;
-    }
-
-    @PostMapping(value="/register",
+    @PostMapping(value = "/register",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> registerUser(@RequestBody @Valid NewUserDTO user, Errors error) {
@@ -41,18 +39,18 @@ public class ApiAuthController {
         return userAuthService.loginUser(user, error);
     }
 
-    @GetMapping(value="/check", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/check", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> checkAuthUser(Principal principal) {
         return userAuthService.getCheckedUser(principal);
     }
 
     @PreAuthorize("hasAuthority('user:write')")
-    @GetMapping(value="/logout", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/logout", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> logoutUser() {
         return userAuthService.logoutUser();
     }
 
-    @GetMapping(value="/captcha", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/captcha", produces = MediaType.APPLICATION_JSON_VALUE)
     @JsonView(JsonViews.Name.class)
     public ResponseEntity<?> getCaptcha() throws IOException {
         return userAuthService.getCaptcha();

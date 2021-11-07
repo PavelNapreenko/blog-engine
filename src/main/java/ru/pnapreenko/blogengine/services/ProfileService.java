@@ -1,5 +1,6 @@
 package ru.pnapreenko.blogengine.services;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -14,17 +15,12 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 @Service
+@RequiredArgsConstructor
 public class ProfileService {
 
     private final UsersRepository usersRepository;
     private final ImageStorageService storageService;
     private final PasswordEncoder passwordEncoder;
-
-    public ProfileService(UsersRepository usersRepository, ImageStorageService storageService, PasswordEncoder passwordEncoder) {
-        this.usersRepository = usersRepository;
-        this.storageService = storageService;
-        this.passwordEncoder = passwordEncoder;
-    }
 
     public ResponseEntity<?> updateUserProfile(User user, ProfileDTO profileData) {
 
@@ -61,7 +57,7 @@ public class ProfileService {
         }
 
         if (password != null) {
-            if(!password.isBlank()) {
+            if (!password.isBlank()) {
                 user.setPassword(passwordEncoder.encode(password));
             }
         }
@@ -74,9 +70,9 @@ public class ProfileService {
     }
 
     private Map<String, Object> validateProfileFields(User user, ProfileDTO profile) {
+
         final Pattern emailPattern = Pattern.compile(ConfigStrings.EMAIL_PATTERN, Pattern.CASE_INSENSITIVE);
         final Map<String, Object> errors = new HashMap<>();
-
         final String name = profile.getName();
         final String email = profile.getEmail();
         final String password = profile.getPassword();

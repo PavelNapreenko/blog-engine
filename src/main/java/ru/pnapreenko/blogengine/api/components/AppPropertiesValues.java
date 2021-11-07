@@ -8,8 +8,6 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Data
-@AllArgsConstructor
-@NoArgsConstructor(force = true)
 public class AppPropertiesValues {
     @Value("${blogapp.properties.title}")
     private String title;

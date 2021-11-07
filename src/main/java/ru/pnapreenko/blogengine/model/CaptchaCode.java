@@ -27,14 +27,16 @@ import java.util.UUID;
 @ToString(of = {"code", "secretCode", "imageBase64"})
 public class CaptchaCode extends AbstractEntity {
 
-    @NotNull @Column(nullable = false)
+    @NotNull
+    @Column(nullable = false)
     private Instant time;
 
     @NotBlank
     @Column(nullable = false)
     private String code;
 
-    @NotBlank @Column(name = "secret_code", nullable = false)
+    @NotBlank
+    @Column(name = "secret_code", nullable = false)
     @JsonProperty("secret")
     @JsonView(JsonViews.Name.class)
     private String secretCode;

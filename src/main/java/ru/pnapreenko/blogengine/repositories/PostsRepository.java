@@ -69,10 +69,10 @@ public interface PostsRepository extends JpaRepository<Post, Integer> {
                            Pageable pageable);
 
     @Query("select count(p) from #{#entityName} p where (:user is null or p.author = :user)")
-    int countByAuthor(@Param("user") User user);
+    Long countByAuthor(@Param("user") User user);
 
     @Query("select sum(p.viewCount) from #{#entityName} p where (:user is null or p.author = :user)")
-    int getViewsByUser(@Param("user") User user);
+    Long getViewsByUser(@Param("user") User user);
 
     @Query("select date_format(min(p.time),'%Y-%m-%d %H:%m') from  #{#entityName} p where (:user is null or p.author = :user)")
     String getFirstPostDateByUser(@Param("user") User user);

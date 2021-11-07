@@ -1,9 +1,8 @@
 package ru.pnapreenko.blogengine.model;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import com.fasterxml.jackson.annotation.JsonView;
+import lombok.*;
+import ru.pnapreenko.blogengine.api.utils.JsonViews;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -15,7 +14,7 @@ import java.util.Set;
 @Entity
 @Table(name = "post_comments")
 @Data
-@NoArgsConstructor(force = true)
+@NoArgsConstructor
 @EqualsAndHashCode(callSuper = true, of = {"text", "time"})
 @ToString(callSuper = true, of = {"text", "user", "time"})
 public class PostComment extends AbstractEntity {
@@ -31,6 +30,7 @@ public class PostComment extends AbstractEntity {
     @NotNull
     @ManyToOne(cascade = CascadeType.MERGE, optional = false)
     @JoinColumn(name = "user_id", nullable = false, updatable = false)
+    @JsonView(JsonViews.EntityIdName.class)
     private User user;
 
     @NotNull
@@ -40,10 +40,11 @@ public class PostComment extends AbstractEntity {
 
     @NotNull
     @Column(nullable = false)
-    private Instant time;
+    private Instant time = Instant.now();
 
     @NotBlank
     @Column(columnDefinition = "TEXT", nullable = false)
+    @JsonView(JsonViews.EntityIdName.class)
     private String text;
 
     }

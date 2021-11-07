@@ -11,6 +11,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import ru.pnapreenko.blogengine.api.interfaces.StorageService;
 import ru.pnapreenko.blogengine.config.ImageStorageProperties;
+
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
@@ -106,6 +107,7 @@ public class ImageStorageService implements StorageService {
         public StorageException(String message) {
             super(message);
         }
+
         public StorageException(String message, Throwable cause) {
             super(message, cause);
         }
@@ -136,7 +138,7 @@ public class ImageStorageService implements StorageService {
             BufferedImage image = ImageIO.read(in);
             BufferedImage newImage = Scalr.resize(
                     image,
-                    Scalr.Method.ULTRA_QUALITY,
+                    Scalr.Method.QUALITY,
                     Scalr.Mode.AUTOMATIC,
                     36, 36);
             File newFile = new File(this.rootLocation + "/" + file.getName());

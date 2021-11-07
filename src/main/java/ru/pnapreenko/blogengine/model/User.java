@@ -1,5 +1,6 @@
 package ru.pnapreenko.blogengine.model;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -7,6 +8,7 @@ import lombok.ToString;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 import org.hibernate.annotations.NaturalId;
+import ru.pnapreenko.blogengine.api.utils.JsonViews;
 import ru.pnapreenko.blogengine.enums.Role;
 
 import javax.persistence.*;
@@ -36,6 +38,7 @@ public class User extends AbstractEntity {
     @NotBlank
     @Size(max = 255)
     @Column(nullable = false)
+    @JsonView({JsonViews.IdName.class, JsonViews.EntityIdName.class})
     private String name;
 
     @NaturalId(mutable = true)
@@ -54,6 +57,7 @@ public class User extends AbstractEntity {
     private String code;
 
     @Column(columnDefinition = "TEXT")
+    @JsonView(JsonViews.EntityIdName.class)
     private String photo;
 
     @NotNull

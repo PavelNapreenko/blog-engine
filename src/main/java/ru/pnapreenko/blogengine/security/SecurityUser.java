@@ -7,13 +7,13 @@ import org.springframework.security.core.userdetails.UserDetails;
 import ru.pnapreenko.blogengine.model.User;
 
 import java.util.Collection;
-import java.util.List;
+import java.util.Set;
 
 @Data
 public class SecurityUser implements UserDetails {
     private final String username;
     private final String password;
-    private final List<SimpleGrantedAuthority> authorities;
+    private final Set<SimpleGrantedAuthority> authorities;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
