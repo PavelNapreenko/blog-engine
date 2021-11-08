@@ -148,29 +148,33 @@ public class PostsService {
         if (principal == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(APIResponse.error());
         }
-        User editor = userAuthService.getUserFromDB(principal.getName());
-        Post postToSave = (post == null) ? new Post() : post;
-        Instant now = Instant.now();
-        Instant postDate = Instant.ofEpochMilli(newPost.getTimestamp());
+
         Map<String, Object> errors = validateNewPostSaveDataInputAndGetErrors(newPost, validationErrors);
         if (errors.size() > 0) {
             return ResponseEntity.ok(APIResponse.error(errors));
         }
+
+        User editor = userAuthService.getUserFromDB(principal.getName());
+        Post postToSave = (post == null) ? new Post() : post;
+        Instant now = Instant.now();
+        Instant postDate = Instant.ofEpochMilli(newPost.getTimestamp());
+        boolean isPostPremoderation = settingsService.isPostPremoderation();
+
         postToSave.setTitle(newPost.getTitle());
         postToSave.setText(newPost.getText());
         postToSave.setActive(newPost.getActive());
         postToSave.setTime(postDate.isBefore(now) ? now : postDate);
         postToSave.setAuthor((postToSave.getId() == 0) ? editor : postToSave.getAuthor());
 
-        boolean isPostPremoderation = settingsService.isPostPremoderation();
-        if ((post == null) || (editor.equals(postToSave.getAuthor()) && !editor.isModerator())) {
-            if (isPostPremoderation) {
+        if (isPostPremoderation) {
+            if ((post == null) || (editor.equals(postToSave.getAuthor()) && !editor.isModerator())) {
                 postToSave.setModerationStatus(ModerationStatus.NEW);
             }
-            if (!isPostPremoderation && postToSave.isActive()) {
-                postToSave.setModerationStatus(ModerationStatus.ACCEPTED);
-            }
         }
+        if (!isPostPremoderation && postToSave.isActive()) {
+            postToSave.setModerationStatus(ModerationStatus.ACCEPTED);
+        }
+
         if (newPost.getTags() != null) {
             newPost.getTags().forEach(tag -> postToSave.getTags().add(tagsService.saveTag(tag)));
         }

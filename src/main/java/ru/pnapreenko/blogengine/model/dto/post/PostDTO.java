@@ -82,7 +82,7 @@ public class PostDTO implements Comparable<PostDTO> {
     }
 
     private String getAnnounce(String text) {
-        text = text.substring(0,149).concat("...");
+        text = text.substring(0, 50).concat("...");
         return text;
     }
 

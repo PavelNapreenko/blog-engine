@@ -46,8 +46,8 @@ public class ApiAuthController {
 
     @PreAuthorize("hasAuthority('user:write')")
     @GetMapping(value = "/logout", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> logoutUser() {
-        return userAuthService.logoutUser();
+    public ResponseEntity<?> logoutUser(Principal principal) {
+        return userAuthService.logoutUser(principal);
     }
 
     @GetMapping(value = "/captcha", produces = MediaType.APPLICATION_JSON_VALUE)

@@ -40,7 +40,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .formLogin().disable()
                 .logout()
                 .logoutUrl("/logout")
-                .logoutSuccessUrl("/api/posts");
+                .logoutSuccessUrl("/posts")
+                .deleteCookies("JSESSIONID")
+                .clearAuthentication(true)
+                .invalidateHttpSession(true);
     }
 
     @Override
