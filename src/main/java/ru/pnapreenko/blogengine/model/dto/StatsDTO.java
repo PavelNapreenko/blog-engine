@@ -9,16 +9,16 @@ import ru.pnapreenko.blogengine.api.utils.JsonViews;
 @NoArgsConstructor
 public class StatsDTO {
     @JsonView(JsonViews.Name.class)
-    private long postsCount;
+    private int postsCount;
 
     @JsonView(JsonViews.Name.class)
-    private long likesCount;
+    private int likesCount;
 
     @JsonView(JsonViews.Name.class)
-    private long dislikesCount;
+    private int dislikesCount;
 
     @JsonView(JsonViews.Name.class)
-    private long viewsCount;
+    private int viewsCount;
 
     @JsonView(JsonViews.Name.class)
     private long firstPublication;

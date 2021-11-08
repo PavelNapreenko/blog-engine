@@ -7,6 +7,12 @@ public enum ModerationStatus {
     ACCEPTED,
     DECLINED;
 
+    private static final ModerationStatus[] values = ModerationStatus.values();
+
+    public static ModerationStatus getById(int id) {
+        return values[id];
+    }
+
     public static class StringToEnumConverter implements Converter<String, ModerationStatus> {
         @Override
         public ModerationStatus convert(String source) {

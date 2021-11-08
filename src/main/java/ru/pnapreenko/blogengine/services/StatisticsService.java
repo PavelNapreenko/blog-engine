@@ -45,8 +45,8 @@ public class StatisticsService {
         long firstPublication;
         StatsDTO stats = new StatsDTO();
         stats.setPostsCount(getValue((postsRepository.countByAuthor(user))));
-        stats.setLikesCount(getValue((long) votesRepository.countByUserAndValue(user, (byte) 1)));
-        stats.setDislikesCount(getValue((long) votesRepository.countByUserAndValue(user, (byte) -1)));
+        stats.setLikesCount(getValue(votesRepository.countByUserAndValue(user, (byte) 1)));
+        stats.setDislikesCount(getValue(votesRepository.countByUserAndValue(user, (byte) -1)));
         stats.setViewsCount(getValue(postsRepository.getViewsByUser(user)));
 
         String firstPostDate = postsRepository.getFirstPostDateByUser(user);
@@ -61,7 +61,7 @@ public class StatisticsService {
         return stats;
     }
 
-    private long getValue(Long value) {
+    private int getValue(Integer value) {
         if (value == null) {
             return 0;
         }
