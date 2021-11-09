@@ -41,9 +41,9 @@ public class UserAuthService {
     private final CaptchaService captchaService;
     private final MailSendService mailSendService;
     private final PasswordEncoder passwordEncoder;
+    private final Environment environment;
 
 
-    Environment environment;
 
     @Bean
     public PasswordEncoder BCryptEncoder() {
