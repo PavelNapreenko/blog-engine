@@ -41,12 +41,14 @@ public class ConfigStrings {
     public static final int AUTH_MIN_PASSWORD_LENGTH = 6;
     public static final String AUTH_INVALID_PASSWORD_LENGTH = String.format("Пароль короче " +
             "%d символов.", AUTH_MIN_PASSWORD_LENGTH);
+
     public static final String AUTH_INVALID_CAPTCHA = "Код с картинки введен неверно.";
     public static final String AUTH_ERROR = "Ошибка аутентификации";
     public static final String AUTH_EMPTY_EMAIL_OR_PASSWORD = "Адрес или пароль не указаны.";
     public static final String AUTH_LOGIN_NO_SUCH_USER = "Пользователь не найден.";
     public static final String AUTH_WRONG_PASSWORD = "Пароль указан неверно.";
     public static final String AUTH_INVALID_NAME = "Имя указано неверно.";
+
     public static final int POST_NEW_TITLE_MIN_LENGTH = 3;
     public static final String POST_INVALID_NEW_TITLE = "Заголовок поста не установлен.";
     public static final int POST_NEW_TEXT_MIN_LENGTH = 50;
@@ -68,7 +70,6 @@ public class ConfigStrings {
     public static final String COMMENT_WRONG_PARENT_ID = "Поле 'parent_id' содержит неверный идентификатор.";
     public static final String COMMENT_WRONG_TEXT = "Поле 'text' является обязательным и не может быть пустым.";
     public static final String MODERATION_INVALID_POST = "Модерирование постов, закрепленных за другими модераторами запрещено!";
-    public static final String EMAIL_PATTERN = "^(.+)@(.+)\\.(.+)$";
     public static final int AUTH_MIN_NAME_LENGTH = 3;
     public static final int AUTH_MAX_FIELD_LENGTH = 255;
     public static final String AUTH_WRONG_NAME = "Имя указано неверно.";

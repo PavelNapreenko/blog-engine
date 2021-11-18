@@ -1,6 +1,7 @@
 package ru.pnapreenko.blogengine.services;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.validator.routines.EmailValidator;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -72,7 +73,6 @@ public class ProfileService {
 
     private Map<String, Object> validateProfileFields(User user, ProfileDTO profile) {
 
-        final Pattern emailPattern = Pattern.compile(ConfigStrings.EMAIL_PATTERN, Pattern.CASE_INSENSITIVE);
         final Map<String, Object> errors = new HashMap<>();
         final String name = profile.getName();
         final String email = profile.getEmail();
@@ -84,7 +84,8 @@ public class ProfileService {
             errors.put("name", ConfigStrings.AUTH_WRONG_NAME);
         }
 
-        if (email == null || email.isBlank() || !emailPattern.matcher(email).matches()) {
+        if (email == null || email.isBlank() || !EmailValidator.getInstance()
+                .isValid(email)) {
             errors.put("email", ConfigStrings.AUTH_INVALID_EMAIL);
         } else if (!errors.containsKey("email") &&
                 usersRepository.findByEmail(email) != null &&
