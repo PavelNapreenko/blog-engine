@@ -14,6 +14,7 @@ import ru.pnapreenko.blogengine.model.dto.auth.PasswordRestoreDTO;
 import ru.pnapreenko.blogengine.model.dto.auth.UserUnAuthDTO;
 import ru.pnapreenko.blogengine.services.UserAuthService;
 
+import javax.mail.MessagingException;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.security.Principal;
@@ -59,7 +60,7 @@ public class ApiAuthController {
     @PostMapping(value = "/restore",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> restoreUserPassword(@RequestBody @Valid EmailDTO email, Errors errors) {
+    public ResponseEntity<?> restoreUserPassword(@RequestBody @Valid EmailDTO email, Errors errors) throws MessagingException {
         return userAuthService.restoreUserPassword(email, errors);
     }
 

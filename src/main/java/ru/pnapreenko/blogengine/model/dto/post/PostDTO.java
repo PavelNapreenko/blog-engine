@@ -60,16 +60,14 @@ public class PostDTO implements Comparable<PostDTO> {
     public PostDTO(Post post) {
         this.id = post.getId();
         this.title = post.getTitle();
-        this.text = post.getText();
+        this.text = Jsoup.parse(post.getText()).text();
         this.announce = Jsoup.parse(getAnnounce(post.getText())).text();
         this.timestamp = post.getTime().getEpochSecond();
-
         this.user = new PostAuthorDTO(post.getAuthor().getId(), post.getAuthor().getName());
         this.viewCount = post.getViewCount();
         this.commentCount = post.getComments().size();
         this.likeCount = getLikeCount(post);
         this.dislikeCount = getDislikeCount(post);
-
         this.date = post.getTime();
         this.comments = new ArrayList<>();
     }
@@ -82,7 +80,7 @@ public class PostDTO implements Comparable<PostDTO> {
     }
 
     private String getAnnounce(String text) {
-        text = text.substring(0, 50).concat("...");
+        text = text.substring(0, 150).concat("...");
         return text;
     }
 

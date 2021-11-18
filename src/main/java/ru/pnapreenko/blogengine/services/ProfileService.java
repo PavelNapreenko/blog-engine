@@ -10,6 +10,7 @@ import ru.pnapreenko.blogengine.model.User;
 import ru.pnapreenko.blogengine.model.dto.ProfileDTO;
 import ru.pnapreenko.blogengine.repositories.UsersRepository;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -22,7 +23,7 @@ public class ProfileService {
     private final ImageStorageService storageService;
     private final PasswordEncoder passwordEncoder;
 
-    public ResponseEntity<?> updateUserProfile(User user, ProfileDTO profileData) {
+    public ResponseEntity<?> updateUserProfile(User user, ProfileDTO profileData) throws IOException {
 
         final Map<String, Object> errors = validateProfileFields(user, profileData);
 

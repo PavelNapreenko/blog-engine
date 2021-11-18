@@ -51,10 +51,14 @@ public class ConfigStrings {
     public static final String POST_INVALID_NEW_TITLE = "Заголовок поста не установлен.";
     public static final int POST_NEW_TEXT_MIN_LENGTH = 50;
     public static final String POST_INVALID_NEW_TEXT = "Текст публикации слишком короткий.";
-    public static final String IMAGE_INVALID_SIZE = "Размер файла превышает допустимый размер.";
+
+    public static final String IMAGE_EMPTY_NOT_SAVE= "Не удалось сохранить пустой файл: ";
+    public static final String IMAGE_EXCEEDS_ALLOWED_SIZE = "Файл превышает допустимый размер.";
+    public static final String IMAGE_NOT_SAVE_WITH_EXTERNAL_PATH = "Не удается сохранить файл с относительным путем за пределами текущего каталога: ";
+    public static final String IMAGE_WITH_INVALID_TYPE = "Можно хранить только PNG и JPE?G изображения: ";
     public static final long IMAGE_MAX_SIZE = 5_000_000;
-    public static final String IMAGE_INVALID_TYPE = "Неверный формат файла.";
     public static final int IMAGES_MAX_CACHE_AGE = 3;
+
 
 
     public static final String VALIDATION_MESSAGE = "Тело запроса пустое, сформировано неверно или содержит ошибки.";
@@ -71,7 +75,7 @@ public class ConfigStrings {
     public static final String AUTH_SERVER_URL = "http://%s:%s";
     public static final String AUTH_MAIL_SUBJECT = "Ссылка на восстановление пароля";
     public static final String AUTH_MAIL_MESSAGE = "Для восстановления пароля, " +
-            "пройдите по этой ссылке: %s/login/change-password/%s";
+            "пройдите по этой ссылке: <a href=\"%s/login/change-password/%s\" style=\"color:#ff8f1c; font-weight:bold; text-decorations:none;\">Email recovery</a>";
     public static final String AUTH_CODE_IS_OUTDATED = "Ссылка для восстановления пароля устарела. " +
             "Вы можете <a href=\"/login/restore-password\">запросить ссылку снова</a>.";
 }

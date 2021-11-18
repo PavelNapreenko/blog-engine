@@ -61,8 +61,9 @@ public interface PostsRepository extends JpaRepository<Post, Integer> {
                                      @Param("user") User moderator,
                                      Pageable pageable);
 
-    @Query("select p from #{#entityName} p left join p.votes v where p.author = :user and p.isActive = :is_active and " +
-            "(:status is null or p.moderationStatus = :status) group by p.id order by (sum(case when v.value = 1 then 1 else 0 end)) desc")
+    @Query("select p from #{#entityName} p left join p.votes v where p.isActive = :is_active and " +
+            "(:status is null or p.moderationStatus = :status) and p.author = :user group by p.id " +
+            "order by (sum(case when v.value = 1 then 1 else 0 end)) desc")
     Page<Post> findMyPosts(@Param("user") User user,
                            @Param("is_active") boolean isActive,
                            @Param("status") ModerationStatus postStatus,
