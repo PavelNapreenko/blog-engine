@@ -173,6 +173,9 @@ public class PostsService {
         if ((!isPostPremoderation && postToSave.isActive()) || editor.isModerator()) {
             postToSave.setModerationStatus(ModerationStatus.ACCEPTED);
         }
+        if (postToSave.getAuthor().isModerator()) {
+            postToSave.setModeratedBy(postToSave.getAuthor());
+        }
 
         postsRepository.save(postToSave);
         return ResponseEntity.ok(APIResponse.ok());
