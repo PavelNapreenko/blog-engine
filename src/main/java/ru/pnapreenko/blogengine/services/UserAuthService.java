@@ -22,6 +22,7 @@ import ru.pnapreenko.blogengine.model.dto.auth.*;
 import ru.pnapreenko.blogengine.repositories.PostsRepository;
 import ru.pnapreenko.blogengine.repositories.UsersRepository;
 
+import javax.mail.MessagingException;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.security.Principal;
@@ -116,6 +117,7 @@ public class UserAuthService {
         if (principal == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(APIResponse.error());
         }
+        SecurityContextHolder.getContext().setAuthentication(null);
         return ResponseEntity.ok(APIResponse.ok());
     }
 
@@ -169,7 +171,7 @@ public class UserAuthService {
     }
 
 
-    public ResponseEntity<?> restoreUserPassword(EmailDTO email, Errors validationErrors) {
+    public ResponseEntity<?> restoreUserPassword(EmailDTO email, Errors validationErrors) throws MessagingException {
         if (validationErrors.hasErrors())
             return ResponseEntity.ok(
                     APIResponse.error(ErrorsValidation.getValidationErrors(validationErrors))

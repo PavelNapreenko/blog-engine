@@ -1,10 +1,12 @@
 package ru.pnapreenko.blogengine.model;
 
 
-import lombok.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
-import org.hibernate.annotations.NaturalId;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -21,7 +23,6 @@ import java.util.Set;
 @ToString(callSuper = true, of = {"name"})
 public class Tag extends AbstractEntity {
 
-    @NaturalId
     @NotBlank
     @Size(max = 255)
     @Column(nullable = false)

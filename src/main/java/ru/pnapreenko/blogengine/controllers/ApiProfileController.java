@@ -16,6 +16,7 @@ import ru.pnapreenko.blogengine.services.ImageStorageService;
 import ru.pnapreenko.blogengine.services.ProfileService;
 import ru.pnapreenko.blogengine.services.UserAuthService;
 
+import java.io.IOException;
 import java.security.Principal;
 
 @RestController
@@ -36,18 +37,19 @@ public class ApiProfileController {
                                                     @RequestParam("name") String name,
                                                     @RequestParam("email") String email,
                                                     @RequestParam("password") String password,
-                                                    Principal principal) {
+                                                    Principal principal) throws IOException {
         if (principal == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(APIResponse.error());
         }
+
         User user = userAuthService.getUserFromDB(principal.getName());
-
+        if (user.getPhoto() != null) {
+            storageService.delete(user.getPhoto());
+        }
         String pathToSavedFile = storageService.store(photo);
-
         UriComponents photoUri = UriComponentsBuilder.newInstance()
                 .path("{root}/{file_uri}")
                 .buildAndExpand(storageService.getRootLocation(), pathToSavedFile);
-
         ProfileDTO profileData = ProfileDTO.builder()
                 .photo(photoUri.toUriString())
                 .removePhoto(removePhoto)
@@ -62,7 +64,7 @@ public class ApiProfileController {
     @PostMapping(
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> updateProfile(@RequestBody ProfileDTO profileData, Principal principal) {
+    public ResponseEntity<?> updateProfile(@RequestBody ProfileDTO profileData, Principal principal) throws IOException {
         if (principal == null) {
             return ResponseEntity.ok(APIResponse.error());
         }

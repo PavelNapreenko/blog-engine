@@ -54,7 +54,7 @@ public class CaptchaCode extends AbstractEntity {
     }
 
     public boolean isValidCode(String userCaptchaCode) {
-        return code.equals(userCaptchaCode);
+        return code.equalsIgnoreCase(userCaptchaCode);
     }
 }
 

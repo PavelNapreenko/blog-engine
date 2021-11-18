@@ -4,9 +4,9 @@ import com.fasterxml.jackson.annotation.JsonView;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.jsoup.Jsoup;
 import ru.pnapreenko.blogengine.api.utils.JsonViews;
 import ru.pnapreenko.blogengine.model.Post;
-import ru.pnapreenko.blogengine.model.PostComment;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -56,14 +56,12 @@ public class PostIdDTO {
     public PostIdDTO(Post post) {
         this.id = post.getId();
         this.title = post.getTitle();
-        this.text = post.getText();
+        this.text = Jsoup.parse(post.getText()).text();
         this.timestamp = post.getTime().getEpochSecond();
-
         this.user = new PostAuthorDTO(post.getAuthor().getId(), post.getAuthor().getName());
         this.viewCount = post.getViewCount();
         this.likeCount = getLikeCount(post);
         this.dislikeCount = getDislikeCount(post);
-
         this.date = post.getTime();
         this.comments = new ArrayList<>();
     }

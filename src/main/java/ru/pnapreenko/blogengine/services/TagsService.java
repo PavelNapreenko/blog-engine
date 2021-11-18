@@ -41,6 +41,8 @@ public class TagsService {
     }
 
     private List<TagDTO> getTagsDTOList(List<Tag> source) {
-        return source.stream().map(TagDTOConverter::getConversion).collect(Collectors.toList());
+        return source.stream()
+                .map(TagDTOConverter::getConversion)
+                .collect(Collectors.toList());
     }
 }

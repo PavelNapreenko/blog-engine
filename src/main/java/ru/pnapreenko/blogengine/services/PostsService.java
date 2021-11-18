@@ -40,7 +40,6 @@ public class PostsService {
     private final TagsRepository tagsRepository;
     private final VotesRepository votesRepository;
     private final CommentsRepository commentsRepository;
-    private final TagsService tagsService;
     private final UserAuthService userAuthService;
     private final SettingsService settingsService;
 
@@ -128,7 +127,7 @@ public class PostsService {
         if (principal == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(APIResponse.error());
         }
-        User moderator = userAuthService.getUserFromDB(principal.getName());
+        final User moderator = (status.equals(ModerationStatus.NEW)) ? null : userAuthService.getUserFromDB(principal.getName());
         return ResponseEntity.ok(new ListPostsDTO(getPageWithPostDTO(postsRepository.findAllModeratedPosts(status, moderator,
                 getPageable(offset, limit)))));
     }
@@ -139,7 +138,7 @@ public class PostsService {
         }
         final boolean isActive = myPostsStatus.isActive();
         final ModerationStatus postStatus = myPostsStatus.getModerationStatus();
-        User user = userAuthService.getUserFromDB(principal.getName());
+        final User user = userAuthService.getUserFromDB(principal.getName());
         return ResponseEntity.ok(new ListPostsDTO(getPageWithPostDTO(postsRepository.findMyPosts(user, isActive, postStatus,
                 getPageable(offset, limit)))));
     }
@@ -154,7 +153,7 @@ public class PostsService {
             return ResponseEntity.ok(APIResponse.error(errors));
         }
 
-        User editor = userAuthService.getUserFromDB(principal.getName());
+        final User editor = userAuthService.getUserFromDB(principal.getName());
         Post postToSave = (post == null) ? new Post() : post;
         Instant now = Instant.now();
         Instant postDate = Instant.ofEpochMilli(newPost.getTimestamp());
@@ -171,13 +170,13 @@ public class PostsService {
                 postToSave.setModerationStatus(ModerationStatus.NEW);
             }
         }
-        if (!isPostPremoderation && postToSave.isActive()) {
+        if ((!isPostPremoderation && postToSave.isActive()) || editor.isModerator()) {
             postToSave.setModerationStatus(ModerationStatus.ACCEPTED);
         }
-
-        if (newPost.getTags() != null) {
-            newPost.getTags().forEach(tag -> postToSave.getTags().add(tagsService.saveTag(tag)));
+        if (postToSave.getAuthor().isModerator()) {
+            postToSave.setModeratedBy(postToSave.getAuthor());
         }
+
         postsRepository.save(postToSave);
         return ResponseEntity.ok(APIResponse.ok());
     }
@@ -186,7 +185,7 @@ public class PostsService {
         if (principal == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(APIResponse.error());
         }
-        User moderator = userAuthService.getUserFromDB(principal.getName());
+        final User moderator = userAuthService.getUserFromDB(principal.getName());
         final Optional<Post> postOptional = postsRepository.findById(moderation.getPostId());
         if (postOptional.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
@@ -196,11 +195,12 @@ public class PostsService {
         final Post post = postOptional.get();
         final ModerationDecision decision = ModerationDecision.valueOf(moderation.getDecision().toUpperCase());
         final User postModerator = post.getModeratedBy();
-        if (!postModerator.equals(moderator)) {
+        if (postModerator != null && !postModerator.equals(moderator)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
                     APIResponse.error(ConfigStrings.MODERATION_INVALID_POST)
             );
         }
+
         ModerationStatus status = (decision == ModerationDecision.ACCEPT)
                 ? ModerationStatus.ACCEPTED
                 : ModerationStatus.DECLINED;
