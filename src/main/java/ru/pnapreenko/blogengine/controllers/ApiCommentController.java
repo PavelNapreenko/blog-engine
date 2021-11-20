@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import ru.pnapreenko.blogengine.api.responses.UnAuthResponse;
 import ru.pnapreenko.blogengine.model.dto.NewCommentDTO;
 import ru.pnapreenko.blogengine.services.CommentsService;
 
@@ -23,9 +24,8 @@ public class ApiCommentController {
 
     @PreAuthorize("hasAuthority('user:write')")
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE,
-                 produces = MediaType.APPLICATION_JSON_VALUE)
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> addComment(@Valid @RequestBody NewCommentDTO comment, Principal principal) {
-        return commentsService.addComment(comment, principal);
+        return (principal == null) ? UnAuthResponse.getUnAuthResponse() : commentsService.addComment(comment, principal);
     }
-
 }

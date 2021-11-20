@@ -22,9 +22,6 @@ public class PostVotesService {
     private final PostsRepository postsRepository;
 
     public ResponseEntity<?> vote(String voteType, Integer postId, Principal principal) {
-        if (principal == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(APIResponse.error());
-        }
         User user = userAuthService.getUserFromDB(principal.getName());
 
         if (postId <= 0) {

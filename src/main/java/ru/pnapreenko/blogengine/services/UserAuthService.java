@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -43,7 +42,6 @@ public class UserAuthService {
     private final MailSendService mailSendService;
     private final PasswordEncoder passwordEncoder;
     private final Environment environment;
-
 
 
     @Bean
@@ -113,10 +111,7 @@ public class UserAuthService {
         return ResponseEntity.ok(APIResponse.ok("user", getUserAuthDTO(getUserFromDB(principal.getName()))));
     }
 
-    public ResponseEntity<?> logoutUser(Principal principal) {
-        if (principal == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(APIResponse.error());
-        }
+    public ResponseEntity<?> logoutUser() {
         SecurityContextHolder.getContext().setAuthentication(null);
         return ResponseEntity.ok(APIResponse.ok());
     }

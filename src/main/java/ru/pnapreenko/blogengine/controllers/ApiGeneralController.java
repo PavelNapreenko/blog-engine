@@ -6,6 +6,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import ru.pnapreenko.blogengine.api.responses.UnAuthResponse;
 import ru.pnapreenko.blogengine.api.utils.JsonViews;
 import ru.pnapreenko.blogengine.config.AppProperties;
 import ru.pnapreenko.blogengine.model.dto.SettingsDTO;
@@ -50,7 +51,7 @@ public class ApiGeneralController {
     @GetMapping(value = "/statistics/{statsType:(?:all|my)}", produces = MediaType.APPLICATION_JSON_VALUE)
     @JsonView(JsonViews.Name.class)
     public ResponseEntity<?> getStats(@PathVariable(value = "statsType") String statsType, Principal principal) {
-        return statisticsService.getStats(statsType, principal);
+        return (principal == null) ? UnAuthResponse.getUnAuthResponse() : statisticsService.getStats(statsType, principal);
     }
 }
 

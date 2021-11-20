@@ -8,6 +8,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
+import ru.pnapreenko.blogengine.api.responses.UnAuthResponse;
 import ru.pnapreenko.blogengine.api.utils.JsonViews;
 import ru.pnapreenko.blogengine.enums.ModerationStatus;
 import ru.pnapreenko.blogengine.enums.MyPostsStatus;
@@ -81,7 +82,7 @@ public class ApiPostController {
             @RequestParam(name = "status") String status, Principal principal) {
         ModerationStatus moderationStatus = new ModerationStatus.StringToEnumConverter().convert(status);
         moderationStatus = (moderationStatus == null) ? ModerationStatus.NEW : moderationStatus;
-        return postsService.getModeratedPosts(offset, limit, moderationStatus, principal);
+        return (principal == null) ? UnAuthResponse.getUnAuthResponse() : postsService.getModeratedPosts(offset, limit, moderationStatus, principal);
     }
 
     @PreAuthorize("hasAuthority('user:write')")
@@ -93,7 +94,7 @@ public class ApiPostController {
             @RequestParam(name = "status") String status, Principal principal) {
         MyPostsStatus myPostsStatus = new MyPostsStatus.StringToEnumConverter().convert(status);
         myPostsStatus = (myPostsStatus == null) ? MyPostsStatus.INACTIVE : myPostsStatus;
-        return postsService.getMyPosts(offset, limit, myPostsStatus, principal);
+        return (principal == null) ? UnAuthResponse.getUnAuthResponse() : postsService.getMyPosts(offset, limit, myPostsStatus, principal);
     }
 
     @PreAuthorize("hasAuthority('user:write')")
@@ -101,7 +102,7 @@ public class ApiPostController {
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> saveNewPost(@RequestBody @Valid NewPostDTO newPost, Errors errors, Principal principal) {
-                return postsService.savePost(null, newPost, errors, principal);
+        return (principal == null) ? UnAuthResponse.getUnAuthResponse() : postsService.savePost(null, newPost, errors, principal);
     }
 
     @PreAuthorize("hasAuthority('user:write')")
@@ -121,6 +122,6 @@ public class ApiPostController {
     public ResponseEntity<?> vote(@PathVariable(value = "voteType") String voteType,
                                   @RequestBody Map<String, Integer> payload, Principal principal) {
         Integer postId = payload.getOrDefault("post_id", 0);
-        return postVotesService.vote(voteType, postId, principal);
+        return (principal == null) ? UnAuthResponse.getUnAuthResponse() : postVotesService.vote(voteType, postId, principal);
     }
 }

@@ -113,9 +113,6 @@ public class ImageStorageService implements StorageService {
     }
 
     public ResponseEntity<?> uploadImage(MultipartFile file, Principal principal) {
-        if (principal == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(APIResponse.error());
-        }
         if (file == null) {
             return ResponseEntity.badRequest().body(APIResponse.error());
         }

@@ -1,7 +1,6 @@
 package ru.pnapreenko.blogengine.services;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import ru.pnapreenko.blogengine.api.responses.APIResponse;
@@ -26,9 +25,6 @@ public class CommentsService {
     private final UserAuthService userAuthService;
 
     public ResponseEntity<?> addComment(NewCommentDTO comment, Principal principal) {
-        if (principal == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(APIResponse.error());
-        }
         User user = userAuthService.getUserFromDB(principal.getName());
         Optional<Post> post = postsRepository.findById(comment.getPostId());
         Optional<PostComment> parentComment = Optional.empty();

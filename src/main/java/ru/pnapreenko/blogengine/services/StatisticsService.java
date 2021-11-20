@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import ru.pnapreenko.blogengine.api.responses.APIResponse;
 import ru.pnapreenko.blogengine.model.User;
 import ru.pnapreenko.blogengine.model.dto.StatsDTO;
 import ru.pnapreenko.blogengine.repositories.PostsRepository;
@@ -28,11 +27,6 @@ public class StatisticsService {
 
     public ResponseEntity<?> getStats(String statsType, Principal principal) {
         boolean isStatsPublic = settingsService.isStatsPublic();
-
-        if (principal == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(APIResponse.error());
-        }
-
         User user = userAuthService.getUserFromDB(principal.getName());
 
         if (statsType.equalsIgnoreCase("all") && (isStatsPublic || user.isModerator())) {

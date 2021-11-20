@@ -14,7 +14,6 @@ import ru.pnapreenko.blogengine.repositories.UsersRepository;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
