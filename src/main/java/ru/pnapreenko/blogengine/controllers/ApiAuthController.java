@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
+import ru.pnapreenko.blogengine.api.responses.UnAuthResponse;
 import ru.pnapreenko.blogengine.api.utils.JsonViews;
 import ru.pnapreenko.blogengine.model.dto.auth.EmailDTO;
 import ru.pnapreenko.blogengine.model.dto.auth.NewUserDTO;
@@ -48,7 +49,7 @@ public class ApiAuthController {
     @PreAuthorize("hasAuthority('user:write')")
     @GetMapping(value = "/logout", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> logoutUser(Principal principal) {
-        return userAuthService.logoutUser(principal);
+        return (principal == null) ? UnAuthResponse.getUnAuthResponse() : userAuthService.logoutUser();
     }
 
     @GetMapping(value = "/captcha", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -71,5 +72,4 @@ public class ApiAuthController {
                                                Errors errors) {
         return userAuthService.resetUserPassword(request, errors);
     }
-
 }

@@ -124,18 +124,12 @@ public class PostsService {
     }
 
     public ResponseEntity<?> getModeratedPosts(int offset, int limit, ModerationStatus status, Principal principal) {
-        if (principal == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(APIResponse.error());
-        }
         final User moderator = (status.equals(ModerationStatus.NEW)) ? null : userAuthService.getUserFromDB(principal.getName());
         return ResponseEntity.ok(new ListPostsDTO(getPageWithPostDTO(postsRepository.findAllModeratedPosts(status, moderator,
                 getPageable(offset, limit)))));
     }
 
     public ResponseEntity<?> getMyPosts(int offset, int limit, MyPostsStatus myPostsStatus, Principal principal) {
-        if (principal == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(APIResponse.error());
-        }
         final boolean isActive = myPostsStatus.isActive();
         final ModerationStatus postStatus = myPostsStatus.getModerationStatus();
         final User user = userAuthService.getUserFromDB(principal.getName());
@@ -144,10 +138,6 @@ public class PostsService {
     }
 
     public ResponseEntity<?> savePost(Post post, NewPostDTO newPost, Errors validationErrors, Principal principal) {
-        if (principal == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(APIResponse.error());
-        }
-
         Map<String, Object> errors = validateNewPostSaveDataInputAndGetErrors(newPost, validationErrors);
         if (errors.size() > 0) {
             return ResponseEntity.ok(APIResponse.error(errors));
@@ -182,9 +172,6 @@ public class PostsService {
     }
 
     public ResponseEntity<?> updatePostModerationStatus(ModerationDTO moderation, Principal principal) {
-        if (principal == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(APIResponse.error());
-        }
         final User moderator = userAuthService.getUserFromDB(principal.getName());
         final Optional<Post> postOptional = postsRepository.findById(moderation.getPostId());
         if (postOptional.isEmpty()) {

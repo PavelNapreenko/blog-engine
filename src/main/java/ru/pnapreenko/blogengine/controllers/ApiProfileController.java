@@ -1,7 +1,6 @@
 package ru.pnapreenko.blogengine.controllers;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -10,6 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 import ru.pnapreenko.blogengine.api.responses.APIResponse;
+import ru.pnapreenko.blogengine.api.responses.UnAuthResponse;
 import ru.pnapreenko.blogengine.model.User;
 import ru.pnapreenko.blogengine.model.dto.ProfileDTO;
 import ru.pnapreenko.blogengine.services.ImageStorageService;
@@ -39,7 +39,7 @@ public class ApiProfileController {
                                                     @RequestParam("password") String password,
                                                     Principal principal) throws IOException {
         if (principal == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(APIResponse.error());
+            return UnAuthResponse.getUnAuthResponse();
         }
 
         User user = userAuthService.getUserFromDB(principal.getName());

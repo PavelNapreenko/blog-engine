@@ -17,10 +17,10 @@ public class ApiCalendarController {
 
     private final CalendarService calendarService;
 
-    @GetMapping(value="", produces = "application/json")
+    @GetMapping(value = "", produces = "application/json")
     @JsonView(JsonViews.IdName.class)
     public CalendarDTO getCalendar(
-            @RequestParam(name="year") String year) {
+            @RequestParam(name = "year") String year) {
         return calendarService.getCalendar(year);
     }
 }
