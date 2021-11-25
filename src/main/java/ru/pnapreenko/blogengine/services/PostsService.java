@@ -147,7 +147,6 @@ public class PostsService {
         Post postToSave = (post == null) ? new Post() : post;
         Instant now = Instant.now();
         Instant postDate = Instant.ofEpochMilli(newPost.getTimestamp());
-        boolean isPostPremoderation = settingsService.isPostPremoderation();
 
         postToSave.setTitle(newPost.getTitle());
         postToSave.setText(newPost.getText());
@@ -155,6 +154,7 @@ public class PostsService {
         postToSave.setTime(postDate.isBefore(now) ? now : postDate);
         postToSave.setAuthor((postToSave.getId() == 0) ? editor : postToSave.getAuthor());
 
+        boolean isPostPremoderation = settingsService.isPostPremoderation();
         if (isPostPremoderation) {
             if ((post == null) || (editor.equals(postToSave.getAuthor()) && !editor.isModerator())) {
                 postToSave.setModerationStatus(ModerationStatus.NEW);
@@ -166,9 +166,12 @@ public class PostsService {
         if (postToSave.getAuthor().isModerator()) {
             postToSave.setModeratedBy(postToSave.getAuthor());
         }
+        if (!postToSave.isActive()) {
+            postToSave.setModerationStatus(ModerationStatus.NEW);
+        }
 
         postsRepository.save(postToSave);
-        return ResponseEntity.ok(APIResponse.ok());
+        return ResponseEntity.ok(APIResponse.ok("id", postToSave.getId()));
     }
 
     public ResponseEntity<?> updatePostModerationStatus(ModerationDTO moderation, Principal principal) {

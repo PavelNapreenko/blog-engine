@@ -79,4 +79,8 @@ public class ConfigStrings {
             "пройдите по этой ссылке: <a href=\"%s/login/change-password/%s\" style=\"color:#ff8f1c; font-weight:bold; text-decorations:none;\">Email recovery</a>";
     public static final String AUTH_CODE_IS_OUTDATED = "Ссылка для восстановления пароля устарела. " +
             "Вы можете <a href=\"/login/restore-password\">запросить ссылку снова</a>.";
+    public static final int IMAGE_MAX_WIDTH = 300;
+    public static final int IMAGE_MAX_HEIGHT = 400;
+    public static final int PHOTO_MAX_WIDTH = 36;
+    public static final int PHOTO_MAX_HEIGHT = 36;
 }

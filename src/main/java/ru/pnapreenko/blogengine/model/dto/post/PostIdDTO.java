@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonView;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.jsoup.Jsoup;
 import ru.pnapreenko.blogengine.api.utils.JsonViews;
 import ru.pnapreenko.blogengine.model.Post;
 
@@ -56,7 +55,7 @@ public class PostIdDTO {
     public PostIdDTO(Post post) {
         this.id = post.getId();
         this.title = post.getTitle();
-        this.text = Jsoup.parse(post.getText()).text();
+        this.text = post.getText();
         this.timestamp = post.getTime().getEpochSecond();
         this.user = new PostAuthorDTO(post.getAuthor().getId(), post.getAuthor().getName());
         this.viewCount = post.getViewCount();

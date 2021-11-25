@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonView;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.jsoup.Jsoup;
 import ru.pnapreenko.blogengine.api.utils.JsonViews;
 import ru.pnapreenko.blogengine.model.PostComment;
 
@@ -28,7 +27,7 @@ public class PostCommentDTO {
     public PostCommentDTO(PostComment comment) {
         this.id = comment.getId();
         this.timestamp = comment.getTime().getEpochSecond();
-        this.text = Jsoup.parse(comment.getText()).text();
+        this.text = comment.getText();
         this.user = new CommentAuthorDTO(comment.getUser().getId(), comment.getUser().getName(), comment.getUser().getPhoto());
     }
 }

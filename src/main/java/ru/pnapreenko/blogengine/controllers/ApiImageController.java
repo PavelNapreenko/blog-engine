@@ -8,7 +8,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import ru.pnapreenko.blogengine.api.responses.APIResponse;
 import ru.pnapreenko.blogengine.api.responses.UnAuthResponse;
+import ru.pnapreenko.blogengine.api.utils.ConfigStrings;
 import ru.pnapreenko.blogengine.services.ImageStorageService;
 
 import java.security.Principal;
@@ -24,6 +26,13 @@ public class ApiImageController {
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
             produces = MediaType.TEXT_PLAIN_VALUE)
     public ResponseEntity<?> uploadImage(@RequestParam("image") MultipartFile file, Principal principal) {
-        return (principal == null) ? UnAuthResponse.getUnAuthResponse() : storageService.uploadImage(file, principal);
+        int imageWidth = ConfigStrings.IMAGE_MAX_WIDTH;
+        int imageHeight = ConfigStrings.IMAGE_MAX_HEIGHT;
+        if (file == null) {
+            return ResponseEntity.badRequest().body(APIResponse.error());
+        }
+        return (principal == null) ?
+                UnAuthResponse.getUnAuthResponse() :
+                ResponseEntity.ok(storageService.uploadImage(file, imageWidth, imageHeight));
     }
 }
