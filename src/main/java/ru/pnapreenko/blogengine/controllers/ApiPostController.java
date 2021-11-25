@@ -2,12 +2,14 @@ package ru.pnapreenko.blogengine.controllers;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
+import ru.pnapreenko.blogengine.api.responses.APIResponse;
 import ru.pnapreenko.blogengine.api.responses.UnAuthResponse;
 import ru.pnapreenko.blogengine.api.utils.JsonViews;
 import ru.pnapreenko.blogengine.enums.ModerationStatus;
@@ -21,6 +23,7 @@ import ru.pnapreenko.blogengine.services.PostsService;
 import javax.validation.Valid;
 import java.security.Principal;
 import java.util.Map;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/api/post")
@@ -111,8 +114,11 @@ public class ApiPostController {
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> editPost(@PathVariable int id,
                                       @RequestBody @Valid NewPostDTO newPostData, Errors errors, Principal principal) {
-        Post post = postsRepository.getById(id);
-        return postsService.savePost(post, newPostData, errors, principal);
+        Optional<Post> postOptional = postsRepository.findById(id);
+        if (postOptional.isEmpty())
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(APIResponse.error());
+        Post post = postOptional.get();
+        return (principal == null) ? UnAuthResponse.getUnAuthResponse() : postsService.savePost(post, newPostData, errors, principal);
     }
 
     @PreAuthorize("hasAuthority('user:write')")

@@ -1,5 +1,6 @@
 package ru.pnapreenko.blogengine.services;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -13,18 +14,13 @@ import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class CaptchaService {
 
     private final AppProperties appProperties;
     private final CaptchaCodesRepository captchaCodesRepository;
 
-    public CaptchaService(AppProperties appProperties, CaptchaCodesRepository captchaCodesRepository) {
-        this.appProperties = appProperties;
-        this.captchaCodesRepository = captchaCodesRepository;
-    }
-
     public ResponseEntity<?> getCaptcha() throws IOException {
-
         final int CODE_TTL = appProperties.getCaptcha().getCodeTTL();
         final int CODE_LENGTH = appProperties.getCaptcha().getCodeLength();
 
@@ -44,6 +40,6 @@ public class CaptchaService {
         Optional<CaptchaCode> captchaOpt = Optional.ofNullable(
                 captchaCodesRepository.findBySecretCode(userCaptchaSecretCode)
         );
-        return captchaOpt.isEmpty() || !captchaOpt.get().isValidCode(userCaptcha);
+        return captchaOpt.isPresent() && captchaOpt.get().isValidCode(userCaptcha);
     }
 }

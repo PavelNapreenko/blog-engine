@@ -6,10 +6,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.util.UriComponents;
-import org.springframework.web.util.UriComponentsBuilder;
 import ru.pnapreenko.blogengine.api.responses.APIResponse;
 import ru.pnapreenko.blogengine.api.responses.UnAuthResponse;
+import ru.pnapreenko.blogengine.api.utils.ConfigStrings;
 import ru.pnapreenko.blogengine.model.User;
 import ru.pnapreenko.blogengine.model.dto.ProfileDTO;
 import ru.pnapreenko.blogengine.services.ImageStorageService;
@@ -41,17 +40,15 @@ public class ApiProfileController {
         if (principal == null) {
             return UnAuthResponse.getUnAuthResponse();
         }
+        int photoWidth = ConfigStrings.PHOTO_MAX_WIDTH;
+        int photoHeight = ConfigStrings.PHOTO_MAX_HEIGHT;
 
         User user = userAuthService.getUserFromDB(principal.getName());
         if (user.getPhoto() != null) {
             storageService.delete(user.getPhoto());
         }
-        String pathToSavedFile = storageService.store(photo);
-        UriComponents photoUri = UriComponentsBuilder.newInstance()
-                .path("{root}/{file_uri}")
-                .buildAndExpand(storageService.getRootLocation(), pathToSavedFile);
         ProfileDTO profileData = ProfileDTO.builder()
-                .photo(photoUri.toUriString())
+                .photo(storageService.uploadImage(photo, photoWidth, photoHeight))
                 .removePhoto(removePhoto)
                 .name(name)
                 .email(email)

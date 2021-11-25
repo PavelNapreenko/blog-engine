@@ -60,8 +60,8 @@ public class PostDTO implements Comparable<PostDTO> {
     public PostDTO(Post post) {
         this.id = post.getId();
         this.title = post.getTitle();
-        this.text = Jsoup.parse(post.getText()).text();
-        this.announce = Jsoup.parse(getAnnounce(post.getText())).text();
+        this.text = post.getText();
+        this.announce = getAnnounce(Jsoup.parse(post.getText()).text());
         this.timestamp = post.getTime().getEpochSecond();
         this.user = new PostAuthorDTO(post.getAuthor().getId(), post.getAuthor().getName());
         this.viewCount = post.getViewCount();

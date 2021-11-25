@@ -15,6 +15,7 @@ import ru.pnapreenko.blogengine.api.utils.ConfigStrings;
 import ru.pnapreenko.blogengine.api.utils.ErrorsValidation;
 import ru.pnapreenko.blogengine.services.ImageStorageService;
 
+import javax.security.sasl.AuthenticationException;
 import javax.validation.ConstraintViolationException;
 import java.util.HashMap;
 import java.util.Map;
