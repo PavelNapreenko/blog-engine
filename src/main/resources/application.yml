@@ -1,12 +1,12 @@
-server.port:  8090
+server.port:  ${PORT:8090}
 
 spring:
   autoconfigure:
     exclude: org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
   datasource:
-    url: jdbc:mysql://localhost:3306/blogapp?createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
-    username: root
-    password: admin
+    url: jdbc:${JDBC_DATABASE_URL:mysql://localhost:3306/blogapp?createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC}
+    username: ${JDBC_DATABASE_USERNAME:root}
+    password: ${JDBC_DATABASE_PASSWORD:admin}
     driver-class-name: com.mysql.cj.jdbc.Driver
   hikari:
     connection-timeout: 30_000
@@ -26,14 +26,13 @@ spring:
         enable_lazy_load_no_trans: true
   logging:
     level:
-      org.springframework:
-       INFO
+      org.springframework: INFO
   mail:
-    host: smtp.mail.ru
-    username: sender.sender.sender.sender@mail.ru
-    password: NCBnSqwmgpP7VjficJVm
-    port: 465
-    protocol: smtps
+    host: ${MAIL_HOST:smtp.mail.ru}
+    username: ${MAIL_USERNAME:sender.sender.sender.sender@mail.ru}
+    password: ${MAIL_PASSWORD:NCBnSqwmgpP7VjficJVm}
+    port: ${MAIL_PORT:465}
+    protocol: ${MAIL_PROTOCOL:smtps}
     test-connection: true
     properties:
       "mail.smtp.auth": true
