@@ -1,1 +1,1 @@
-web: java -jar target/blog-engine-1.0.jar
+web: $ set -a; . ./.env; java -jar target/blog-engine-1.0.jar; set +a
