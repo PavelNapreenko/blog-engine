@@ -12,6 +12,6 @@
 База данных                  |     MySQL 8
 Сборщик проекта              |     Maven
 
-<a href = "https://napreenko-java-skillbox.herokuapp.com">Ссылка на проект<>
+<a href = "https://napreenko-java-skillbox.herokuapp.com">Ссылка на проект
 
 
