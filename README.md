@@ -12,6 +12,24 @@
 База данных                  |     MySQL 8
 Сборщик проекта              |     Maven
 
+**Запуск приложения**
+______________________________________________________
+
+Подготовить окружение:
+$ cp .env_example .env
+
+Задать необходимые значения переменным:
+PORT,
+JDBC_DATABASE_,
+MAIL_,
+IMAGES_UPLOAD_DIR в файле ".env".
+
+Запустить приложение с нужными переменными окружения:
+
+$ set -a; . ./.env; java -jar target/blog-engine-1.0.jar; set +a
+
+Или в IntelliJ IDEA: Edit Configuration / EnvFile / Enable EnvFile / + .env.
+
 <a href="https://napreenko-java-skillbox.herokuapp.com" class="button">Ссылка на проект на heroku</a>
 <br></br>
 <img alt="GitHub watchers" src="https://img.shields.io/github/watchers/PavelNapreenko/blog-engine?color=green&style=plastic">
