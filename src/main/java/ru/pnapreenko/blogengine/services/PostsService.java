@@ -163,9 +163,6 @@ public class PostsService {
         if ((!isPostPremoderation && postToSave.isActive()) || editor.isModerator()) {
             postToSave.setModerationStatus(ModerationStatus.ACCEPTED);
         }
-        if (postToSave.getAuthor().isModerator()) {
-            postToSave.setModeratedBy(postToSave.getAuthor());
-        }
         if (!postToSave.isActive()) {
             postToSave.setModerationStatus(ModerationStatus.NEW);
         }
