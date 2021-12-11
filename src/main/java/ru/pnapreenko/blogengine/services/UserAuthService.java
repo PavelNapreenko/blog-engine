@@ -189,7 +189,7 @@ public class UserAuthService {
         mailSendService.send(
                 updatedUser.getEmail(),
                 ConfigStrings.AUTH_MAIL_SUBJECT,
-                String.format(ConfigStrings.AUTH_MAIL_MESSAGE, url, code)
+                String.format(ConfigStrings.AUTH_MAIL_MESSAGE, "https://napreenko-java-skillbox.herokuapp.com/login/restore-password", code)
         );
         return ResponseEntity.ok(APIResponse.ok());
     }
