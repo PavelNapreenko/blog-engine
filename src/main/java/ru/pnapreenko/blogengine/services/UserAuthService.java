@@ -182,9 +182,9 @@ public class UserAuthService {
         userFromDB.setCode(code);
         User updatedUser = usersRepository.save(userFromDB);
 
-        final String port = environment.getProperty("server.port");
+//        final String port = environment.getProperty("server.port");
         final String hostName = InetAddress.getLoopbackAddress().getHostName();
-        final String url = String.format(ConfigStrings.AUTH_SERVER_URL, hostName, port);
+        final String url = String.format(ConfigStrings.AUTH_SERVER_URL, hostName);
 
         mailSendService.send(
                 updatedUser.getEmail(),
