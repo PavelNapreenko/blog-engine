@@ -177,7 +177,7 @@ public class UserAuthService {
 
         log.info(String.format("User with email '%s' found: %s", userEmail, userFromDB));
 
-        final String code = UUID.randomUUID().toString();
+        final String code = UUID.randomUUID().toString().replaceAll("-", "");
 
         userFromDB.setCode(code);
         User updatedUser = usersRepository.save(userFromDB);
