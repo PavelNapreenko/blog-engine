@@ -177,19 +177,19 @@ public class UserAuthService {
 
         log.info(String.format("User with email '%s' found: %s", userEmail, userFromDB));
 
-        final String code = UUID.randomUUID().toString().replaceAll("-", "");
+        final String code = UUID.randomUUID().toString().replaceAll("-","");
 
         userFromDB.setCode(code);
         User updatedUser = usersRepository.save(userFromDB);
 
-//        final String port = environment.getProperty("server.port");
+        final String port = environment.getProperty("server.port");
         final String hostName = InetAddress.getLoopbackAddress().getHostName();
-        final String url = String.format(ConfigStrings.AUTH_SERVER_URL, hostName);
+        final String url = String.format(ConfigStrings.AUTH_SERVER_URL, hostName, port);
 
         mailSendService.send(
                 updatedUser.getEmail(),
                 ConfigStrings.AUTH_MAIL_SUBJECT,
-                String.format(ConfigStrings.AUTH_MAIL_MESSAGE, "https://napreenko-java-skillbox.herokuapp.com/login/restore-password", code)
+                String.format(ConfigStrings.AUTH_MAIL_MESSAGE, url, code)
         );
         return ResponseEntity.ok(APIResponse.ok());
     }
