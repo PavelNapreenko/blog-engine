@@ -19,7 +19,7 @@ public class MailServiceProviderProd implements MailSenderProviderInterface {
 
     @Override
     public void sendMail(String recipientEmail, String code) throws MessagingException, UnknownHostException {
-        final String hostName = InetAddress.getLocalHost().getCanonicalHostName();
+        final String hostName = InetAddress.getLoopbackAddress().getCanonicalHostName();
         final String url = String.format(ConfigStrings.AUTH_SERVER_URL_PROD, hostName);
         mc.sendMessage(recipientEmail, code, url);
     }
