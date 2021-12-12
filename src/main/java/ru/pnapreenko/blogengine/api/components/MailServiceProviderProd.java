@@ -9,6 +9,7 @@ import ru.pnapreenko.blogengine.api.utils.MessageCreator;
 
 import javax.mail.MessagingException;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 @Component
 @ConditionalOnProperty(value = "spring.profiles.active", havingValue = "prod", matchIfMissing = true)
@@ -17,8 +18,8 @@ public class MailServiceProviderProd implements MailSenderProviderInterface {
     private final MessageCreator mc;
 
     @Override
-    public void sendMail(String recipientEmail, String code) throws MessagingException {
-        final String hostName = InetAddress.getLoopbackAddress().getCanonicalHostName();
+    public void sendMail(String recipientEmail, String code) throws MessagingException, UnknownHostException {
+        final String hostName = "napreenko-java-skillbox.herokuapp.com";
         final String url = String.format(ConfigStrings.AUTH_SERVER_URL_PROD, hostName);
         mc.sendMessage(recipientEmail, code, url);
     }

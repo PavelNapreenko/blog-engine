@@ -22,6 +22,7 @@ import ru.pnapreenko.blogengine.repositories.UsersRepository;
 
 import javax.mail.MessagingException;
 import java.io.IOException;
+import java.net.UnknownHostException;
 import java.security.Principal;
 import java.time.Instant;
 import java.util.HashMap;
@@ -162,7 +163,7 @@ public class UserAuthService {
     }
 
 
-    public ResponseEntity<?> restoreUserPassword(EmailDTO email, Errors validationErrors) throws MessagingException {
+    public ResponseEntity<?> restoreUserPassword(EmailDTO email, Errors validationErrors) throws MessagingException, UnknownHostException {
         if (validationErrors.hasErrors())
             return ResponseEntity.ok(
                     APIResponse.error(ErrorsValidation.getValidationErrors(validationErrors))
@@ -212,7 +213,7 @@ public class UserAuthService {
         return ResponseEntity.ok(APIResponse.ok());
     }
 
-    private void sendMail(User user, String code) throws MessagingException {
+    private void sendMail(User user, String code) throws MessagingException, UnknownHostException {
         mailSendService.send(user.getEmail(), code);
     }
 }

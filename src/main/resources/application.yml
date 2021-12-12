@@ -2,7 +2,7 @@ spring:
   autoconfigure:
     exclude: org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
   profiles:
-    active: ${PROFILE_ACTIVE:dev}
+    active: ${PROFILE_ACTIVE:prod}
 
 blogapp:
   properties:

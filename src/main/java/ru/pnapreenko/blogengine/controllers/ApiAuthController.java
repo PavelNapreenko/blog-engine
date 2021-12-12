@@ -18,6 +18,7 @@ import ru.pnapreenko.blogengine.services.UserAuthService;
 import javax.mail.MessagingException;
 import javax.validation.Valid;
 import java.io.IOException;
+import java.net.UnknownHostException;
 import java.security.Principal;
 
 @RestController
@@ -61,7 +62,7 @@ public class ApiAuthController {
     @PostMapping(value = "/restore",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> restoreUserPassword(@RequestBody @Valid EmailDTO email, Errors errors) throws MessagingException {
+    public ResponseEntity<?> restoreUserPassword(@RequestBody @Valid EmailDTO email, Errors errors) throws MessagingException, UnknownHostException {
         return userAuthService.restoreUserPassword(email, errors);
     }
 
