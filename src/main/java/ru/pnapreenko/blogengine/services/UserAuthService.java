@@ -3,7 +3,6 @@ package ru.pnapreenko.blogengine.services;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
-import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -23,7 +22,6 @@ import ru.pnapreenko.blogengine.repositories.UsersRepository;
 
 import javax.mail.MessagingException;
 import java.io.IOException;
-import java.net.InetAddress;
 import java.security.Principal;
 import java.time.Instant;
 import java.util.HashMap;
@@ -41,8 +39,6 @@ public class UserAuthService {
     private final CaptchaService captchaService;
     private final MailSendService mailSendService;
     private final PasswordEncoder passwordEncoder;
-    private final Environment environment;
-
 
     @Bean
     public PasswordEncoder BCryptEncoder() {
@@ -177,20 +173,11 @@ public class UserAuthService {
 
         log.info(String.format("User with email '%s' found: %s", userEmail, userFromDB));
 
-        final String code = UUID.randomUUID().toString().replaceAll("-","");
+        final String code = UUID.randomUUID().toString().replaceAll("-", "");
 
         userFromDB.setCode(code);
         User updatedUser = usersRepository.save(userFromDB);
-
-        final String port = environment.getProperty("server.port");
-        final String hostName = InetAddress.getLoopbackAddress().getHostName();
-        final String url = String.format(ConfigStrings.AUTH_SERVER_URL, hostName, port);
-
-        mailSendService.send(
-                updatedUser.getEmail(),
-                ConfigStrings.AUTH_MAIL_SUBJECT,
-                String.format(ConfigStrings.AUTH_MAIL_MESSAGE, url, code)
-        );
+        sendMail(updatedUser, code);
         return ResponseEntity.ok(APIResponse.ok());
     }
 
@@ -223,5 +210,9 @@ public class UserAuthService {
         usersRepository.save(userFromDB);
 
         return ResponseEntity.ok(APIResponse.ok());
+    }
+
+    private void sendMail(User user, String code) throws MessagingException {
+        mailSendService.send(user.getEmail(), code);
     }
 }

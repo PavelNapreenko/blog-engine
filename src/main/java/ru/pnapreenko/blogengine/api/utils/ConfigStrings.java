@@ -73,10 +73,11 @@ public class ConfigStrings {
     public static final int AUTH_MIN_NAME_LENGTH = 3;
     public static final int AUTH_MAX_FIELD_LENGTH = 255;
     public static final String AUTH_WRONG_NAME = "Имя указано неверно.";
-    public static final String AUTH_SERVER_URL = "https://%s:%s";
+    public static final String AUTH_SERVER_URL = "http://%s:%s";
+    public static final String AUTH_SERVER_URL_PROD = "https://%s";
     public static final String AUTH_MAIL_SUBJECT = "Ссылка на восстановление пароля";
     public static final String AUTH_MAIL_MESSAGE = "Для восстановления пароля, " +
-            "пройдите по этой ссылке: <a href=\"%s/login/change-password/%s\" style=\"color:#ff8f1c; font-weight:bold; text-decorations:none;\">Email recovery</a>";
+            "пройдите по этой ссылке: <a href=\"%s/login/change-password/%s\" style=\"color:#ff8f1c; font-weight:bold; text-decorations:none;\">Сменить пароль</a>";
     public static final String AUTH_CODE_IS_OUTDATED = "Ссылка для восстановления пароля устарела. " +
             "Вы можете <a href=\"/login/restore-password\">запросить ссылку снова</a>.";
     public static final int IMAGE_MAX_WIDTH = 300;
