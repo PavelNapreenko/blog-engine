@@ -3,8 +3,12 @@ package ru.pnapreenko.blogengine.config;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Bean;
+import org.springframework.mail.MailException;
+import org.springframework.mail.javamail.JavaMailSender;
 import ru.pnapreenko.blogengine.api.components.AppPropertiesValues;
 
+import javax.mail.internet.MimeMessage;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 

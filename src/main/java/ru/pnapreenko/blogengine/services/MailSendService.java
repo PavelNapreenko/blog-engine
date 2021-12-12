@@ -1,30 +1,19 @@
 package ru.pnapreenko.blogengine.services;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
+import ru.pnapreenko.blogengine.api.interfaces.MailSenderProviderInterface;
 
-import javax.mail.Message;
 import javax.mail.MessagingException;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
 
 @Service
 public class MailSendService {
-    private final JavaMailSender mailSender;
-    @Value("${spring.mail.username}")
-    private String emailFrom;
+    private final MailSenderProviderInterface mspi;
 
-    public MailSendService(JavaMailSender mailSender) {
-        this.mailSender = mailSender;
+    public MailSendService(MailSenderProviderInterface mdi) {
+        this.mspi = mdi;
     }
 
-    public void send(String recipientEmail, String subject, String message) throws MessagingException {
-        final MimeMessage mimeMessage = this.mailSender.createMimeMessage();
-        mimeMessage.setFrom(emailFrom);
-        mimeMessage.setRecipient(Message.RecipientType.TO, new InternetAddress(recipientEmail));
-        mimeMessage.setSubject(subject);
-        mimeMessage.setContent(message, "text/html; charset=utf-8");
-        mailSender.send(mimeMessage);
+    public void send(String recipientEmail, String code) throws MessagingException {
+        mspi.sendMail(recipientEmail, code);
     }
 }

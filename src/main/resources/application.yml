@@ -1,43 +1,8 @@
-server.port:  ${PORT:8090}
-
 spring:
   autoconfigure:
     exclude: org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
-  datasource:
-    url: jdbc:${JDBC_DATABASE_URL:mysql://localhost:3306/blogapp?createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC}
-    username: ${JDBC_DATABASE_USERNAME:root}
-    password: ${JDBC_DATABASE_PASSWORD:admin}
-    driver-class-name: com.mysql.cj.jdbc.Driver
-  hikari:
-    connection-timeout: 30_000
-    maximum-pool-size: 10
-  jpa:
-    open-in-view: false
-    generate-ddl: true
-    hibernate:
-      ddl-auto: validate
-      naming:
-        implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyHbmImpl
-        physical-strategy: org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy
-    show-sql: true
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.MySQL8Dialect
-        enable_lazy_load_no_trans: true
-  logging:
-    level:
-      org.springframework: INFO
-  mail:
-    host: ${MAIL_HOST:smtp.mail.ru}
-    username: ${MAIL_USERNAME:sender.sender.sender.sender@mail.ru}
-    password: ${MAIL_PASSWORD:NCBnSqwmgpP7VjficJVm}
-    port: ${MAIL_PORT:465}
-    protocol: ${MAIL_PROTOCOL:smtps}
-    test-connection: true
-    properties:
-      "mail.smtp.auth": true
-      "mail.transport.protocol": smtps
-      "mail.debug": false
+  profiles:
+    active: ${PROFILE_ACTIVE:dev}
 
 blogapp:
   properties:
@@ -56,4 +21,6 @@ blogapp:
     code-ttl: 1
   upload-dir:
       location: ${IMAGES_UPLOAD_DIR:upload}
+
+server.port: ${PORT:8090}
 
