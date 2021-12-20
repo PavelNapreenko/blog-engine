@@ -20,10 +20,18 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
         enable_lazy_load_no_trans: true
+        jdbc:
+          batch_size: 10
+        order_queries: true
   logging:
     level:
       org:
         springframework: INFO
+        hibernate: INFO
+        SQL: DEBUG
+        cache: DEBUG
+
+
   mail:
     host: ${MAIL_HOST:smtp.mail.ru}
     username: ${MAIL_USERNAME:sender.sender.sender.sender@mail.ru}

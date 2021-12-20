@@ -144,16 +144,16 @@ public class UserAuthService {
         User userFromDB = usersRepository.findByEmail(email);
 
         if (userFromDB != null && userFromDB.getEmail().equals(email))
-            errors.put("email", ConfigStrings.AUTH_EMAIL_ALREADY_REGISTERED);
+            errors.put("email", ConfigStrings.AUTH_EMAIL_ALREADY_REGISTERED.getName());
 
         if (name == null || name.equals(""))
-            errors.put("name", ConfigStrings.AUTH_INVALID_NAME);
+            errors.put("name", ConfigStrings.AUTH_INVALID_NAME.getName());
 
         if (password == null || password.length() < ConfigStrings.Constants.AUTH_MIN_PASSWORD_LENGTH)
-            errors.put("password", ConfigStrings.AUTH_INVALID_PASSWORD_LENGTH);
+            errors.put("password", ConfigStrings.AUTH_INVALID_PASSWORD_LENGTH.getName());
 
         if (!captchaService.isValidCaptcha(captcha, captchaSecretCode))
-            errors.put("captcha", ConfigStrings.AUTH_INVALID_CAPTCHA);
+            errors.put("captcha", ConfigStrings.AUTH_INVALID_CAPTCHA.getName());
 
         return errors;
     }
@@ -191,10 +191,10 @@ public class UserAuthService {
         final Map<String, Object> errors = new HashMap<>();
 
         if (captchaService.isValidCaptcha(request.getCaptcha(), request.getCaptchaSecret()))
-            errors.put("captcha", ConfigStrings.AUTH_INVALID_CAPTCHA);
+            errors.put("captcha", ConfigStrings.AUTH_INVALID_CAPTCHA.getName());
 
         if (request.getPassword().length() < ConfigStrings.Constants.AUTH_MIN_PASSWORD_LENGTH)
-            errors.put("password", ConfigStrings.AUTH_INVALID_PASSWORD_LENGTH);
+            errors.put("password", ConfigStrings.AUTH_INVALID_PASSWORD_LENGTH.getName());
 
         if (!errors.isEmpty())
             return ResponseEntity.ok(APIResponse.error(errors));
@@ -202,7 +202,7 @@ public class UserAuthService {
         User userFromDB = usersRepository.findByCode(request.getCode());
 
         if (userFromDB == null) {
-            errors.put("code", ConfigStrings.AUTH_CODE_IS_OUTDATED);
+            errors.put("code", ConfigStrings.AUTH_CODE_IS_OUTDATED.getName());
             return ResponseEntity.ok(APIResponse.error(errors));
         }
 

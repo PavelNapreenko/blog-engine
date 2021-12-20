@@ -74,7 +74,7 @@ public class ProfileService {
         if (name == null || name.isBlank() ||
                 !(name.length() >= ConfigStrings.Constants.AUTH_MIN_NAME_LENGTH &&
                         name.length() <= ConfigStrings.Constants.AUTH_MAX_FIELD_LENGTH)) {
-            errors.put("name", ConfigStrings.AUTH_WRONG_NAME);
+            errors.put("name", ConfigStrings.AUTH_WRONG_NAME.getName());
         }
 
         if (email == null || email.isBlank() || !EmailValidator.getInstance()
@@ -84,7 +84,7 @@ public class ProfileService {
                 usersRepository.findByEmail(email) != null &&
                 !user.getEmail().equals(email)
         ) {
-            errors.put("email", ConfigStrings.AUTH_EMAIL_ALREADY_REGISTERED);
+            errors.put("email", ConfigStrings.AUTH_EMAIL_ALREADY_REGISTERED.getName());
         }
 
         if (password != null
@@ -92,7 +92,7 @@ public class ProfileService {
                 !(password.length() >= ConfigStrings.Constants.AUTH_MIN_PASSWORD_LENGTH &&
                         password.length() <= ConfigStrings.Constants.AUTH_MAX_FIELD_LENGTH
                 ))) {
-            errors.put("password", ConfigStrings.AUTH_INVALID_PASSWORD_LENGTH);
+            errors.put("password", ConfigStrings.AUTH_INVALID_PASSWORD_LENGTH.getName());
 
         }
         return errors;

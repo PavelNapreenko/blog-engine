@@ -32,7 +32,7 @@ public class CommentsService {
         if (post.isEmpty()) {
             return ResponseEntity.badRequest().body(
                     APIResponse.error(ConfigStrings.WRONG_POST_ID.getName(), new HashMap<>() {{
-                        put("post_id", ConfigStrings.WRONG_POST_ID);
+                        put("post_id", ConfigStrings.WRONG_POST_ID.getName());
                     }})
             );
         }
@@ -43,7 +43,7 @@ public class CommentsService {
             if (parentComment.isEmpty() || (!postComments.isEmpty() && !postComments.contains(parentComment.get()))) {
                 return ResponseEntity.badRequest().body(
                         APIResponse.error(ConfigStrings.COMMENT_WRONG_PARENT_ID.getName(), new HashMap<>() {{
-                            put("parent_id", ConfigStrings.COMMENT_WRONG_PARENT_ID);
+                            put("parent_id", ConfigStrings.COMMENT_WRONG_PARENT_ID.getName());
                         }})
                 );
             }

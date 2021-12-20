@@ -219,10 +219,10 @@ public class PostsService {
             return ErrorsValidation.getValidationErrors(validationErrors);
         }
         if (title == null || title.length() < ConfigStrings.ConfigNumbers.POST_NEW_TITLE_MIN_LENGTH.getNumber()) {
-            errors.put("title", ConfigStrings.POST_INVALID_NEW_TITLE);
+            errors.put("title", ConfigStrings.POST_INVALID_NEW_TITLE.getName());
         }
         if (text == null || text.length() < ConfigStrings.ConfigNumbers.POST_NEW_TEXT_MIN_LENGTH.getNumber()) {
-            errors.put("text", ConfigStrings.POST_INVALID_NEW_TEXT);
+            errors.put("text", ConfigStrings.POST_INVALID_NEW_TEXT.getName());
         }
         return errors;
     }

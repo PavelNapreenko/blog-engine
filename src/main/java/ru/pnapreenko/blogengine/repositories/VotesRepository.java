@@ -12,6 +12,7 @@ import java.util.List;
 
 @Repository
 public interface VotesRepository extends JpaRepository<PostVote, Integer> {
+
     @Query("select count (v) from PostVote v where (:user is null or v.user = :user) and v.value = :value")
     int countByUserAndValue(@Param("user") User user, @Param("value") byte value);
 

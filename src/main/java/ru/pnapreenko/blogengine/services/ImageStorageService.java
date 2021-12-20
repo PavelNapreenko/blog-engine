@@ -52,16 +52,16 @@ public class ImageStorageService implements StorageService {
         final Pattern FILE_PATTERN = Pattern.compile("^(.*)(.)(png|jpe?g|PNG|JPE?G)$");
 
         if (file.isEmpty()) {
-            throw new StorageException(ConfigStrings.IMAGE_EMPTY_NOT_SAVE + filename);
+            throw new StorageException(ConfigStrings.IMAGE_EMPTY_NOT_SAVE.getName() + filename);
         }
         if (file.getSize() > maxFileSize) {
             throw new StorageException(ConfigStrings.IMAGE_EXCEEDS_ALLOWED_SIZE.getName());
         }
         if (filename.contains("..")) {
-            throw new StorageException(ConfigStrings.IMAGE_NOT_SAVE_WITH_EXTERNAL_PATH + filename);
+            throw new StorageException(ConfigStrings.IMAGE_NOT_SAVE_WITH_EXTERNAL_PATH.getName() + filename);
         }
         if (!FILE_PATTERN.matcher(fileType).matches()) {
-            throw new StorageException(ConfigStrings.IMAGE_WITH_INVALID_TYPE + filename);
+            throw new StorageException(ConfigStrings.IMAGE_WITH_INVALID_TYPE.getName() + filename);
         }
 
         try (InputStream inputStream = file.getInputStream()) {
