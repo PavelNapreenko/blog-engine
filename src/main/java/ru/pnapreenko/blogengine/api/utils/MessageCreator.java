@@ -5,6 +5,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
+import ru.pnapreenko.blogengine.config.ConfigStrings;
+
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
@@ -19,8 +21,8 @@ public class MessageCreator {
     private String emailFrom;
 
     public void sendMessage(String recipientEmail, String code, String url) throws MessagingException {
-        final String subject = ConfigStrings.AUTH_MAIL_SUBJECT;
-        final String message = String.format(ConfigStrings.AUTH_MAIL_MESSAGE, url, code);
+        final String subject = ConfigStrings.AUTH_MAIL_SUBJECT.getName();
+        final String message = String.format(ConfigStrings.AUTH_MAIL_MESSAGE.getName(), url, code);
         final MimeMessage mimeMessage = mailSender.createMimeMessage();
         mimeMessage.setFrom(emailFrom);
         mimeMessage.setRecipients(Message.RecipientType.TO, recipientEmail);

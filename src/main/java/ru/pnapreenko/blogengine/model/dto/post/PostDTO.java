@@ -18,7 +18,6 @@ import java.util.List;
 @AllArgsConstructor
 public class PostDTO implements Comparable<PostDTO> {
 
-
     @JsonView({JsonViews.IdName.class, JsonViews.EntityId.class})
     private int id;
 

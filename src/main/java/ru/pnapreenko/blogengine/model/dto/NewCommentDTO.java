@@ -6,7 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.springframework.lang.Nullable;
-import ru.pnapreenko.blogengine.api.utils.ConfigStrings;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
@@ -22,10 +21,10 @@ public class NewCommentDTO {
     private Integer parentId;
 
     @JsonProperty("post_id")
-    @NotNull(message = ConfigStrings.COMMENT_POST_ID_IS_MANDATORY)
-    @Min(value = 1, message = ConfigStrings.WRONG_POST_ID)
+    @NotNull(message = "Поле 'post_id' является обязательным.")
+    @Min(value = 1, message = "Поле 'post_id' содержит неверный идентификатор.")
     private Integer postId;
 
-    @NotBlank(message = ConfigStrings.COMMENT_WRONG_TEXT)
+    @NotBlank(message = "Поле 'text' является обязательным и не может быть пустым.")
     private String text;
 }

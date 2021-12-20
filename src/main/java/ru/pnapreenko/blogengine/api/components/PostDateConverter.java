@@ -6,19 +6,16 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
-import lombok.SneakyThrows;
 import org.springframework.boot.jackson.JsonComponent;
 import ru.pnapreenko.blogengine.api.utils.DateUtils;
-import ru.pnapreenko.blogengine.api.utils.ConfigStrings;
+import ru.pnapreenko.blogengine.config.ConfigStrings;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.time.Instant;
 
 @JsonComponent
 public class PostDateConverter {
-    private static final String DATE_FORMAT = ConfigStrings.NEW_POST_DATE_FORMAT;
-    private static final SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
+    private static final String DATE_FORMAT = ConfigStrings.NEW_POST_DATE_FORMAT.getName();
 
     public static class Serialize extends JsonSerializer<Instant> {
         @Override

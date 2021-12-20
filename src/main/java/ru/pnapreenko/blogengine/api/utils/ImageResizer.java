@@ -5,10 +5,14 @@ import org.apache.commons.io.IOUtils;
 import org.imgscalr.Scalr;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
+import ru.pnapreenko.blogengine.config.ConfigStrings;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.Objects;
 
 public class ImageResizer {
@@ -24,7 +28,8 @@ public class ImageResizer {
         try {
             BufferedInputStream in = new BufferedInputStream(file.getInputStream());
             BufferedImage image = ImageIO.read(in);
-            if (image.getWidth() > ConfigStrings.IMAGE_MAX_WIDTH || image.getHeight() > ConfigStrings.IMAGE_MAX_HEIGHT) {
+            if (image.getWidth() > ConfigStrings.ConfigNumbers.IMAGE_MAX_WIDTH.getNumber()
+                    || image.getHeight() > ConfigStrings.ConfigNumbers.IMAGE_MAX_HEIGHT.getNumber()) {
                 resizeWidth = width;
                 resizeHeight = height;
             } else {
@@ -48,6 +53,4 @@ public class ImageResizer {
                 mFile.getContentType(),
                 IOUtils.toByteArray(new FileInputStream(file)));
     }
-
-
 }

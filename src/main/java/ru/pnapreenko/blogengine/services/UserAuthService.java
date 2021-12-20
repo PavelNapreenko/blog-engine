@@ -13,8 +13,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.Errors;
 import ru.pnapreenko.blogengine.api.responses.APIResponse;
-import ru.pnapreenko.blogengine.api.utils.ConfigStrings;
 import ru.pnapreenko.blogengine.api.utils.ErrorsValidation;
+import ru.pnapreenko.blogengine.config.ConfigStrings;
 import ru.pnapreenko.blogengine.model.User;
 import ru.pnapreenko.blogengine.model.dto.auth.*;
 import ru.pnapreenko.blogengine.repositories.PostsRepository;
@@ -43,7 +43,7 @@ public class UserAuthService {
 
     @Bean
     public PasswordEncoder BCryptEncoder() {
-        return new BCryptPasswordEncoder(ConfigStrings.AUTH_BCRYPT_STRENGTH);
+        return new BCryptPasswordEncoder(ConfigStrings.ConfigNumbers.AUTH_BCRYPT_STRENGTH.getNumber());
     }
 
     public ResponseEntity<?> registerUser(NewUserDTO user, Errors validationErrors) {
@@ -70,14 +70,14 @@ public class UserAuthService {
         SecurityContextHolder.getContext().setAuthentication(auth);
 
         if (errors.hasErrors())
-            return ResponseEntity.badRequest().body(APIResponse.error(ConfigStrings.AUTH_ERROR));
+            return ResponseEntity.badRequest().body(APIResponse.error(ConfigStrings.AUTH_ERROR.getName()));
 
         final String email = user.getEmail();
         final String password = user.getPassword();
 
         if (email.isBlank() || password.isBlank())
             return ResponseEntity.badRequest().body(APIResponse.error(
-                    ConfigStrings.AUTH_EMPTY_EMAIL_OR_PASSWORD));
+                    ConfigStrings.AUTH_EMPTY_EMAIL_OR_PASSWORD.getName()));
 
         log.info(String.format("Trying to authenticate user with email '%s' " +
                 "and password '***'.", email));
@@ -86,13 +86,13 @@ public class UserAuthService {
 
         if (userFromDB == null) {
             log.info(String.format("User with email '%s' is not found!", email));
-            return ResponseEntity.ok(APIResponse.error(ConfigStrings.AUTH_LOGIN_NO_SUCH_USER));
+            return ResponseEntity.ok(APIResponse.error(ConfigStrings.AUTH_LOGIN_NO_SUCH_USER.getName()));
         }
         log.info(String.format("User with email '%s' found: %s", email, userFromDB));
 
         if (!isValidPassword(password, userFromDB.getPassword())) {
             log.info(String.format("Wrong password for user with email '%s'!", email));
-            return ResponseEntity.badRequest().body(APIResponse.error(ConfigStrings.AUTH_WRONG_PASSWORD));
+            return ResponseEntity.badRequest().body(APIResponse.error(ConfigStrings.AUTH_WRONG_PASSWORD.getName()));
         }
 
         log.info(String.format("User with email '%s' successfully authenticated.",
@@ -149,7 +149,7 @@ public class UserAuthService {
         if (name == null || name.equals(""))
             errors.put("name", ConfigStrings.AUTH_INVALID_NAME);
 
-        if (password == null || password.length() < ConfigStrings.AUTH_MIN_PASSWORD_LENGTH)
+        if (password == null || password.length() < ConfigStrings.Constants.AUTH_MIN_PASSWORD_LENGTH)
             errors.put("password", ConfigStrings.AUTH_INVALID_PASSWORD_LENGTH);
 
         if (!captchaService.isValidCaptcha(captcha, captchaSecretCode))
@@ -193,7 +193,7 @@ public class UserAuthService {
         if (captchaService.isValidCaptcha(request.getCaptcha(), request.getCaptchaSecret()))
             errors.put("captcha", ConfigStrings.AUTH_INVALID_CAPTCHA);
 
-        if (request.getPassword().length() < ConfigStrings.AUTH_MIN_PASSWORD_LENGTH)
+        if (request.getPassword().length() < ConfigStrings.Constants.AUTH_MIN_PASSWORD_LENGTH)
             errors.put("password", ConfigStrings.AUTH_INVALID_PASSWORD_LENGTH);
 
         if (!errors.isEmpty())

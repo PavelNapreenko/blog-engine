@@ -11,11 +11,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import ru.pnapreenko.blogengine.api.responses.APIResponse;
-import ru.pnapreenko.blogengine.api.utils.ConfigStrings;
 import ru.pnapreenko.blogengine.api.utils.ErrorsValidation;
+import ru.pnapreenko.blogengine.config.ConfigStrings;
 import ru.pnapreenko.blogengine.services.ImageStorageService;
 
-import javax.security.sasl.AuthenticationException;
 import javax.validation.ConstraintViolationException;
 import java.util.HashMap;
 import java.util.Map;
@@ -32,7 +31,7 @@ public class GlobalExceptionHandler {
 
         e.getConstraintViolations()
                 .forEach(constraint -> errors.put(constraint.getPropertyPath().toString(), constraint.getMessage()));
-        return APIResponse.error(ConfigStrings.VALIDATION_MESSAGE, errors);
+        return APIResponse.error(ConfigStrings.VALIDATION_MESSAGE.getName(), errors);
     }
 
     @ExceptionHandler
@@ -40,7 +39,7 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.OK)
     public Object handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
         Map<String, Object> errors = ErrorsValidation.getValidationErrors(e.getBindingResult());
-        return APIResponse.error(ConfigStrings.VALIDATION_MESSAGE, errors);
+        return APIResponse.error(ConfigStrings.VALIDATION_MESSAGE.getName(), errors);
     }
 
     @ExceptionHandler
@@ -69,7 +68,7 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Object handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException e) {
         return APIResponse.error(new HashMap<>() {{
-            put(e.getName(), String.format(ConfigStrings.ERROR_HANDLER_INVALID_OPTION,
+            put(e.getName(), String.format(ConfigStrings.ERROR_HANDLER_INVALID_OPTION.getName(),
                     e.getName(), e.getValue()));
         }});
     }

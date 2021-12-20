@@ -10,7 +10,6 @@ import ru.pnapreenko.blogengine.api.utils.JsonViews;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PostAuthorDTO {
-
     @JsonView({JsonViews.Id.class})
     private int id;
 

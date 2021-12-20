@@ -1,25 +1,31 @@
 package ru.pnapreenko.blogengine.enums;
 
-import ru.pnapreenko.blogengine.api.utils.ConfigStrings;
+import lombok.RequiredArgsConstructor;
+import ru.pnapreenko.blogengine.config.ConfigStrings;
 
+@RequiredArgsConstructor
 public enum PostMode {
-    /** сортировать по дате публикации, выводить сначала новые */
+    /**
+     * сортировать по дате публикации, выводить сначала новые
+     */
     RECENT("recent"),
 
-    /** popular - сортировать по убыванию количества комментариев */
+    /**
+     * popular - сортировать по убыванию количества комментариев
+     */
     POPULAR("popular"),
 
-    /** best - сортировать по убыванию количества лайков */
+    /**
+     * best - сортировать по убыванию количества лайков
+     */
     BEST("best"),
 
-    /** early - сортировать по дате публикации, выводить сначала старые */
+    /**
+     * early - сортировать по дате публикации, выводить сначала старые
+     */
     EARLY("early");
 
     private final String name;
-
-    PostMode(String name) {
-        this.name = name;
-    }
 
     public String getName() {
         return name;
@@ -31,6 +37,6 @@ public enum PostMode {
                 return mode;
             }
         }
-        throw new IllegalArgumentException(String.format(ConfigStrings.POST_NO_SUCH_MODE, name));
+        throw new IllegalArgumentException(String.format(ConfigStrings.POST_NO_SUCH_MODE.getName(), name));
     }
 }

@@ -5,7 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.springframework.lang.Nullable;
-import ru.pnapreenko.blogengine.api.utils.ConfigStrings;
+import ru.pnapreenko.blogengine.config.ConfigStrings;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -18,18 +18,17 @@ import java.util.Set;
 @NoArgsConstructor
 @ToString
 public class NewPostDTO {
-
-    @NotBlank(message = ConfigStrings.FIELD_CANT_BE_BLANK)
-    @Size(message = ConfigStrings.POST_INVALID_TITLE,
-            min = ConfigStrings.POST_TITLE_MIN_LENGTH, max = ConfigStrings.POST_TITLE_MAX_LENGTH)
+    @NotBlank(message = ConfigStrings.Constants.FIELD_CANT_BE_BLANK)
+    @Size(message = ConfigStrings.Constants.POST_INVALID_TITLE,
+            min = ConfigStrings.Constants.POST_TITLE_MIN_LENGTH, max = ConfigStrings.Constants.POST_TITLE_MAX_LENGTH)
     private String title;
 
-    @NotBlank(message = ConfigStrings.FIELD_CANT_BE_BLANK)
-    @Size(message = ConfigStrings.POST_INVALID_TEXT,
-            min = ConfigStrings.POST_TEXT_MIN_LENGTH, max = ConfigStrings.POST_TEXT_MAX_LENGTH)
+    @NotBlank(message = ConfigStrings.Constants.FIELD_CANT_BE_BLANK)
+    @Size(message = ConfigStrings.Constants.POST_INVALID_TEXT,
+            min = ConfigStrings.Constants.POST_TEXT_MIN_LENGTH, max = ConfigStrings.Constants.POST_TEXT_MAX_LENGTH)
     private String text;
 
-    @NotNull(message = ConfigStrings.FIELD_CANT_BE_BLANK)
+    @NotNull(message = ConfigStrings.Constants.FIELD_CANT_BE_BLANK)
     private Boolean active;
 
     @NotNull

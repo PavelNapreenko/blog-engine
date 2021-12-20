@@ -10,6 +10,5 @@ public interface StorageService {
     String store(MultipartFile file);
     Path load(String filename);
     boolean delete(String filename) throws IOException;
-    void deleteAll();
     Path getRootLocation();
 }
