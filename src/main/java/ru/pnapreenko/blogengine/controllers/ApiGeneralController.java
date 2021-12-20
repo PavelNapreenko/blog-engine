@@ -1,6 +1,7 @@
 package ru.pnapreenko.blogengine.controllers;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -18,18 +19,12 @@ import java.security.Principal;
 
 @RestController
 @RequestMapping("/api")
+@RequiredArgsConstructor
 public class ApiGeneralController {
 
     private final AppProperties appProperties;
     private final SettingsService settingsService;
     private final StatisticsService statisticsService;
-
-    public ApiGeneralController(AppProperties appProperties, SettingsService settingsService,
-                                StatisticsService statisticsService) {
-        this.appProperties = appProperties;
-        this.settingsService = settingsService;
-        this.statisticsService = statisticsService;
-    }
 
     @GetMapping("/init")
     public ResponseEntity<?> getBlogProperties() {

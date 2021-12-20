@@ -16,14 +16,14 @@ import javax.validation.Valid;
 import java.security.Principal;
 
 @RestController
-@RequestMapping("/api/moderation")
+@RequestMapping(value = "/api/moderation", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
 public class ApiModerationController {
 
     private final PostsService postsService;
 
     @PreAuthorize("hasAuthority('user:moderate')")
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping()
     public ResponseEntity<?> moderate(@RequestBody @Valid ModerationDTO moderation, Principal principal) {
         return (principal == null) ? UnAuthResponse.getUnAuthResponse() : postsService.updatePostModerationStatus(moderation, principal);
     }

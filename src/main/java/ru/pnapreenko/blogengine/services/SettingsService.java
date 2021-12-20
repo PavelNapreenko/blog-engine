@@ -1,5 +1,6 @@
 package ru.pnapreenko.blogengine.services;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import ru.pnapreenko.blogengine.enums.SettingsCodeAndValue;
@@ -10,17 +11,13 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class SettingsService {
-
     private final SettingsRepository settingsRepository;
-
-    public SettingsService(SettingsRepository settingsRepository) {
-        this.settingsRepository = settingsRepository;
-    }
 
     public ResponseEntity<?> getSettings() {
         Map<String, Boolean> map = settingsRepository.findAll().stream()
-                .collect(Collectors.toMap(s -> s.getCode().getName(), s -> s.getValue().getValue()));
+                .collect(Collectors.toMap(s -> s.getCode().getName(), s -> s.getValue().isValue()));
         return ResponseEntity.ok(new SettingsDTO(
                 map.get(SettingsCodeAndValue.Code.MULTIUSER_MODE.getName()),
                 map.get(SettingsCodeAndValue.Code.POST_PREMODERATION.getName()),
@@ -29,15 +26,15 @@ public class SettingsService {
     }
 
     public boolean isStatsPublic() {
-        return settingsRepository.findByCodeIs(SettingsCodeAndValue.Code.STATISTICS_IS_PUBLIC).getValue().getValue();
+        return settingsRepository.findByCodeIs(SettingsCodeAndValue.Code.STATISTICS_IS_PUBLIC).getValue().isValue();
     }
 
     public boolean isMultiuserMode() {
-        return settingsRepository.findByCodeIs(SettingsCodeAndValue.Code.MULTIUSER_MODE).getValue().getValue();
+        return settingsRepository.findByCodeIs(SettingsCodeAndValue.Code.MULTIUSER_MODE).getValue().isValue();
     }
 
     public boolean isPostPremoderation() {
-        return settingsRepository.findByCodeIs(SettingsCodeAndValue.Code.POST_PREMODERATION).getValue().getValue();
+        return settingsRepository.findByCodeIs(SettingsCodeAndValue.Code.POST_PREMODERATION).getValue().isValue();
     }
 
     public ResponseEntity<?> saveSettings(SettingsDTO settings) {

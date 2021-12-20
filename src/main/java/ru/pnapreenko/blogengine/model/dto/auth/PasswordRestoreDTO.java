@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.ToString;
-import ru.pnapreenko.blogengine.api.utils.ConfigStrings;
+import ru.pnapreenko.blogengine.config.ConfigStrings;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
@@ -13,19 +13,19 @@ import javax.validation.constraints.Size;
 @AllArgsConstructor
 @ToString
 public class PasswordRestoreDTO {
-    @NotBlank(message = ConfigStrings.FIELD_CANT_BE_BLANK)
+    @NotBlank(message = ConfigStrings.Constants.FIELD_CANT_BE_BLANK)
     private final String code;
 
-    @NotBlank(message = ConfigStrings.FIELD_CANT_BE_BLANK)
-    @Size(min = ConfigStrings.AUTH_MIN_PASSWORD_LENGTH,
-            max = ConfigStrings.AUTH_MAX_FIELD_LENGTH,
-            message = ConfigStrings.AUTH_SHORT_PASSWORD)
+    @NotBlank(message = ConfigStrings.Constants.FIELD_CANT_BE_BLANK)
+    @Size(min = ConfigStrings.Constants.AUTH_MIN_PASSWORD_LENGTH,
+            max = ConfigStrings.Constants.AUTH_MAX_FIELD_LENGTH,
+            message = ConfigStrings.Constants.AUTH_SHORT_PASSWORD)
     private final String password;
 
-    @NotBlank(message = ConfigStrings.FIELD_CANT_BE_BLANK)
+    @NotBlank(message = ConfigStrings.Constants.FIELD_CANT_BE_BLANK)
     private final String captcha;
 
     @JsonProperty(value = "captcha_secret")
-    @NotBlank(message = ConfigStrings.FIELD_CANT_BE_BLANK)
+    @NotBlank(message = ConfigStrings.Constants.FIELD_CANT_BE_BLANK)
     private final String captchaSecret;
 }

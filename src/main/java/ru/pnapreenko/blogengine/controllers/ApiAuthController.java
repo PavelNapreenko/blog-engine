@@ -22,53 +22,49 @@ import java.net.UnknownHostException;
 import java.security.Principal;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping(value = "/api/auth", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
 public class ApiAuthController {
 
     private final UserAuthService userAuthService;
 
     @PostMapping(value = "/register",
-            consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE)
+            consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> registerUser(@RequestBody @Valid NewUserDTO user, Errors error) {
         return userAuthService.registerUser(user, error);
     }
 
     @PostMapping(value = "/login",
-            consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE)
+            consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> login(@RequestBody @Valid UserUnAuthDTO user, Errors error) {
         return userAuthService.loginUser(user, error);
     }
 
-    @GetMapping(value = "/check", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping("/check")
     public ResponseEntity<?> checkAuthUser(Principal principal) {
         return userAuthService.getCheckedUser(principal);
     }
 
     @PreAuthorize("hasAuthority('user:write')")
-    @GetMapping(value = "/logout", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping("/logout")
     public ResponseEntity<?> logoutUser(Principal principal) {
         return (principal == null) ? UnAuthResponse.getUnAuthResponse() : userAuthService.logoutUser();
     }
 
-    @GetMapping(value = "/captcha", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping("/captcha")
     @JsonView(JsonViews.Name.class)
     public ResponseEntity<?> getCaptcha() throws IOException {
         return userAuthService.getCaptcha();
     }
 
     @PostMapping(value = "/restore",
-            consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE)
+            consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> restoreUserPassword(@RequestBody @Valid EmailDTO email, Errors errors) throws MessagingException, UnknownHostException {
         return userAuthService.restoreUserPassword(email, errors);
     }
 
     @PostMapping(value = "/password",
-            consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE)
+            consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> resetUserPassword(@RequestBody @Valid PasswordRestoreDTO request,
                                                Errors errors) {
         return userAuthService.resetUserPassword(request, errors);

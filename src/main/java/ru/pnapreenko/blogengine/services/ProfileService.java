@@ -6,7 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.pnapreenko.blogengine.api.responses.APIResponse;
-import ru.pnapreenko.blogengine.api.utils.ConfigStrings;
+import ru.pnapreenko.blogengine.config.ConfigStrings;
 import ru.pnapreenko.blogengine.model.User;
 import ru.pnapreenko.blogengine.model.dto.ProfileDTO;
 import ru.pnapreenko.blogengine.repositories.UsersRepository;
@@ -36,17 +36,13 @@ public class ProfileService {
         final String email = profileData.getEmail();
         final String password = profileData.getPassword();
 
-        if (photo != null) {
-            if (!photo.isBlank() && !photo.equals(user.getPhoto())) {
-                user.setPhoto(photo);
-            }
+        if (photo != null && (!photo.isBlank() && !photo.equals(user.getPhoto()))) {
+            user.setPhoto(photo);
         }
 
-        if (removePhoto) {
-            if (user.getPhoto() != null) {
-                storageService.delete(user.getPhoto());
-                user.setPhoto(null);
-            }
+        if (removePhoto && user.getPhoto() != null) {
+            storageService.delete(user.getPhoto());
+            user.setPhoto(null);
         }
 
         if (!name.isBlank() && !name.equals(user.getName())) {
@@ -57,10 +53,8 @@ public class ProfileService {
             user.setEmail(email);
         }
 
-        if (password != null) {
-            if (!password.isBlank()) {
-                user.setPassword(passwordEncoder.encode(password));
-            }
+        if (password != null && !password.isBlank()) {
+            user.setPassword(passwordEncoder.encode(password));
         }
 
         User savedUser = usersRepository.save(user);
@@ -78,28 +72,28 @@ public class ProfileService {
         final String password = profile.getPassword();
 
         if (name == null || name.isBlank() ||
-                !(name.length() >= ConfigStrings.AUTH_MIN_NAME_LENGTH &&
-                        name.length() <= ConfigStrings.AUTH_MAX_FIELD_LENGTH)) {
-            errors.put("name", ConfigStrings.AUTH_WRONG_NAME);
+                !(name.length() >= ConfigStrings.Constants.AUTH_MIN_NAME_LENGTH &&
+                        name.length() <= ConfigStrings.Constants.AUTH_MAX_FIELD_LENGTH)) {
+            errors.put("name", ConfigStrings.AUTH_WRONG_NAME.getName());
         }
 
         if (email == null || email.isBlank() || !EmailValidator.getInstance()
                 .isValid(email)) {
-            errors.put("email", ConfigStrings.AUTH_INVALID_EMAIL);
+            errors.put("email", ConfigStrings.Constants.AUTH_INVALID_EMAIL);
         } else if (!errors.containsKey("email") &&
                 usersRepository.findByEmail(email) != null &&
                 !user.getEmail().equals(email)
         ) {
-            errors.put("email", ConfigStrings.AUTH_EMAIL_ALREADY_REGISTERED);
+            errors.put("email", ConfigStrings.AUTH_EMAIL_ALREADY_REGISTERED.getName());
         }
 
-        if (password != null) {
-            if (!password.isBlank() &&
-                    !(password.length() >= ConfigStrings.AUTH_MIN_PASSWORD_LENGTH &&
-                            password.length() <= ConfigStrings.AUTH_MAX_FIELD_LENGTH
-                    )) {
-                errors.put("password", ConfigStrings.AUTH_INVALID_PASSWORD_LENGTH);
-            }
+        if (password != null
+                && (!password.isBlank() &&
+                !(password.length() >= ConfigStrings.Constants.AUTH_MIN_PASSWORD_LENGTH &&
+                        password.length() <= ConfigStrings.Constants.AUTH_MAX_FIELD_LENGTH
+                ))) {
+            errors.put("password", ConfigStrings.AUTH_INVALID_PASSWORD_LENGTH.getName());
+
         }
         return errors;
     }

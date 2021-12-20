@@ -2,6 +2,7 @@ package ru.pnapreenko.blogengine.controllers;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -11,13 +12,13 @@ import ru.pnapreenko.blogengine.model.dto.CalendarDTO;
 import ru.pnapreenko.blogengine.services.CalendarService;
 
 @RestController
-@RequestMapping("/api/calendar")
+@RequestMapping(value = "/api/calendar", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
 public class ApiCalendarController {
 
     private final CalendarService calendarService;
 
-    @GetMapping(value = "", produces = "application/json")
+    @GetMapping("")
     @JsonView(JsonViews.IdName.class)
     public CalendarDTO getCalendar(
             @RequestParam(name = "year") String year) {

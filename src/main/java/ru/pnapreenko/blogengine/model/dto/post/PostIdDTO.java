@@ -16,7 +16,6 @@ import java.util.List;
 @AllArgsConstructor
 public class PostIdDTO {
 
-
     @JsonView({JsonViews.IdName.class, JsonViews.EntityId.class})
     private int id;
 

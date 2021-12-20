@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import ru.pnapreenko.blogengine.api.responses.APIResponse;
-import ru.pnapreenko.blogengine.api.utils.ConfigStrings;
+import ru.pnapreenko.blogengine.config.ConfigStrings;
 import ru.pnapreenko.blogengine.model.Post;
 import ru.pnapreenko.blogengine.model.PostComment;
 import ru.pnapreenko.blogengine.model.User;
@@ -31,8 +31,8 @@ public class CommentsService {
         String text = comment.getText();
         if (post.isEmpty()) {
             return ResponseEntity.badRequest().body(
-                    APIResponse.error(ConfigStrings.WRONG_POST_ID, new HashMap<>() {{
-                        put("post_id", ConfigStrings.WRONG_POST_ID);
+                    APIResponse.error(ConfigStrings.WRONG_POST_ID.getName(), new HashMap<>() {{
+                        put("post_id", ConfigStrings.WRONG_POST_ID.getName());
                     }})
             );
         }
@@ -42,8 +42,8 @@ public class CommentsService {
 
             if (parentComment.isEmpty() || (!postComments.isEmpty() && !postComments.contains(parentComment.get()))) {
                 return ResponseEntity.badRequest().body(
-                        APIResponse.error(ConfigStrings.COMMENT_WRONG_PARENT_ID, new HashMap<>() {{
-                            put("parent_id", ConfigStrings.COMMENT_WRONG_PARENT_ID);
+                        APIResponse.error(ConfigStrings.COMMENT_WRONG_PARENT_ID.getName(), new HashMap<>() {{
+                            put("parent_id", ConfigStrings.COMMENT_WRONG_PARENT_ID.getName());
                         }})
                 );
             }

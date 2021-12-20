@@ -2,14 +2,13 @@ package ru.pnapreenko.blogengine.services;
 
 import lombok.Getter;
 import org.springframework.stereotype.Service;
-import org.springframework.util.FileSystemUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 import ru.pnapreenko.blogengine.api.interfaces.StorageService;
-import ru.pnapreenko.blogengine.api.utils.ConfigStrings;
 import ru.pnapreenko.blogengine.api.utils.ImageResizer;
+import ru.pnapreenko.blogengine.config.ConfigStrings;
 import ru.pnapreenko.blogengine.config.ImageStorageProperties;
 
 import java.io.File;
@@ -53,17 +52,18 @@ public class ImageStorageService implements StorageService {
         final Pattern FILE_PATTERN = Pattern.compile("^(.*)(.)(png|jpe?g|PNG|JPE?G)$");
 
         if (file.isEmpty()) {
-            throw new StorageException(ConfigStrings.IMAGE_EMPTY_NOT_SAVE + filename);
+            throw new StorageException(ConfigStrings.IMAGE_EMPTY_NOT_SAVE.getName() + filename);
         }
         if (file.getSize() > maxFileSize) {
-            throw new StorageException(ConfigStrings.IMAGE_EXCEEDS_ALLOWED_SIZE);
+            throw new StorageException(ConfigStrings.IMAGE_EXCEEDS_ALLOWED_SIZE.getName());
         }
         if (filename.contains("..")) {
-            throw new StorageException(ConfigStrings.IMAGE_NOT_SAVE_WITH_EXTERNAL_PATH + filename);
+            throw new StorageException(ConfigStrings.IMAGE_NOT_SAVE_WITH_EXTERNAL_PATH.getName() + filename);
         }
         if (!FILE_PATTERN.matcher(fileType).matches()) {
-            throw new StorageException(ConfigStrings.IMAGE_WITH_INVALID_TYPE + filename);
+            throw new StorageException(ConfigStrings.IMAGE_WITH_INVALID_TYPE.getName() + filename);
         }
+
         try (InputStream inputStream = file.getInputStream()) {
             Files.createDirectories(fullUploadPath);
             Files.copy(inputStream, fullFilePath,
@@ -95,11 +95,6 @@ public class ImageStorageService implements StorageService {
         }
         deleteFolder(rootLocation.toString());
         return result;
-    }
-
-    @Override
-    public void deleteAll() {
-        FileSystemUtils.deleteRecursively(rootLocation.toFile());
     }
 
     public static class StorageException extends RuntimeException {

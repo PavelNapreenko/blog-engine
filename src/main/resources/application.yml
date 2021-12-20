@@ -2,7 +2,7 @@ spring:
   autoconfigure:
     exclude: org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
   profiles:
-    active: ${PROFILE_ACTIVE:prod}
+    active: ${PROFILE_ACTIVE:dev}
 
 blogapp:
   properties:
@@ -20,7 +20,9 @@ blogapp:
     code-length: 6
     code-ttl: 1
   upload-dir:
-      location: ${IMAGES_UPLOAD_DIR:upload}
+    location: ${IMAGES_UPLOAD_DIR:upload}
+  external-service: ${APPLICATION_EXTERNAL_SERVICE:https://napreenko-java-skillbox.herokuapp.com}
 
-server.port: ${PORT:8090}
+server:
+  port: ${PORT:8090}
 

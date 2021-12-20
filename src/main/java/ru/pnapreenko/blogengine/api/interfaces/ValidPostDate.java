@@ -1,6 +1,6 @@
 package ru.pnapreenko.blogengine.api.interfaces;
 
-import ru.pnapreenko.blogengine.api.utils.ConfigStrings;
+import ru.pnapreenko.blogengine.config.ConfigStrings;
 
 import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;
@@ -9,12 +9,12 @@ import javax.validation.Payload;
 import java.lang.annotation.*;
 import java.time.Instant;
 
-@Target({ ElementType.METHOD, ElementType.FIELD, ElementType.ANNOTATION_TYPE })
+@Target({ElementType.METHOD, ElementType.FIELD, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = ValidPostDate.PostDateValidator.class)
 @Documented
 public @interface ValidPostDate {
-    String message() default ConfigStrings.NEW_POST_INVALID_DATE;
+    String message() default ConfigStrings.Constants.NEW_POST_INVALID_DATE;
 
     Class<?>[] groups() default {};
 

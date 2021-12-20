@@ -16,15 +16,16 @@ import javax.validation.Valid;
 import java.security.Principal;
 
 @RestController
-@RequestMapping("/api/comment")
+@RequestMapping(value = "/api/comment",
+        consumes = MediaType.APPLICATION_JSON_VALUE,
+        produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
 public class ApiCommentController {
 
     private final CommentsService commentsService;
 
     @PreAuthorize("hasAuthority('user:write')")
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping("")
     public ResponseEntity<?> addComment(@Valid @RequestBody NewCommentDTO comment, Principal principal) {
         return (principal == null) ? UnAuthResponse.getUnAuthResponse() : commentsService.addComment(comment, principal);
     }

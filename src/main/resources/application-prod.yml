@@ -22,7 +22,9 @@ spring:
         enable_lazy_load_no_trans: true
   logging:
     level:
-      org.springframework: INFO
+      org:
+        hibernate: ERROR
+        cache: ERROR
   mail:
     host: ${MAIL_HOST:smtp.mail.ru}
     username: ${MAIL_USERNAME:sender.sender.sender.sender@mail.ru}

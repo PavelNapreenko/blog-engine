@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.pnapreenko.blogengine.api.responses.APIResponse;
 import ru.pnapreenko.blogengine.api.responses.UnAuthResponse;
-import ru.pnapreenko.blogengine.api.utils.ConfigStrings;
+import ru.pnapreenko.blogengine.config.ConfigStrings;
 import ru.pnapreenko.blogengine.model.User;
 import ru.pnapreenko.blogengine.model.dto.ProfileDTO;
 import ru.pnapreenko.blogengine.services.ImageStorageService;
@@ -19,7 +19,8 @@ import java.io.IOException;
 import java.security.Principal;
 
 @RestController
-@RequestMapping("/api/profile/my")
+@RequestMapping(value = "/api/profile/my",
+        produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
 public class ApiProfileController {
 
@@ -28,9 +29,7 @@ public class ApiProfileController {
     private final ImageStorageService storageService;
 
     @PreAuthorize("hasAuthority('user:write')")
-    @PostMapping(
-            consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> updateProfileWithPhoto(@RequestParam("photo") MultipartFile photo,
                                                     @RequestParam("removePhoto") boolean removePhoto,
                                                     @RequestParam("name") String name,
@@ -40,8 +39,8 @@ public class ApiProfileController {
         if (principal == null) {
             return UnAuthResponse.getUnAuthResponse();
         }
-        int photoWidth = ConfigStrings.PHOTO_MAX_WIDTH;
-        int photoHeight = ConfigStrings.PHOTO_MAX_HEIGHT;
+        int photoWidth = ConfigStrings.ConfigNumbers.PHOTO_MAX_WIDTH.getNumber();
+        int photoHeight = ConfigStrings.ConfigNumbers.PHOTO_MAX_HEIGHT.getNumber();
 
         User user = userAuthService.getUserFromDB(principal.getName());
         if (user.getPhoto() != null) {
@@ -58,9 +57,7 @@ public class ApiProfileController {
     }
 
     @PreAuthorize("hasAuthority('user:write')")
-    @PostMapping(
-            consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> updateProfile(@RequestBody ProfileDTO profileData, Principal principal) throws IOException {
         if (principal == null) {
             return ResponseEntity.ok(APIResponse.error());

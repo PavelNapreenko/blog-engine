@@ -1,6 +1,6 @@
 package ru.pnapreenko.blogengine.api.interfaces;
 
-import ru.pnapreenko.blogengine.api.utils.ConfigStrings;
+import ru.pnapreenko.blogengine.config.ConfigStrings;
 import ru.pnapreenko.blogengine.enums.ModerationDecision;
 
 import javax.validation.Constraint;
@@ -9,13 +9,13 @@ import javax.validation.ConstraintValidatorContext;
 import javax.validation.Payload;
 import java.lang.annotation.*;
 
-@Target({ ElementType.METHOD, ElementType.FIELD, ElementType.ANNOTATION_TYPE })
+@Target({ElementType.METHOD, ElementType.FIELD, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = ValidModerationDecision.ModerationDecisionValidator.class)
 @Documented
 public @interface ValidModerationDecision {
 
-    String message() default ConfigStrings.MODERATION_WRONG_DECISION;
+    String message() default ConfigStrings.Constants.MODERATION_WRONG_DECISION;
 
     Class<?>[] groups() default {};
 

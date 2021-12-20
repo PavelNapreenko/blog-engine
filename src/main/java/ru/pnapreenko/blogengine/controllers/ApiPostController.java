@@ -26,7 +26,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @Controller
-@RequestMapping("/api/post")
+@RequestMapping(value = "/api/post", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
 public class ApiPostController {
 
@@ -34,7 +34,7 @@ public class ApiPostController {
     private final PostsRepository postsRepository;
     private final PostVotesService postVotesService;
 
-    @GetMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping()
     @JsonView(JsonViews.IdName.class)
     public ResponseEntity<?> getPosts(
             @RequestParam(name = "offset") int offset,
@@ -43,7 +43,7 @@ public class ApiPostController {
         return postsService.getPosts(offset, limit, mode);
     }
 
-    @GetMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping("/search")
     @JsonView(JsonViews.IdName.class)
     public ResponseEntity<?> searchPosts(
             @RequestParam(name = "offset") int offset,
@@ -52,7 +52,7 @@ public class ApiPostController {
         return postsService.searchPosts(offset, limit, query);
     }
 
-    @GetMapping(value = "/byDate", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping("/byDate")
     @JsonView(JsonViews.IdName.class)
     public ResponseEntity<?> searchByDate(
             @RequestParam(name = "offset") int offset,
@@ -61,7 +61,7 @@ public class ApiPostController {
         return postsService.searchByDate(offset, limit, date);
     }
 
-    @GetMapping(value = "/byTag", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping("/byTag")
     @JsonView(JsonViews.IdName.class)
     public ResponseEntity<?> searchByTag(
             @RequestParam(name = "offset") int offset,
@@ -70,14 +70,14 @@ public class ApiPostController {
         return postsService.searchByTag(offset, limit, tagName);
     }
 
-    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping("/{id}")
     @JsonView(JsonViews.EntityIdName.class)
     public ResponseEntity<?> searchPosts(@PathVariable int id, Principal principal) {
         return postsService.getPost(id, principal);
     }
 
     @PreAuthorize("hasAuthority('user:moderate')")
-    @GetMapping(value = "/moderation", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping("/moderation")
     @JsonView(JsonViews.IdName.class)
     public ResponseEntity<?> getModeratedPosts(
             @RequestParam(name = "offset") int offset,
@@ -89,7 +89,7 @@ public class ApiPostController {
     }
 
     @PreAuthorize("hasAuthority('user:write')")
-    @GetMapping(value = "/my", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping("/my")
     @JsonView(JsonViews.IdName.class)
     public ResponseEntity<?> getMyPosts(
             @RequestParam(name = "offset") int offset,
@@ -102,16 +102,14 @@ public class ApiPostController {
 
     @PreAuthorize("hasAuthority('user:write')")
     @PostMapping(value = "",
-            consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE)
+            consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> saveNewPost(@RequestBody @Valid NewPostDTO newPost, Errors errors, Principal principal) {
         return (principal == null) ? UnAuthResponse.getUnAuthResponse() : postsService.savePost(null, newPost, errors, principal);
     }
 
     @PreAuthorize("hasAuthority('user:write')")
     @PutMapping(value = "/{id:[1-9]\\d*}",
-            consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE)
+            consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> editPost(@PathVariable int id,
                                       @RequestBody @Valid NewPostDTO newPostData, Errors errors, Principal principal) {
         Optional<Post> postOptional = postsRepository.findById(id);
@@ -123,8 +121,7 @@ public class ApiPostController {
 
     @PreAuthorize("hasAuthority('user:write')")
     @PostMapping(value = "/{voteType:(?:dis)?like}",
-            consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE)
+            consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> vote(@PathVariable(value = "voteType") String voteType,
                                   @RequestBody Map<String, Integer> payload, Principal principal) {
         Integer postId = payload.getOrDefault("post_id", 0);

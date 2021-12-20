@@ -2,6 +2,7 @@ package ru.pnapreenko.blogengine.controllers;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,13 +12,14 @@ import ru.pnapreenko.blogengine.api.utils.JsonViews;
 import ru.pnapreenko.blogengine.services.TagsService;
 
 @RestController
-@RequestMapping("/api/tag")
+@RequestMapping(value = "/api/tag", produces = MediaType.APPLICATION_JSON_VALUE)
+
 @RequiredArgsConstructor
 public class ApiTagController {
 
     private final TagsService tagsService;
 
-    @GetMapping(produces = "application/json")
+    @GetMapping()
     @JsonView(JsonViews.IdName.class)
     public ResponseEntity<?> getTags(
             @RequestParam(name="query", required = false) String query) {

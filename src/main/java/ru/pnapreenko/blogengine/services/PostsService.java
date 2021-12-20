@@ -9,7 +9,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.Errors;
 import ru.pnapreenko.blogengine.api.responses.APIResponse;
-import ru.pnapreenko.blogengine.api.utils.*;
+import ru.pnapreenko.blogengine.api.utils.CommentDTOConverter;
+import ru.pnapreenko.blogengine.api.utils.DateUtils;
+import ru.pnapreenko.blogengine.api.utils.ErrorsValidation;
+import ru.pnapreenko.blogengine.api.utils.PostDTOConverter;
+import ru.pnapreenko.blogengine.config.ConfigStrings;
 import ru.pnapreenko.blogengine.enums.ModerationDecision;
 import ru.pnapreenko.blogengine.enums.ModerationStatus;
 import ru.pnapreenko.blogengine.enums.MyPostsStatus;
@@ -79,7 +83,7 @@ public class PostsService {
         Optional<Post> postOptional = postsRepository.findById(id);
         if (postOptional.isEmpty())
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                    APIResponse.error(String.format(ConfigStrings.POST_NOT_FOUND, id))
+                    APIResponse.error(String.format(ConfigStrings.POST_NOT_FOUND.getName(), id))
             );
         Post post = postOptional.get();
 
@@ -99,8 +103,8 @@ public class PostsService {
     }
 
     public ResponseEntity<?> searchPosts(int offset, int limit, String query) {
-        if (query == null || query.length() < ConfigStrings.POST_MIN_QUERY_LENGTH) {
-            return ResponseEntity.badRequest().body(APIResponse.error(ConfigStrings.POST_INVALID_QUERY));
+        if (query == null || query.length() < ConfigStrings.ConfigNumbers.POST_MIN_QUERY_LENGTH.getNumber()) {
+            return ResponseEntity.badRequest().body(APIResponse.error(ConfigStrings.POST_INVALID_QUERY.getName()));
         }
         return ResponseEntity.ok(new ListPostsDTO(getPageWithPostDTO(postsRepository.findAllBySearchQuery(Instant.now(), query,
                 getPageable(offset, limit)))));
@@ -108,7 +112,7 @@ public class PostsService {
 
     public ResponseEntity<?> searchByDate(int offset, int limit, String date) {
         if (!DateUtils.isValidDate(date)) {
-            return ResponseEntity.badRequest().body(APIResponse.error(ConfigStrings.POST_INVALID_DATE));
+            return ResponseEntity.badRequest().body(APIResponse.error(ConfigStrings.POST_INVALID_DATE.getName()));
         }
         return ResponseEntity.ok(new ListPostsDTO(getPageWithPostDTO(postsRepository.findAllByDate(Instant.now(), date,
                 getPageable(offset, limit)))));
@@ -118,7 +122,7 @@ public class PostsService {
         Tag tag = tagsRepository.findByNameIgnoreCase(tagName);
         if (tag == null)
             return ResponseEntity.badRequest().body(
-                    APIResponse.error(String.format(ConfigStrings.POST_INVALID_TAG, tagName))
+                    APIResponse.error(String.format(ConfigStrings.POST_INVALID_TAG.getName(), tagName))
             );
         return ResponseEntity.ok(new ListPostsDTO(getPageWithPostDTO(postsRepository.findAllByTag(Instant.now(), tag, getPageable(offset, limit)))));
     }
@@ -155,12 +159,11 @@ public class PostsService {
         postToSave.setAuthor((postToSave.getId() == 0) ? editor : postToSave.getAuthor());
 
         boolean isPostPremoderation = settingsService.isPostPremoderation();
-        if (isPostPremoderation) {
-            if ((post == null) || (editor.equals(postToSave.getAuthor()) && !editor.isModerator())) {
-                postToSave.setModerationStatus(ModerationStatus.NEW);
-            }
+
+        if (isPostPremoderation && ((post == null) || (editor.equals(postToSave.getAuthor()) && !editor.isModerator()))) {
+            postToSave.setModerationStatus(ModerationStatus.NEW);
         }
-        if ((!isPostPremoderation && postToSave.isActive()) || editor.isModerator()) {
+        if ((!isPostPremoderation && (postToSave.isActive()) || editor.isModerator())) {
             postToSave.setModerationStatus(ModerationStatus.ACCEPTED);
         }
         if (!postToSave.isActive()) {
@@ -176,7 +179,7 @@ public class PostsService {
         final Optional<Post> postOptional = postsRepository.findById(moderation.getPostId());
         if (postOptional.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                    APIResponse.error(String.format(ConfigStrings.POST_NOT_FOUND, moderation.getPostId()))
+                    APIResponse.error(String.format(ConfigStrings.POST_NOT_FOUND.getName(), moderation.getPostId()))
             );
         }
         final Post post = postOptional.get();
@@ -184,8 +187,7 @@ public class PostsService {
         final User postModerator = post.getModeratedBy();
         if (postModerator != null && !postModerator.equals(moderator)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
-                    APIResponse.error(ConfigStrings.MODERATION_INVALID_POST)
-            );
+                    APIResponse.error(ConfigStrings.MODERATION_INVALID_POST.getName()));
         }
 
         ModerationStatus status = (decision == ModerationDecision.ACCEPT)
@@ -216,11 +218,11 @@ public class PostsService {
         if (validationErrors.hasErrors()) {
             return ErrorsValidation.getValidationErrors(validationErrors);
         }
-        if (title == null || title.length() < ConfigStrings.POST_NEW_TITLE_MIN_LENGTH) {
-            errors.put("title", ConfigStrings.POST_INVALID_NEW_TITLE);
+        if (title == null || title.length() < ConfigStrings.ConfigNumbers.POST_NEW_TITLE_MIN_LENGTH.getNumber()) {
+            errors.put("title", ConfigStrings.POST_INVALID_NEW_TITLE.getName());
         }
-        if (text == null || text.length() < ConfigStrings.POST_NEW_TEXT_MIN_LENGTH) {
-            errors.put("text", ConfigStrings.POST_INVALID_NEW_TEXT);
+        if (text == null || text.length() < ConfigStrings.ConfigNumbers.POST_NEW_TEXT_MIN_LENGTH.getNumber()) {
+            errors.put("text", ConfigStrings.POST_INVALID_NEW_TEXT.getName());
         }
         return errors;
     }
