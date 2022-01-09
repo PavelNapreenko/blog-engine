@@ -5,9 +5,11 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 import org.hibernate.annotations.NaturalId;
+import org.hibernate.annotations.Cache;
 import ru.pnapreenko.blogengine.api.utils.JsonViews;
 import ru.pnapreenko.blogengine.enums.Role;
 
@@ -21,6 +23,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
+@Cacheable
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @Table(name = "users")
 @Data
 @NoArgsConstructor(force = true)
@@ -61,19 +65,23 @@ public class User extends AbstractEntity {
     private String photo;
 
     @NotNull
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @OneToMany(mappedBy = "author", fetch = FetchType.LAZY, orphanRemoval = true)
     private final Set<Post> posts = new HashSet<>();
 
     @NotNull
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @OneToMany(mappedBy = "moderatedBy", fetch = FetchType.LAZY, orphanRemoval = true)
     @LazyCollection(LazyCollectionOption.EXTRA)
     private final Set<Post> moderatedPosts = new HashSet<>();
 
     @NotNull
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, orphanRemoval = true)
     private final Set<PostComment> comments = new HashSet<>();
 
     @NotNull
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, orphanRemoval = true)
     private final Set<PostVote> votes = new HashSet<>();
 

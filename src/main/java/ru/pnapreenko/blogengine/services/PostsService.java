@@ -24,17 +24,12 @@ import ru.pnapreenko.blogengine.model.Tag;
 import ru.pnapreenko.blogengine.model.User;
 import ru.pnapreenko.blogengine.model.dto.ModerationDTO;
 import ru.pnapreenko.blogengine.model.dto.post.*;
-import ru.pnapreenko.blogengine.repositories.CommentsRepository;
 import ru.pnapreenko.blogengine.repositories.PostsRepository;
 import ru.pnapreenko.blogengine.repositories.TagsRepository;
-import ru.pnapreenko.blogengine.repositories.VotesRepository;
 
 import java.security.Principal;
 import java.time.Instant;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -42,15 +37,13 @@ import java.util.stream.Collectors;
 public class PostsService {
     private final PostsRepository postsRepository;
     private final TagsRepository tagsRepository;
-    private final VotesRepository votesRepository;
-    private final CommentsRepository commentsRepository;
     private final UserAuthService userAuthService;
     private final SettingsService settingsService;
 
     public ResponseEntity<?> getPosts(int offset, int limit, String postMode) {
         final Instant now = Instant.now();
         final PostMode mode;
-        Page<PostDTO> posts = getAllActivePosts(now, offset, limit);
+        Page<PostDTO> posts = getPageWithPostDTO(postsRepository.findAllOrderByTimeLessThen_Desc(now, getPageable(offset, limit)));
 
         try {
             mode = PostMode.getByName(postMode);
@@ -199,10 +192,6 @@ public class PostsService {
         return ResponseEntity.ok(APIResponse.ok());
     }
 
-    private Page<PostDTO> getAllActivePosts(Instant now, int offset, int limit) {
-        return getPageWithPostDTO(postsRepository.findAllOrderByTimeLessThen_Desc(now, getPageable(offset, limit)));
-    }
-
     private Pageable getPageable(int offset, int limit) {
         return PageRequest.of(offset / limit, limit);
     }
@@ -227,18 +216,24 @@ public class PostsService {
         return errors;
     }
 
-    private List<PostCommentDTO> getPostIdComments(List<PostComment> source) {
-        return source.stream().map(CommentDTOConverter::getConversion).collect(Collectors.toList());
-    }
-
     private PostIdDTO getPostIdDTO(Post post) {
         PostIdDTO postIdDTO = new PostIdDTO(post);
+        List<PostCommentDTO> comments = getPostIdComments(new ArrayList<>(post.getComments()));
+        List<String> tagsNames = new ArrayList<>();
+
+        for (Tag tag : post.getTags()) {
+            tagsNames.add(tag.getName());
+        }
+
         postIdDTO.setTimestamp(post.getTime().getEpochSecond());
-        postIdDTO.setLikeCount(votesRepository.findByPostAndValue(post, (byte) 1).size());
-        postIdDTO.setDislikeCount(votesRepository.findByPostAndValue(post, (byte) -1).size());
-        postIdDTO.setTags(tagsRepository.findTagNamesUsingPost(post));
-        List<PostCommentDTO> comments = getPostIdComments(commentsRepository.findByPost(post));
+        postIdDTO.setLikeCount(post.getVotes().stream().filter(postVote -> postVote.getValue() > 0).count());
+        postIdDTO.setDislikeCount(post.getVotes().stream().filter(postVote -> postVote.getValue() < 0).count());
         postIdDTO.setComments(comments);
+        postIdDTO.setTags(tagsNames);
         return postIdDTO;
+    }
+
+    private List<PostCommentDTO> getPostIdComments(List<PostComment> source) {
+        return source.stream().map(CommentDTOConverter::getConversion).collect(Collectors.toList());
     }
 }

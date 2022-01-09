@@ -5,11 +5,16 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.time.Instant;
 
 @Entity
+@Cacheable
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @Table(name = "post_votes")
 @Data
 @NoArgsConstructor(force = true)
@@ -21,18 +26,15 @@ public class PostVote extends AbstractEntity {
         this.post = post;
     }
 
-    public PostVote(@NotNull User user, @NotNull Post post, @NotNull Instant time) {
-        this(user, post);
-        this.time = time;
-    }
-
     @NotNull
-    @ManyToOne(cascade = CascadeType.MERGE, optional = false)
+    @Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
+    @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @NotNull
-    @ManyToOne(cascade = CascadeType.MERGE, optional = false)
+    @Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
+    @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "post_id", nullable = false)
     private Post post;
 
