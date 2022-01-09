@@ -4,8 +4,10 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
+import org.hibernate.annotations.Cache;
 import ru.pnapreenko.blogengine.enums.ModerationStatus;
 
 import javax.persistence.*;
@@ -17,6 +19,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
+@Cacheable
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @Table(name = "posts")
 @Data
 @NoArgsConstructor(force = true)
@@ -32,12 +36,14 @@ public class Post extends AbstractEntity {
     @Column(name = "moderation_status", length = 10, nullable = false)
     private ModerationStatus moderationStatus = ModerationStatus.NEW;
 
+    @Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
     @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "moderator_id")
     private User moderatedBy;
 
     @NotNull
-    @ManyToOne(cascade = CascadeType.MERGE, optional = false)
+    @Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
+    @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id")
     private User author;
 
@@ -58,6 +64,7 @@ public class Post extends AbstractEntity {
     private int viewCount;
 
     @NotNull
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
     @JoinTable(name = "tag2post",
             joinColumns = @JoinColumn(name = "post_id"),
@@ -66,11 +73,13 @@ public class Post extends AbstractEntity {
     private Set<Tag> tags = new HashSet<>();
 
     @NotNull
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @OneToMany(mappedBy = "post", fetch = FetchType.LAZY, orphanRemoval = true)
     @LazyCollection(LazyCollectionOption.EXTRA)
     private final Set<PostVote> votes = new HashSet<>();
 
     @NotNull
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @OneToMany(mappedBy = "post", fetch = FetchType.LAZY, orphanRemoval = true)
     @LazyCollection(LazyCollectionOption.EXTRA)
     private final Set<PostComment> comments = new HashSet<>();

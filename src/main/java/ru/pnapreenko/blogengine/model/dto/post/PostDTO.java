@@ -49,9 +49,6 @@ public class PostDTO implements Comparable<PostDTO> {
     private long dislikeCount;
 
     @JsonView(JsonViews.EntityIdName.class)
-    private List<String> tags;
-
-    @JsonView(JsonViews.EntityIdName.class)
     private List<PostComment> comments;
 
     private Instant date;

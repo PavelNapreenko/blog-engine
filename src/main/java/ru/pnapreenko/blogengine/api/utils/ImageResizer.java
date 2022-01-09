@@ -36,7 +36,7 @@ public class ImageResizer {
                 resizeWidth = image.getWidth();
                 resizeHeight = image.getHeight();
             }
-            BufferedImage resizeImage = Scalr.resize(image, resizeWidth, resizeHeight);
+            BufferedImage resizeImage = Scalr.resize(image, Scalr.Method.QUALITY, resizeWidth, resizeHeight);
             File newFile = new File(file.getName());
             ImageIO.write(resizeImage, Objects.requireNonNull(fileEnd), newFile);
             multipartFile = getConversionToMultipartFile(file, newFile);

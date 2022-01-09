@@ -62,6 +62,7 @@ public class PostIdDTO {
         this.dislikeCount = getDislikeCount(post);
         this.date = post.getTime();
         this.comments = new ArrayList<>();
+        this.tags = new ArrayList<>();
     }
 
     private long getLikeCount(Post post) {

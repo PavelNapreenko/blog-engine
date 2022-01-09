@@ -2,7 +2,10 @@ package ru.pnapreenko.blogengine.model;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import lombok.*;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import ru.pnapreenko.blogengine.api.utils.JsonViews;
+
+import org.hibernate.annotations.Cache;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -12,6 +15,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
+@Cacheable
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @Table(name = "post_comments")
 @Data
 @NoArgsConstructor
@@ -24,17 +29,20 @@ public class PostComment extends AbstractEntity {
     private PostComment parentComment;
 
     @NotNull
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @OneToMany(mappedBy = "parentComment", fetch = FetchType.LAZY, orphanRemoval = true)
     private final Set<PostComment> childComments = new HashSet<>();
 
     @NotNull
-    @ManyToOne(cascade = CascadeType.MERGE, optional = false)
+    @Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
+    @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false, updatable = false)
     @JsonView(JsonViews.EntityIdName.class)
     private User user;
 
     @NotNull
-    @ManyToOne(cascade = CascadeType.MERGE, optional = false)
+    @Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
+    @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "post_id", nullable = false, updatable = false)
     private Post post;
 
@@ -46,5 +54,4 @@ public class PostComment extends AbstractEntity {
     @Column(columnDefinition = "TEXT", nullable = false)
     @JsonView(JsonViews.EntityIdName.class)
     private String text;
-
     }

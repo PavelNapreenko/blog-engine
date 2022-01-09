@@ -16,20 +16,20 @@ import java.time.Instant;
 
 @Repository
 public interface PostsRepository extends JpaRepository<Post, Integer> {
-    @Cacheable(cacheNames="postsFindAllOrderByTimeLessThen_Desc", key="#date")
+    @Cacheable(cacheNames="newPosts", key="#date")
     @Query("select p from #{#entityName} p where p.isActive = 1 and p.moderationStatus = 'ACCEPTED' and p.time <= :date order by p.time desc")
     Page<Post> findAllOrderByTimeLessThen_Desc(@Param("date") Instant date, Pageable pageable);
 
-    @Cacheable(cacheNames="postsFindAllAllOrderByTimeLessThen", key="#date")
+    @Cacheable(cacheNames="oldPosts", key="#date")
     @Query("select p from #{#entityName} p where p.isActive = 1 and p.moderationStatus = 'ACCEPTED' and p.time <= :date order by p.time")
     Page<Post> findAllOrderByTimeLessThen(@Param("date") Instant date, Pageable pageable);
 
-    @Cacheable(cacheNames="postsFindAllOrderByVotesDescAndTimeLessThen", key="#date")
+    @Cacheable(cacheNames="bestPosts", key="#date")
     @Query("select p from #{#entityName} p left join p.votes v where p.isActive = 1 and p.moderationStatus = 'ACCEPTED' and p.time <= :date " +
             "group by p.id order by (sum(case when v.value = 1 then 1 else 0 end)) desc")
     Page<Post> findAllOrderByVotesDescAndTimeLessThen(@Param("date") Instant date, Pageable pageable);
 
-    @Cacheable(cacheNames="postsFindAllOrderByVotesDescAndTimeLessThen", key="#date")
+    @Cacheable(cacheNames="popularPosts", key="#date")
     @Query("select p from #{#entityName} p left join p.comments " + "where p.isActive = 1 and p.moderationStatus = 'ACCEPTED' and p.time <= :date " +
             "group by p.id order by size(p.comments) desc")
     Page<Post> findAllOrderByCommentsDecsAndTimeLessThen(@Param("date") Instant date, Pageable pageable);
