@@ -20,22 +20,9 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
         enable_lazy_load_no_trans: true
-        query:
-          plan_cache_max_size: 100
-          plan_parameter_metadata_max_size: 100
         jdbc:
           batch_size: 10
         order_queries: true
-        cache:
-          use_query_cache: true
-          region:
-            factory_class: org.hibernate.cache.ehcache.EhCacheRegionFactory
-          provider_class: org.hibernate.cache.EhCacheProvider
-          use_second_level_cache: true
-          ehcache:
-            missing_cache_strategy: create
-        transaction:
-          manager: lookup.class
 
   logging:
     level:
