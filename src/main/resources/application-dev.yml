@@ -30,7 +30,6 @@ spring:
         springframework: INFO
         hibernate: INFO
         SQL: DEBUG
-        cache: DEBUG
 
 
   mail:
