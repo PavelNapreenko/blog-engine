@@ -43,7 +43,7 @@ public class Post extends AbstractEntity {
 
     @NotNull
     @Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
-    @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(cascade = CascadeType.MERGE, optional = false)
     @JoinColumn(name = "user_id")
     private User author;
 

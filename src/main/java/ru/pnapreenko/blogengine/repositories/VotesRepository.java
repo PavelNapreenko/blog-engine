@@ -11,10 +11,10 @@ import ru.pnapreenko.blogengine.model.User;
 
 @Repository
 public interface VotesRepository extends JpaRepository<PostVote, Integer> {
-    @Cacheable(cacheNames="votesCountByUserAndValue", key = "#user")
+    @Cacheable(cacheNames="votesCount", key = "#user")
     @Query("select count (v) from PostVote v where (:user is null or v.user = :user) and v.value = :value")
     int countByUserAndValue(@Param("user") User user, @Param("value") byte value);
 
-    @Cacheable(cacheNames="votesByUserAndPost")
+    @Cacheable(cacheNames="votes")
     PostVote findByUserAndPost(User user, Post post);
 }
