@@ -35,14 +35,14 @@ public class PostComment extends AbstractEntity {
 
     @NotNull
     @Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
-    @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(cascade = CascadeType.MERGE, optional = false)
     @JoinColumn(name = "user_id", nullable = false, updatable = false)
     @JsonView(JsonViews.EntityIdName.class)
     private User user;
 
     @NotNull
     @Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
-    @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(cascade = CascadeType.MERGE, optional = false)
     @JoinColumn(name = "post_id", nullable = false, updatable = false)
     private Post post;
 

@@ -1,6 +1,7 @@
 package ru.pnapreenko.blogengine.services;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -40,6 +41,7 @@ public class PostsService {
     private final UserAuthService userAuthService;
     private final SettingsService settingsService;
 
+    @Cacheable("posts")
     public ResponseEntity<?> getPosts(int offset, int limit, String postMode) {
         final Instant now = Instant.now();
         final PostMode mode;

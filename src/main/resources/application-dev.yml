@@ -20,9 +20,6 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
         enable_lazy_load_no_trans: true
-        jdbc:
-          batch_size: 10
-        order_queries: true
 
   logging:
     level:

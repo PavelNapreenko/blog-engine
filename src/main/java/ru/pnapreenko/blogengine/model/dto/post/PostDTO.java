@@ -7,11 +7,8 @@ import lombok.NoArgsConstructor;
 import org.jsoup.Jsoup;
 import ru.pnapreenko.blogengine.api.utils.JsonViews;
 import ru.pnapreenko.blogengine.model.Post;
-import ru.pnapreenko.blogengine.model.PostComment;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -48,9 +45,6 @@ public class PostDTO implements Comparable<PostDTO> {
     @JsonView({JsonViews.IdName.class, JsonViews.EntityIdName.class})
     private long dislikeCount;
 
-    @JsonView(JsonViews.EntityIdName.class)
-    private List<PostComment> comments;
-
     private Instant date;
 
     public PostDTO(Post post) {
@@ -65,7 +59,6 @@ public class PostDTO implements Comparable<PostDTO> {
         this.likeCount = getLikeCount(post);
         this.dislikeCount = getDislikeCount(post);
         this.date = post.getTime();
-        this.comments = new ArrayList<>();
     }
 
     @Override
